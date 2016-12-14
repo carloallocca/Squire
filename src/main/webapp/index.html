@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>SPARQL Query Reformulation Tool</title>
+
+    <!-- Bootstrap -->
+    <link href="vendor/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/sqrt.css" rel="stylesheet">
+    
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+    
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            
+            
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="pesto-navbar-right">
+            <span class="sr-only">Toggle navigation</span>
+          </button>
+          <a class="navbar-brand" href="#"><img src="gfx/sqrtLogo.png" style="display:inline; max-height:32px"/> <b>SQUIRE</b> - SPARQL Query Recommendation Tool</a>
+        </div>
+      </div>
+        
+        
+        
+    </nav>  
+
+    <div class="container" role="main">
+      <p>SQUIRE is a Web service that analyses new linked datasets to recommend SPARQL queries similar to those you already use for your dataset.</p>
+    <form class="form" id="mainform">
+    
+    <div class="form-group">
+      <ul class="nav nav-tabs">
+        <label>Source Dataset</label>
+        <li role="presentation" class="active"><a href="#tab1" data-toggle="tab">SPARQL Endpoint</a></li>
+        <li role="presentation"><a href="#tab2" data-toggle="tab">RDF File</a></li>
+      </ul>
+      
+        
+        
+        
+      <div class="tab-content provide-rdf">
+
+        <div class="tab-pane active" id="tab3">
+        
+        </div>
+          
+          
+        <div class="tab-pane active" id="tab1">
+          <div class="input-group">
+            <span class="input-group-addon" id="basic-addon3">URL</span>
+            <input type="text" placeholder="Endpoint of the dataset you can already query" class="form-control" name="src_sparql" value="http://data.open.ac.uk/query" aria-describedby="basic-addon3">
+          </div>
+        </div>
+        <div class="tab-pane" id="tab2">
+          <input type="file"  id="basic-url" aria-describedby="basic-addon3">
+        </div>
+      </div>      
+    </div>
+    
+    <div class="form-group">
+      <label>Source Query</label>
+      <textarea class="form-control" name="qo" placeholder="Enter a SPARQL query that works for the source data..." style="width: 100%; height: 150px;">SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module>. ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/vocab/aiiso/schema#code> ?code . }</textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Weight parameters</label><span style="font-size:0.8em"> - Customise the coefficients used to rank recommendations</span>
+      <div>
+  	    <div class="squire_weight">
+            <span>Result type similarity</span><label id="weight_rts">0.0</label>
+            <input name="weight_rts" type ="range" min ="0" max="5" step ="0.1" value ="1.0"/>
+  	    </div>
+  	    <div class="squire_weight">
+            <span>Result size similarity</span><label id="weight_rss">0.0</label>
+            <input name="weight_rss" type ="range" min ="0" max="5" step ="0.1" value ="1.0"/>
+  	    </div>
+  	    <div class="squire_weight">
+            <span>Query root distance</span><label id="weight_qrd">0.0</label>
+            <input name="weight_qrd" type ="range" min ="0" max="5" step ="0.1" value ="1.0"/>
+  	    </div>
+  	    <div class="squire_weight">
+            <span>Query specificity distance</span><label id="weight_qsd">0.0</label>
+            <input name="weight_qsd" type ="range" min ="0" max="5" step ="0.1" value ="1.0"/>
+  	    </div>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <ul class="nav nav-tabs">
+        <label>Target Dataset</label>
+        <li role="presentation" class="active"><a href="#tab3" data-toggle="tab">SPARQL Endpoint</a></li>
+        <li role="presentation"><a href="#tab4" data-toggle="tab">RDF File</a></li>
+      </ul>
+      
+      <div class="tab-content provide-rdf">
+        <div class="tab-pane active" id="tab3">
+          <div class="input-group">
+            <span class="input-group-addon" id="basic-addon3">URL</span>
+            <input type="text" placeholder="Endpoint of the dataset you want to discover how to query" class="form-control" name="tgt_sparql" value="https://data.ox.ac.uk/sparql/" aria-describedby="basic-addon3"/>
+          </div>
+        </div>
+        <div class="tab-pane" id="tab4">
+          <input type="file"  id="basic-url" aria-describedby="basic-addon3">
+        </div>
+      </div>      
+    </div>
+    <div style="min-height: 50px">
+      
+      Show top <select name="limit">
+      <option value="1">1</option>
+      <option value="5" selected>5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      </select>
+      results
+<div class="progress" style="display:inline-block; margin:0 30px; visibility:hidden; width:300px">
+  <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+    <span class="sr-only">45% Complete</span>
+  </div>
+</div>
+      <button class="btn btn-primary" name="submit" style="float:right">Recommend</button>
+      <button class="btn btn-danger" name="stop" style="display:none; float:right" disabled>Stop</button>
+    </div>
+    </form>
+
+    <div id="notify"></div>    
+    <div class="result-area"></div>
+    </div>
+
+    <script src="vendor/jquery/dist/jquery.min.js"></script>
+    <script src="vendor/bootstrap/dist/js/bootstrap.min.js"></script>
+<!--
+    <script src="vendor/angular/angular.min.js"></script>
+-->    
+    <script type="text/javascript">
+// Our stuff here
+var ujob; // this one will be interruptible.
+var done = true;
+var tdata = [
+  {
+    "query" : "SELECT DISTINCT ?mod ?o\r\nWHERE {\r\n  ?mod a <http://id.southampton.ac.uk/ns/Module> .\r\n  ?mod <http://purl.org/vocab/aiiso/schema#name> ?o\r\n}",
+    "score" : 7.62
+  },{
+    "query" : "SELECT DISTINCT ?mod ?o\r\nWHERE {\r\n  ?mod a <http://id.southampton.ac.uk/ns/Module> .\r\n  ?mod <http://id.southampton.ac.uk/ns/bannerSubject> ?o\r\n}",
+    "score" : 6.66
+  },{
+    "query" : "SELECT DISTINCT ?mod ?o\r\nWHERE {\r\n  ?mod a <http://id.southampton.ac.uk/ns/Module> .\r\n  ?mod <http://id.southampton.ac.uk/ns/bannerModuleCode> ?o\r\n}",
+    "score" : 3.32
+  }
+];
+
+function htmlEntities(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+$('input[type="range"]').on('input change', function () {
+	$('#'+$(this).prop('name')).text($(this).val());
+}).change();
+
+$('button[name="stop"]').click(function(e){
+	e.preventDefault();
+	$('.progress').css('visibility','hidden')
+	 $("#mainform :input").prop("disabled", false);
+	$(this).prop('disabled', true).hide();
+	$('[name="submit"]').prop('disabled', false).show();
+	$.ajax({
+  	  'url'      : ujob,
+  	  'dataType' : 'json',
+      'method'   : 'DELETE',
+  	  'success'  : function(data,status,xhr){
+  	  }
+	})
+	done = true;
+});
+
+$('button[name="submit"]').click(function(e){
+  e.preventDefault();
+	done = false;
+  $('.progress').css('visibility','visible')
+  $('.result-area').css('min-height','600px').html('');
+	$("#mainform :input").prop("disabled", true);
+    $('[name="submit"]').prop('disabled', true).hide();
+	$('[name="stop"]').prop('disabled', false).show();
+
+  $('html, body').animate({
+      scrollTop: $(".progress").offset().top
+  }, 2000);
+  
+  function makeData(obj,i) {
+      var html = [];
+      var endpoint = $('[name="tgt_sparql"]').val();
+      var href = endpoint + '?query=' + encodeURIComponent(obj.query + " LIMIT 10") + '&output=htmltab&jsonp=&show_inline=1#results_table';
+      html.push('<div class="sqrt_res" id="result_'+i+'">');
+      html.push('<label>Query '+(i+1)+'</label><small>(score: '+obj.score+')</small>');
+      html.push('<a class="btn btn-default sqrt_run" href="'+href+'" target="sqrt_target">Test it</a>');
+      html.push('<pre>'+htmlEntities(obj.query)+'</pre>');
+      html.push('</div>');
+      html.push('<hr/>');
+      $('.result-area').append(html.join(''))
+  }
+  
+  $.ajax({
+    'url'         : 'services/v1/recommend',
+    //'crossDomain' : true,
+    'data'        : {
+      'source_endpoint' : $('[name="src_sparql"]').val() ,
+      'target_endpoint' : $('[name="tgt_sparql"]').val(),
+      'qo'              : $('[name="qo"]').val(),
+      'weight_rts'      : $('[name="weight_rts"]').val(),
+      'weight_qrd'      : $('[name="weight_qrd"]').val(),
+      'weight_rss'      : $('[name="weight_rss"]').val(),
+      'weight_qsd'      : $('[name="weight_qsd"]').val()
+    },
+    'dataType'    : 'json',
+    'method'      : 'POST',
+    'success'    : function(data,status,xhr){
+    	if(!data.token) $('#notify').html('Server failed to create job for processing your request.')
+    	ujob='services/v1/job/'+data.token;
+    	var similarity = 0.0;
+    	var queries = [];
+    	var delay = 400;
+    	(function poll() {
+    	    	$.ajax({
+    	    	  'url'      : ujob,
+    	    	  'dataType' : 'json',
+    	    	  'success'  : function(data,status,xhr){
+    	    		  if(similarity != data.datasetsSim){
+    	    			  similarity = data.datasetsSim;
+    	    			  $('#notify').html('dataset similarity = '+similarity);
+    	    		  }
+    	    		  if(data.recommandedQueryList) { 
+    	    			$('.result-area').html('<p>Hover on results to test them on the target dataset.</p>');
+    	    			var newqueries = [];
+    	    			for(var i=0;i<Math.min(data.recommandedQueryList.length,$('[name="limit"]').val());i++) {
+    	    				var rec = data.recommandedQueryList[i];
+    	    				makeData(rec,i);
+    	    				newqueries.push(rec.query)
+    	    				if(queries.indexOf(rec.query) > -1) 
+    	    					$('#result_'+i).show()
+    	    				else $('#result_'+i).fadeIn(delay)
+    	    		  	}
+    	    			queries = newqueries
+    	    		  };
+    	    		 if(!done && data.isFinished === 'false') setTimeout(function() {poll()}, 1000);
+    	    		 else {
+    	    				done = true;
+    	    			 $('.progress').css('visibility','hidden')
+    	    			 $('[name="stop"]').prop('disabled', true).hide();
+    	    			 $('[name="submit"]').prop('disabled', false).show();
+    	    			 $("#mainform :input").prop("disabled", false);
+    	    		 }
+    	    	  }
+    	    	});
+    	})();
+    	
+  //    $('.result-area').append('<p>Hover on results to test them on the target dataset.</p>');
+  //    for(var i=0;i<Math.min(data.queryStringScorePair.length,30);i++)
+  //  	makeData(data.queryStringScorePair[i],i)
+  //    var u = 400;
+  //    for(var i=0; i<Math.min(data.queryStringScorePair.length,30);i++) {  	
+  //	    $('#result_'+i).delay(i*u).fadeIn(u)
+  //    }
+      
+    }
+  });
+
+});
+
+// http://sparql.data.southampton.ac.uk/?query=' + '&output=htmltab&jsonp=&show_inline=1#results_table
+    </script>
+  </body>
+</html>

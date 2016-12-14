@@ -9,3 +9,12 @@ buildNumber.properties
 .mvn/timing.properties
 RDFDatasetIndex/
 .svn/
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+nb-configuration.xml
+nbactions.xml
+nbproject/
