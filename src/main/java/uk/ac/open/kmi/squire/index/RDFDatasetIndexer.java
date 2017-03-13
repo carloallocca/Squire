@@ -7,36 +7,23 @@ package uk.ac.open.kmi.squire.index;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.tools.FileObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.query.Query;
-import org.apache.jena.util.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.StopAnalyzer;
-import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -49,7 +36,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPointBasedRDFDataset;
 
 /**
  *
@@ -75,8 +61,8 @@ public class RDFDatasetIndexer {
     }
 
     private void createIndex() {
-//        Analyzer analyzer = new StopAnalyzer();
-          Analyzer analyzer = new StandardAnalyzer();
+//      Analyzer analyzer = new StopAnalyzer();
+        Analyzer analyzer = new StandardAnalyzer();
         Directory index = null;
         try {
             Path path = Paths.get(this.datasetIndexDir);
@@ -266,6 +252,4 @@ public class RDFDatasetIndexer {
         }
         return null;
     }
- 
-    
 }
