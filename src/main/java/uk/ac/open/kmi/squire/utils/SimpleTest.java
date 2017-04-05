@@ -16,11 +16,11 @@ import java.net.URLEncoder;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
+//import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+//import org.apache.http.impl.client.CloseableHttpClient;
+//import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
@@ -68,46 +68,46 @@ public class SimpleTest {
         return buff.toString();
     }
 
-        public String executeQueryNew(String queryText, String acceptFormat) throws Exception {
-                String httpQueryString = String.format("query=%s",
-                URLEncoder.encode(queryText, "UTF-8"));
-
-                URL url = new URL(this.service + "?" + httpQueryString);
-                
-                String GET_URL=url.toString();
-                
-                CloseableHttpClient httpClient = HttpClients.createDefault();
-		
-               
-                
-                HttpGet httpGet = new HttpGet(GET_URL);
-                
-               
-		//httpGet.addHeader("User-Agent", USER_AGENT);
-		CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-
-                
-		System.out.println("GET Response Status:: "
-				+ httpResponse.getStatusLine().getStatusCode());
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				httpResponse.getEntity().getContent()));
-
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = reader.readLine()) != null) {
-			response.append(inputLine);
-		}
-		reader.close();
-
-		// print result
-		System.out.println(response.toString());
-		httpClient.close();
-
-        
-            return null;
-        }
+//        public String executeQueryNew(String queryText, String acceptFormat) throws Exception {
+//                String httpQueryString = String.format("query=%s",
+//                URLEncoder.encode(queryText, "UTF-8"));
+//
+//                URL url = new URL(this.service + "?" + httpQueryString);
+//                
+//                String GET_URL=url.toString();
+//                
+//                CloseableHttpClient httpClient = HttpClients.createDefault();
+//		
+//               
+//                
+//                HttpGet httpGet = new HttpGet(GET_URL);
+//                
+//               
+//		//httpGet.addHeader("User-Agent", USER_AGENT);
+//		CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
+//
+//                
+//		System.out.println("GET Response Status:: "
+//				+ httpResponse.getStatusLine().getStatusCode());
+//
+//		BufferedReader reader = new BufferedReader(new InputStreamReader(
+//				httpResponse.getEntity().getContent()));
+//
+//		String inputLine;
+//		StringBuffer response = new StringBuffer();
+//
+//		while ((inputLine = reader.readLine()) != null) {
+//			response.append(inputLine);
+//		}
+//		reader.close();
+//
+//		// print result
+//		System.out.println(response.toString());
+//		httpClient.close();
+//
+//        
+//            return null;
+//        }
 
     
     
@@ -184,7 +184,7 @@ public class SimpleTest {
 
         //Accept formats can be: "text/plain", "application/json", text/tab-separated-values
         // "application/rdfxml", "text/csv", text/tab-separated-values  application/sparql-results+xml
-        String response = test.executeQueryNew(query, "application/sparql-results+xml");
-        System.out.println(response);
+ //       String response = test.executeQueryNew(query, "application/sparql-results+xml");
+ //       System.out.println(response);
     }
 }

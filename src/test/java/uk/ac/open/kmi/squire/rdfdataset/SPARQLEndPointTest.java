@@ -5,23 +5,42 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
+import uk.ac.open.kmi.squire.index.II.RDFDatasetIndexerII;
+import uk.ac.open.kmi.squire.index.II.RDFDatasetIndexerTest;
+import uk.ac.open.kmi.squire.loggers.SPARQLEndPointIndexLogger;
 
 /**
  *
  * @author carloallocca
  *
- * see https://github.com/ncbo/sparql-code-examples/tree/master/java
- * see SPARQL Web-Querying Infrastructure: Ready for Action?
+ * see https://github.com/ncbo/sparql-code-examples/tree/master/java see SPARQL
+ * Web-Querying Infrastructure: Ready for Action?
  *
  */
-public class SPARQLEndPointBasedRDFDatasetTest {
+public class SPARQLEndPointTest {
 
-    public SPARQLEndPointBasedRDFDatasetTest() {
+    public SPARQLEndPointTest() {
     }
 
     @BeforeClass
@@ -84,316 +103,6 @@ public class SPARQLEndPointBasedRDFDatasetTest {
      * String urlAddress1 = "http://dbpedia.org/sparql"; String urlAddress2 =
      * "http://sparql.data.southampton.ac.uk/";
      */
-   
-    @Test
-    public void newTest(){
-        
-        String[] urlAddressPair = new String[16];
-        int j =0 ;
-        
-            // classSet cardinality 175
-            // ObjectProperty cardinality 595
-            // datatypePropertySet cardinality 264
-            urlAddressPair[j] = "http://data.open.ac.uk/query";
-            
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "https://data.ox.ac.uk/sparql"; 
-   
-            // classSet cardinality 405
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://linked.opendata.cz/sparql"; 
-            
-            // classSet cardinality 99
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://services.data.gov.uk/education/sparql"; 
-            
-            // classSet cardinality 118
-            // ObjectProperty cardinality 84
-            // datatypePropertySet cardinality 123
-            j = j+1;
-            urlAddressPair[j] = "http://data.cnr.it/sparql-proxy/"; 
-
-            // classSet cardinality 22
-            // ObjectProperty cardinality 24
-            // datatypePropertySet cardinality 52
-            j = j+1;
-            urlAddressPair[j] = "http://data.aalto.fi/sparql"; 
- 
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://sparql.data.southampton.ac.uk/"; 
-             
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://www4.wiwiss.fu-berlin.de/eurostat/sparql"; 
-
-            // classSet cardinality 12
-            // ObjectProperty cardinality 22
-            // datatypePropertySet cardinality 6
-            j = j+1;
-            urlAddressPair[j] = "http://eurostat.linked-statistics.org/sparql"; 
- 
-            // classSet cardinality 415
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality
-            // j = j+1;
-            // urlAddressPair[j] = "https://query.wikidata.org/sparql"; 
- 
-            // classSet cardinality 35
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality
-            // j = j+1;
-            // urlAddressPair[j] = "http://data.ordnancesurvey.co.uk/datasets/os-linked-data/apis/sparql"; 
- 
-            // classSet cardinality 1000
-            // ObjectProperty cardinality 142
-            // datatypePropertySet cardinality 234
-            // j = j+1;
-            // urlAddressPair[j] = "https://www.ebi.ac.uk/rdf/services/biosamples/sparql"; 
-
-            // classSet cardinality 7
-            // ObjectProperty cardinality 4
-            // datatypePropertySet cardinality 4
-            j = j+1;
-            urlAddressPair[j] = "http://dlib-sparql.edina.ac.uk/endpoint/"; 
-
-            // classSet cardinality 10
-            // ObjectProperty cardinality 9
-            // datatypePropertySet cardinality 38
-            j = j+1;
-            urlAddressPair[j] = "http://lod.springer.com/sparql"; 
- 
-            // classSet cardinality 27
-            // ObjectProperty cardinality 37
-            // datatypePropertySet cardinality 23
-            j = j+1;
-            urlAddressPair[j] = "http://edan.si.edu/saam/sparql"; 
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://collection.britishart.yale.edu/sparql/"; 
- 
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://publicspending.net/endpoint"; 
- 
-            // classSet cardinality 29
-            // ObjectProperty cardinality 95
-            // datatypePropertySet cardinality 104
-            j = j+1;
-            urlAddressPair[j] = "http://sparql.asn.desire2learn.com:8890/sparql"; 
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://chem2bio2rdf.org/bindingdb/sparql"; 
- 
-            // classSet cardinality 45
-            // ObjectProperty cardinality 66
-            // datatypePropertySet cardinality 25
-            j = j+1;
-            urlAddressPair[j] = "http://ldf.fi/finlex/sparql"; 
- 
-            // classSet cardinality 62
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://finance.data.gov.uk/sparql/finance/query"; 
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://lsd.taxonconcept.org/sparql"; 
-
-            // classSet cardinality 601
-            // ObjectProperty cardinality 798
-            // datatypePropertySet cardinality 3803
-            // j = j+1;
-            // urlAddressPair[j] = "http://semantic.eea.europa.eu/sparql"; 
- 
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://ecowlim.tfri.gov.tw/sparql/query"; 
- 
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://data.linkededucation.org/request/lak-conference/sparql"; 
-            
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://leonard:7002/sparql/"; 
-            
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://services.data.gov.uk/education/sparql"; 
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://sparql.linkedopendata.it/musei";
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://collection.britishmuseum.org/Sparql";
-            
-            // classSet cardinality 89
-            // ObjectProperty cardinality 114
-            // datatypePropertySet cardinality 104
-            j = j+1;
-            urlAddressPair[j] = "http://data.szepmuveszeti.hu/sparql";
- 
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://datos.artuim.org/sparql";
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://visualdataweb.infor.uva.es/sparql";
-            
-            // classSet cardinality 85
-            // ObjectProperty cardinality 94
-            // datatypePropertySet cardinality 76
-            j = j+1;
-            urlAddressPair[j] = "http://ldf.fi/ww1lod/sparql";
-  
-            // classSet cardinality 103
-            // ObjectProperty cardinality 97
-            // datatypePropertySet cardinality 77
-            j = j+1;
-            urlAddressPair[j] = "http://linkedarc.net/sparql";
-
-            // classSet cardinality 36
-            // ObjectProperty cardinality 199
-            // datatypePropertySet cardinality 76
-            j = j+1;
-            urlAddressPair[j] = "http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/";
- 
-            // classSet cardinality 90
-            // ObjectProperty cardinality 109
-            // datatypePropertySet cardinality 112
-            j = j+1;
-            urlAddressPair[j] = "http://aliada.scanbit.net:8891/sparql";
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://openuplabs.tso.co.uk/sparql/gov-crime";
-
-            // classSet cardinality 4
-            // ObjectProperty cardinality 11
-            // datatypePropertySet cardinality 31
-            j = j+1;
-            urlAddressPair[j] = "http://greek-lod.auth.gr/police/sparql";
- 
-            // classSet cardinality 25
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://setaria.oszk.hu/sparql";
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://data.uni-muenster.de/sparql";            
-
-            // classSet cardinality 598
-            // ObjectProperty cardinality 6908
-            // datatypePropertySet cardinality 10000
-            //  = j+1;
-            // urlAddressPair[j] = "http://serendipity.utpl.edu.ec/lod/sparql"; 
-            
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://lod.openlinksw.com/sparql/";            
-            
-            // classSet cardinality 106
-            // ObjectProperty cardinality 376
-            // datatypePropertySet cardinality 299
-            j = j+1;
-            urlAddressPair[j] = "http://www.semantic-systems-biology.org/biogateway/endpoint";     
- 
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j= j+1;
-            // urlAddressPair[j] = "http://wifo5-03.informatik.uni-mannheim.de/drugbank/snorql/";
- 
-            // classSet cardinality 174
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j= j+1;
-            // urlAddressPair[j] = "http://sparql.uniprot.org/";
- 
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j= j+1;
-            // urlAddressPair[j] = "http://data.bnf.fr/sparql/";
-            
-            // classSet cardinality 1905
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://linkedgeodata.org/sparql/"; 
-            
-            // classSet cardinality 10000
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://dbpedia.org/sparql"; 
-
-            // classSet cardinality 
-            // ObjectProperty cardinality 
-            // datatypePropertySet cardinality 
-            // j = j+1;
-            // urlAddressPair[j] = "http://collection.britishmuseum.org/sparql"; 
-            
-        for (int i = 0; i < urlAddressPair.length; i++) {
-            System.out.println(" ");
-            System.out.println("[newTest] SPARQL endpoint " + urlAddressPair[i]);
-            String graphName = "";
-            SPARQLEndPointBasedRDFDataset instance = new SPARQLEndPointBasedRDFDataset(urlAddressPair[i], graphName);
-            System.out.println(" ");
-            
-        }
-    }
-    
 //    @Test
 //    public void testPair2() {
 //
@@ -717,10 +426,223 @@ public class SPARQLEndPointBasedRDFDatasetTest {
 ////        }
 //
 //        
-//        
-//        
-//        
-//        
+//                
+//    }
+//    
+//    
+
+//    @Test
+//    public void testAddSPARQLEndPointSignature() {
+//        FileInputStream fstream = null;
+//        org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.OFF);
+//
+//        try {
+////            RDFDatasetIndexerII indexerInstance = new RDFDatasetIndexerII(indexDir);
+//
+//            System.out.println("[SPARQLEndPointBasedRDFDatasetTest::testAddSPARQLEndPointSignature]");
+//            //String indexDir="/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/Led2Pro/SPARQEndPointIndex";
+//            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
+//
+//            // Open the file
+//            fstream = new FileInputStream(fileName);
+//            try (BufferedReader br = new BufferedReader(new InputStreamReader(fstream))) {
+//                String strLine;
+//                try {
+//                    //Read File Line By Line
+//                    int i = 1;
+//                    while ((strLine = br.readLine()) != null) {
+//                        System.out.println("EndPoint  " + strLine);
+//                        System.out.println(i);
+//                        i++;
+//                        computeClassSet(strLine, "");
+//
+//                        System.out.println(" ");
+//                        System.out.println(" ");
+//                        System.out.println(" ");
+//                        System.out.println(" ");
+//                        System.out.println(" ");
+//                    }
+//                } catch (IOException ex) {
+//                    Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 1", ex);
+//                } catch (Exception ex) {
+//
+//                    Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 2", ex);
+//                }
+//            }
+//        } catch (FileNotFoundException ex) {
+//            Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 3", ex);
+//        } catch (IOException ex) {
+//
+//            Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 4", ex);
+//        } finally {
+//            try {
+//                if (fstream != null) {
+//                    fstream.close();
+//                }
+//            } catch (IOException ex) {
+//                Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 7", ex);
+//            }
+//        }
+//
 //    }
 
+
+    
+//    @Test
+    public void testAddSPARQLEndPointSignature() {
+        FileInputStream fstream = null;
+//        org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.OFF);
+
+        try {
+//            RDFDatasetIndexerII indexerInstance = new RDFDatasetIndexerII(indexDir);
+
+            System.out.println("[SPARQLEndPointBasedRDFDatasetTest::testAddSPARQLEndPointSignature]");
+            //String indexDir="/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/Led2Pro/SPARQEndPointIndex";
+            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
+
+            // Open the file
+            fstream = new FileInputStream(fileName);
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(fstream))) {
+                String strLine;
+                try {
+                    //Read File Line By Line
+                    int i=1;
+                    while ((strLine = br.readLine()) != null) {
+                        System.out.println("EndPoint  "+ strLine);
+                        System.out.println(i);i++;
+                        
+                        try {
+                            computeClassSet(strLine, "");
+                            computeObjectPropertySet(strLine, "");
+                            computeDataTypePropertySet(strLine, "");
+                            
+                            
+                        } catch (Exception ex) {
+                            Logger.getLogger(SPARQLEndPointTest.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                        
+                        System.out.println(" ");
+                        System.out.println(" ");
+                        System.out.println(" ");
+                        System.out.println(" ");
+                        System.out.println(" ");
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 1", ex);
+                } catch (Exception ex) {
+
+                    Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 2", ex);
+                }
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 3", ex);
+        } catch (IOException ex) {
+
+            Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 4", ex);
+        } finally {
+            try {
+                if (fstream != null) {
+                    fstream.close();
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 7", ex);
+            }
+        }
+
+    }
+
+    
+    
+    
+    
+    private void computeClassSet(String datasetPath, String graphName) throws Exception {
+        String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+                + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                + "prefix owl:<http://www.w3.org/2002/07/owl#> "
+                + " SELECT DISTINCT ?class where "
+                + "{ "
+                + " ?ind a ?class . "
+                + "}";
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(datasetPath, qString, graphName);
+//        QueryExecution qexec = new QueryEngineHTTP((String) this.datasetPath, qString);
+
+        ResultSet results = qexec.execSelect();
+        
+        String a=ResultSetFormatter.asText(results);
+        
+        
+//        List<QuerySolution> solList = ResultSetFormatter.toList(results);//.out(, results, q);
+        System.out.println("#Class " +a);
+        
+//        for (QuerySolution sol : solList) {
+//            if (sol.get("class").asResource().getURI() != null) {
+////                this.classSet.add(sol.get("class").asResource().getURI());
+//                System.out.println(sol.get("class").asResource().getURI());
+//            }
+//        }
+    }
+
+    private void computeObjectPropertySet(String datasetPath, String graphName) throws Exception {
+        String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+                + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                + " SELECT DISTINCT ?op where "
+                + "{ "
+                + " ?s ?op ?o . "
+                + " FILTER (isURI(?o)) "
+                + "}";
+
+        QueryExecution qexec = QueryExecutionFactory.sparqlService(datasetPath, qString, graphName);
+        //QueryExecution qexec = new QueryEngineHTTP(datasetPath, qString);
+
+        ResultSet results = qexec.execSelect();
+        String a=ResultSetFormatter.asText(results);
+
+        //List<QuerySolution> solList = ResultSetFormatter.toList(results);//.out(, results, q);
+        System.out.println("#ObjectProperty " +a);
+        
+        
+//        ResultSetFormatter.out(results);
+        
+//        for (QuerySolution sol : solList) {
+//            if (sol.get("op").asResource().getURI() != null) {
+//                System.out.println(sol.get("op").asResource().getURI());
+//
+//            }
+//        }
+
+    }
+
+    private void computeDataTypePropertySet(String datasetPath, String graphName) throws Exception{
+
+        String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+                + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                + " SELECT DISTINCT ?p  where "
+                + "{ "
+                + " ?s ?p ?o . "
+                + " FILTER (isLiteral(?o)) "
+                + "}";
+
+        //QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.datasetPath, qString, this.graphName);
+        QueryExecution qexec = new QueryEngineHTTP(datasetPath, qString);
+
+        ResultSet results = qexec.execSelect();
+
+                String a=ResultSetFormatter.asText(results);
+
+        //List<QuerySolution> solList = ResultSetFormatter.toList(results);//.out(, results, q);
+        System.out.println("#DatatypeProperty " +a);
+        
+//        List<QuerySolution> solList = ResultSetFormatter.toList(results);//.out(, results, q);
+//        for (QuerySolution sol : solList) {
+//            if (sol.get("p").asResource().getURI() != null) {
+//                System.out.println(sol.get("p").asResource().getURI());            
+//
+//            }
+//        }
+
+    }
+
+    
+    
 }

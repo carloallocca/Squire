@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * @author callocca
  */
-public interface IRDFDataset {
+public interface IRDFDataset extends  Runnable{
     
     public Object getPath();
     public void setPath(Object path);
@@ -35,6 +35,16 @@ public interface IRDFDataset {
     public void  setLiteralSet(ArrayList<String> litSet);
     public void  setRDFVocabulary(ArrayList<String> rdfSet);
     public void  setPropertySet(ArrayList<String> propSet);
+    
+    
+    public boolean isIndexed();
+    public void computeClassSet();
+    public void computeIndividualSet();
+    public void computeDataTypePropertySet();
+    public void computeLiteralSet();
+    public void computePropertySet();
+    public void computeRDFVocabularySet();
+    public void computeObjectPropertySet();
 
     
     

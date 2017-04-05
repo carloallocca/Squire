@@ -8,6 +8,8 @@ package uk.ac.open.kmi.squire.core2;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
@@ -69,20 +71,24 @@ public class QueryRecommendatorForm {
         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
         if (qs.isSatisfiableWRTResults(query, rdfd1)) {
             
-            QueryRecommendator qR = new QueryRecommendator(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
-                                                                                queryRootDistanceDegree,
-                                                                                resultSizeSimilarityDegree,
-                                                                                querySpecificityDistanceDegree);
-           qR.buildRecommendation();
-           
-           sortedRecomQueryList=qR.getSortedRecomQueryList();
-           
-           // reconvert old list by brute force
-           for( QueryScorePair entry : sortedRecomQueryList )
-               newResult.add(new QueryStringScorePair(entry.getQuery().toString(),entry.getScore()));
-              
-            return newResult;
-            //return sortedRecomQueryList;
+            try {
+                QueryRecommendator qR = new QueryRecommendator(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
+                        queryRootDistanceDegree,
+                        resultSizeSimilarityDegree,
+                        querySpecificityDistanceDegree);
+                qR.buildRecommendation();
+                
+                sortedRecomQueryList=qR.getSortedRecomQueryList();
+                
+                // reconvert old list by brute force
+                for( QueryScorePair entry : sortedRecomQueryList )
+                    newResult.add(new QueryStringScorePair(entry.getQuery().toString(),entry.getScore()));
+                
+                return newResult;
+                //return sortedRecomQueryList;
+            } catch (Exception ex) {
+                Logger.getLogger(QueryRecommendatorForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             System.out.println("[SQueryRecommendationWorker::queryRecommendation5]The input query is not satisfiable w.r.t the input dataset... ");     
         }
@@ -110,17 +116,18 @@ public class QueryRecommendatorForm {
         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
         if (qs.isSatisfiableWRTResults(query, rdfd1)) {
             
-            QueryRecommendator qR = new QueryRecommendator(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
-                                                                                queryRootDistanceDegree,
-                                                                                resultSizeSimilarityDegree,
-                                                                                querySpecificityDistanceDegree);
-           qR.buildRecommendation();
-           
-           sortedRecomQueryList=qR.getSortedRecomQueryList();
-           
-            
-            
-            
+            try {
+                QueryRecommendator qR = new QueryRecommendator(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
+                        queryRootDistanceDegree,
+                        resultSizeSimilarityDegree,
+                        querySpecificityDistanceDegree);
+                qR.buildRecommendation();
+                
+                sortedRecomQueryList=qR.getSortedRecomQueryList();
+                
+                
+                
+                
 //            //... generalizing the input query into a SPARLQ Template Query ....
 //            qr.generalizeToQueryTemplate();
 //            
@@ -141,7 +148,10 @@ public class QueryRecommendatorForm {
 //            Collections.sort(qr.getQueryRecommendatedList(), QueryScorePair.queryScoreComp);    
 
 //            return qr.getQueryRecommendatedList();
-            return sortedRecomQueryList;
+return sortedRecomQueryList;
+            } catch (Exception ex) {
+                Logger.getLogger(QueryRecommendatorForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             System.out.println("[SQueryRecommendationWorker::queryRecommendation5]The input query is not satisfiable w.r.t the input dataset... ");     
         }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class Test {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         // classSet cardinality 152
         // ObjectProperty cardinality 595
@@ -34,8 +34,8 @@ public class Test {
         // datatypePropertySet cardinality 82                
         String urlAddress4 = "http://www.europeandataportal.eu/sparql";
 
-        SPARQLEndPointBasedRDFDataset d1 = new SPARQLEndPointBasedRDFDataset(urlAddress3, "");
-        SPARQLEndPointBasedRDFDataset d2 = new SPARQLEndPointBasedRDFDataset(urlAddress4, "");
+        SPARQLEndPoint d1 = new SPARQLEndPoint(urlAddress3, "");
+        SPARQLEndPoint d2 = new SPARQLEndPoint(urlAddress4, "");
 
         RDFDatasetSimilarity simD = new RDFDatasetSimilarity();
 

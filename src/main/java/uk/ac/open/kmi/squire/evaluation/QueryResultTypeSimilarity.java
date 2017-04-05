@@ -32,7 +32,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import uk.ac.open.kmi.squire.rdfdataset.FileBasedRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPointBasedRDFDataset;
+import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
 
 /**
  *
@@ -89,7 +89,7 @@ public class QueryResultTypeSimilarity {
         List<VarTypeMap> signature = new ArrayList<>();
         if (d1 instanceof FileBasedRDFDataset) {
             signature = computeFileBasedQVS(qOri, d1);
-        } else if (d1 instanceof SPARQLEndPointBasedRDFDataset) {
+        } else if (d1 instanceof SPARQLEndPoint) {
             signature = computeSPARQLEndPointBasedQVS(qOri, d1);
         }
         return signature;

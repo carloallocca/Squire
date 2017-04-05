@@ -5,6 +5,9 @@
  */
 package org.mksmart.squire.websquire.v1.resources;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -14,30 +17,42 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class JobStatement {
 
-    private String token;
+    private List<String> dependencyTokens;
     private String message;
+    private String token;
 
-    public JobStatement() {}
+    public JobStatement() {
+        this.dependencyTokens = new LinkedList<String>();
+    }
 
     public JobStatement(String token) {
+        this();
         this.token = token;
         this.message = "Job Created. Use the URL /job/" + token;
     }
 
-    public String getToken() {
-        return token;
+    public List<String> getDependencyTokens() {
+        return dependencyTokens;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public String getToken() {
+        return token;
+    }
+
+    public void setDependencyTokens(List<String> dependenceTokenList) {
+        this.dependencyTokens = dependenceTokenList;
     }
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
 }

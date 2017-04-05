@@ -83,7 +83,7 @@ public class QueryRecommendator<T> {
         this.resultTypeSimilarityDegree = resultTypeSimilarityDegree;
     }
 
-    public void buildRecommendation() {
+    public void buildRecommendation() throws Exception {
         
         //GENERALIZE...
         QueryGeneralizer qG = new QueryGeneralizer(this.q0Copy, this.rdfD1, this.rdfD2);

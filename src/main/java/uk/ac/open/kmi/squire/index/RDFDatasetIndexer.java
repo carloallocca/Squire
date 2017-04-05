@@ -7,23 +7,36 @@ package uk.ac.open.kmi.squire.index;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.tools.FileObject;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.util.FileUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.core.StopAnalyzer;
+import org.apache.lucene.analysis.core.WhitespaceAnalyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.util.StopwordAnalyzerBase;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.index.IndexWriterConfig.OpenMode;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
@@ -36,6 +49,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
+import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
 
 /**
  *
@@ -47,22 +61,30 @@ public class RDFDatasetIndexer {
     private static Log log = LogFactory.getLog(RDFDatasetIndexer.class);
     private final Version version = Version.LUCENE_5_4_0;
 
+    private static RDFDatasetIndexer me ;
+    
     private String datasetIndexDir;
 
-    public RDFDatasetIndexer(String indexDir) {
-        this.datasetIndexDir = indexDir;
-        createIndex();
-    }
+//    public RDFDatasetIndexer(String indexDir) {
+//        this.datasetIndexDir = indexDir;
+//        createIndex();
+//    }
 
-    public RDFDatasetIndexer() {
+    private RDFDatasetIndexer() {
         File file = new File("RDFDatasetIndex");
         this.datasetIndexDir = file.getAbsoluteFile().getAbsolutePath();
         createIndex();
     }
+    
+    public static RDFDatasetIndexer getInstance(){
+        if(me==null) me=new RDFDatasetIndexer();
+        return me;
+    }
+    
 
     private void createIndex() {
-//      Analyzer analyzer = new StopAnalyzer();
-        Analyzer analyzer = new StandardAnalyzer();
+//        Analyzer analyzer = new StopAnalyzer();
+          Analyzer analyzer = new StandardAnalyzer();
         Directory index = null;
         try {
             Path path = Paths.get(this.datasetIndexDir);
@@ -83,7 +105,7 @@ public class RDFDatasetIndexer {
     }
 
     // Add a new SPARQL EndPoint to the index 
-    public void addSPARQLEndPointSignature(String urlAddress, String graphName,
+    public Document indexSignature(String urlAddress, String graphName,
             ArrayList<String> classSet,
             ArrayList<String> objectPropertySet,
             ArrayList<String> datatypePropertySet,
@@ -111,31 +133,28 @@ public class RDFDatasetIndexer {
 
                 Document doc = new Document();
                 //index the SPARQL endpoint
-                
-
-                
  
-                StringField url = new StringField("URL", urlAddress, Field.Store.YES);
-                StringField gName = new StringField("GraphName", graphName, Field.Store.YES);
-                StringField cSet = new StringField("ClassSet", classSet.toString(), Field.Store.YES);
-                StringField oPropSet = new StringField("ObjectPropertySet", objectPropertySet.toString(), Field.Store.YES);
-                StringField dPropertySet = new StringField("DatatypePropertySet", datatypePropertySet.toString(), Field.Store.YES);
-                StringField litSet = new StringField("LiteralSet", literalSet.toString(), Field.Store.YES);
-                StringField indSet = new StringField("IndividualSet", individualSet.toString(), Field.Store.YES);
-                StringField rdfVoc = new StringField("RDFVocabulary", rdfVocabulary.toString(), Field.Store.YES);
-                StringField propSet = new StringField("PropertySet", propertySet.toString(), Field.Store.YES);
+//                StringField url = new StringField("URL", urlAddress, Field.Store.YES);
+//                StringField gName = new StringField("GraphName", graphName, Field.Store.YES);
+//                StringField cSet = new StringField("ClassSet", classSet.toString(), Field.Store.NO);
+//                StringField oPropSet = new StringField("ObjectPropertySet", objectPropertySet.toString(), Field.Store.NO);
+//                StringField dPropertySet = new StringField("DatatypePropertySet", datatypePropertySet.toString(), Field.Store.NO);
+//                StringField litSet = new StringField("LiteralSet", literalSet.toString(), Field.Store.NO);
+//                StringField indSet = new StringField("IndividualSet", individualSet.toString(), Field.Store.NO);
+//                StringField rdfVoc = new StringField("RDFVocabulary", rdfVocabulary.toString(), Field.Store.NO);
+//                StringField propSet = new StringField("PropertySet", propertySet.toString(), Field.Store.NO);
 
                 
-//                Field url = new Field("URL", urlAddress, Field.Store.YES, Field.Index.NOT_ANALYZED);
-//                Field gName = new Field("GraphName", graphName, Field.Store.YES, Field.Index.NOT_ANALYZED);
-//                Field cSet = new Field("ClassSet", classSet.toString(), Field.Store.YES, Field.Index.NO);
-//                Field oPropSet = new Field("ObjectPropertySet", objectPropertySet.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
-//                Field dPropertySet = new Field("DatatypePropertySet", datatypePropertySet.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
-//                Field litSet = new Field("LiteralSet", literalSet.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
-//                Field indSet = new Field("IndividualSet", individualSet.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
-//                Field rdfVoc = new Field("RDFVocabulary", rdfVocabulary.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
-//                Field propSet = new Field("PropertySet", propertySet.toString(), Field.Store.YES, Field.Index.NOT_ANALYZED);
-
+                Field url = new Field("URL", urlAddress, Field.Store.YES, Field.Index.NOT_ANALYZED);
+                Field gName = new Field("GraphName", graphName, Field.Store.YES, Field.Index.NOT_ANALYZED);
+                Field cSet = new Field("ClassSet", classSet.toString(), Field.Store.YES, Field.Index.NO);
+                Field oPropSet = new Field("ObjectPropertySet", objectPropertySet.toString(), Field.Store.YES, Field.Index.NO);
+                Field dPropertySet = new Field("DatatypePropertySet", datatypePropertySet.toString(), Field.Store.YES, Field.Index.NO);
+                Field litSet = new Field("LiteralSet", literalSet.toString(), Field.Store.YES, Field.Index.NO);
+                Field indSet = new Field("IndividualSet", individualSet.toString(), Field.Store.YES, Field.Index.NO);
+                Field rdfVoc = new Field("RDFVocabulary", rdfVocabulary.toString(), Field.Store.YES, Field.Index.NO);
+                Field propSet = new Field("PropertySet", propertySet.toString(), Field.Store.YES, Field.Index.NO);
+                
                 doc.add(url);
                 doc.add(gName);
                 doc.add(cSet);
@@ -155,7 +174,7 @@ public class RDFDatasetIndexer {
 //            Logger.getLogger(SPARQEndPoint.class.getName()).log(Level.SEVERE, null, e.getCause());
 //
                 
-                
+                return doc;
             }
         } catch (CorruptIndexException e) {
             // TODO Auto-generated catch block
@@ -167,6 +186,7 @@ public class RDFDatasetIndexer {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        return null;
     }
 
     private boolean alreadyExists(String urlAddress, String graphName) {
@@ -197,9 +217,9 @@ public class RDFDatasetIndexer {
         return false;
     }
 
-    //public SPARQLEndPointBasedRDFDataset getSPARQLEndPointSignature(String urlAddress, String graphName){    
-    public Document getSPARQLEndPointSignature(String urlAddress, String graphName) {
-        // SPARQLEndPointBasedRDFDataset output= new SPARQLEndPointBasedRDFDataset(urlAddress, graphName);
+    //public SPARQLEndPoint getSignature(String urlAddress, String graphName){    
+    public Document getSignature(String urlAddress, String graphName) {
+        // SPARQLEndPoint output= new SPARQLEndPoint(urlAddress, graphName);
         try {
             if (null != graphName || !graphName.isEmpty()) {
                 Path path = Paths.get(this.datasetIndexDir);
@@ -252,4 +272,6 @@ public class RDFDatasetIndexer {
         }
         return null;
     }
+ 
+    
 }

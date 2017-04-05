@@ -22,7 +22,7 @@ public class FactorialCalculator implements Callable {
     }
 
     @Override
-    public Object call() throws Exception {
+    public Long call() throws Exception {
 
         long output = 0;
         try {

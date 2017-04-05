@@ -31,7 +31,7 @@ import uk.ac.open.kmi.squire.core4.AbstractQueryRecommendationObservable;
 import uk.ac.open.kmi.squire.core4.IQueryRecommendationObservable;
 import uk.ac.open.kmi.squire.core4.IQueryRecommendationObserver;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPointBasedRDFDataset;
+import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
 
 /**
@@ -58,12 +58,10 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
         Query qTMP = QueryFactory.create(q.toString());
         qTMP.setLimit(2);
 
-//        System.out.println("[SPARQLQuerySatisfiable::isSatisfiableWRTResults]"+datasetPath);
         if (datasetPath == null || datasetPath.isEmpty()) {
-            //return false; //it should return false
             return false;
-        } // TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPointBasedRDFDataset
-        else if (d instanceof SPARQLEndPointBasedRDFDataset) {
+        } // TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPoint
+        else if (d instanceof SPARQLEndPoint) {
             List<QuerySolution> resList;
 //                QueryExecution qexec = new QueryEngineHTTP((String) d.getPath(), q);
 //                ResultSet results = qexec.execSelect();
@@ -125,7 +123,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
         if (datasetPath == null || datasetPath.isEmpty()) {
             this.notifyQuerySatisfiableValue(false);
             return false;
-        } else if (d instanceof SPARQLEndPointBasedRDFDataset) {
+        } else if (d instanceof SPARQLEndPoint) {
             List<QuerySolution> resList;
 //                QueryExecution qexec = new QueryEngineHTTP((String) d.getPath(), q);
 //                ResultSet results = qexec.execSelect();
@@ -137,7 +135,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
                 ResultSet results = qexec.execSelect();
                 
 //                System.err.println("[SPARQLQuerySatisfiable::isSatisfiableWRTResultsWithToken]Query Returned.");        
-                        
+
                 resList = ResultSetFormatter.toList(results); //.out(, results, q);
                 if (resList.size() >= 1) {
                     this.notifyQuerySatisfiableValue(true);
@@ -231,7 +229,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 //        if (datasetPath == null || datasetPath.isEmpty()) {
 //            //return false; //it should return false
 //            return false;
-//        } // TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPointBasedRDFDataset
+//        } // TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPoint
 //        else if (datasetPath.startsWith("http://") || datasetPath.startsWith("https://")) {
 //            //manage the case of SPARQL endpoint
 ////            String ontology_service = "http://ambit.uni-plovdiv.bg:8080/ontology";

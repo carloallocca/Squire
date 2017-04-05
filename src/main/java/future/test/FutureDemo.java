@@ -24,7 +24,8 @@ public class FutureDemo {
     
     public static void main(String args[]) throws InterruptedException, ExecutionException { 
         
-        FactorialCalculator task = new FactorialCalculator(100); 
+        FactorialCalculator task = new FactorialCalculator(60);
+        
         System.out.println("Submitting Task ..."); 
         Future future = threadpool.submit(task);
         
@@ -33,7 +34,7 @@ public class FutureDemo {
         
         while (!future.isDone()) { 
             System.out.println("Task is not completed yet....");
-//            System.out.println("The current value is...."+future.get());
+            System.out.println("The current value is...."+future.get());
 
             Thread.sleep(1); //sleep for 1 millisecond before checking again 
             

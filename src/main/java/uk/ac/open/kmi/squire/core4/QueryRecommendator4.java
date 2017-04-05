@@ -83,7 +83,7 @@ public class QueryRecommendator4 <T>  extends AbstractQueryRecommendationObserva
         this.resultTypeSimilarityDegree = resultTypeSimilarityDegree;
     }
 
-    public void buildRecommendation() {
+    public void buildRecommendation() throws Exception {
         
         //GENERALIZE...
         QueryGeneralizer4 qG = new QueryGeneralizer4(this.q0Copy, this.rdfD1, this.rdfD2);
@@ -115,10 +115,10 @@ public class QueryRecommendator4 <T>  extends AbstractQueryRecommendationObserva
                                                                 this.querySpecificityDistanceDegree, this.token);
         qS.register(this);
         qS.specialize();
-//        
-//        //RANKING...
-//        this.qRList=qS.getRecommandedQueryList();
-//        applyRankingToRecommandedQueryList(qRList);
+        
+        //RANKING...
+        this.qRList=qS.getRecommandedQueryList();
+        applyRankingToRecommandedQueryList(qRList);
         
     }
 

@@ -183,7 +183,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
     }
     
     
-    private void computeClassSet() {
+    public void computeClassSet() {
         ExtendedIterator<OntClass> classesIter = this.inf.listClasses();
         for (ExtendedIterator c = classesIter; c.hasNext();) {
             OntClass classe = (OntClass) c.next();
@@ -192,7 +192,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
 
     }
 
-    private void computeIndividualSet() {
+    public void computeIndividualSet() {
         ExtendedIterator<Individual> individualIter = this.inf.listIndividuals();
         for (ExtendedIterator ind = individualIter; ind.hasNext();) {
             Individual individuo = (Individual) ind.next();
@@ -200,7 +200,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
         }
     }
 
-    private void computeObjectPropertySet() {
+    public void computeObjectPropertySet() {
         ExtendedIterator<ObjectProperty> objPropertyIter = this.inf.listObjectProperties();
         for (ExtendedIterator objP = objPropertyIter; objP.hasNext();) {
             ObjectProperty objProperty = (ObjectProperty) objPropertyIter.next();
@@ -208,7 +208,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
         }
     }
 
-    private void computeDataTypePropertySet() {
+    public void computeDataTypePropertySet() {
         ExtendedIterator<DatatypeProperty> datatypePropertyIter = this.inf.listDatatypeProperties();
         for (ExtendedIterator datatypeP = datatypePropertyIter; datatypeP.hasNext();) {
             DatatypeProperty datatypeProperty = (DatatypeProperty) datatypePropertyIter.next();
@@ -216,7 +216,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
         }
     }
 
-    private void computeLiteralSet() {
+    public void computeLiteralSet() {
         StmtIterator it = this.inf.listStatements();
         while (it.hasNext()) {
             Triple stmt = it.next().asTriple();
@@ -239,7 +239,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
         this.propertySet.addAll(this.objectPropertySet);
     }
 
-    private void computeRDFVocabularySet() {
+    public void computeRDFVocabularySet() {
         StmtIterator it = this.inf.listStatements();
         while (it.hasNext()) {
             Triple stmt = it.next().asTriple();
@@ -315,6 +315,21 @@ public class FileBasedRDFDataset implements IRDFDataset {
 
     @Override
     public void setPropertySet(ArrayList<String> propSet) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isIndexed() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void computePropertySet() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void run() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

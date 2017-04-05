@@ -16,6 +16,8 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.entityvariablemapping.ClassVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.DatatypePropertyVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.IndividualVarMapping;
@@ -50,6 +52,8 @@ public class QueryGeneralizer4 {
     private static final String DT_PROP_TEMPLATE_VAR = "dpt";
     private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
     private static final String LITERAL_TEMPLATE_VAR = "lt";
+    
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     public QueryGeneralizer4(Query qo, IRDFDataset d1, IRDFDataset d2) {
         this.originalQuery = qo;
@@ -74,6 +78,11 @@ public class QueryGeneralizer4 {
         Set<Node> subjects = getSubjectsSet(this.originalQueryCopy);
         Set<Node> predicates = getPredicatesSet(this.originalQueryCopy);
         Set<Node> objects = getObjectsSet(this.originalQueryCopy);
+        
+        log.debug("[QueryGeneralizer4::generalize] query objects " +objects.toString());
+
+        
+        
         SPARQLQueryGeneralization qg = new SPARQLQueryGeneralization();
         //SUBJECT
         for (Node subj : subjects) {
@@ -98,7 +107,10 @@ public class QueryGeneralizer4 {
         //OBEJCT
         for (Node obj : objects) {
             if (!(obj.isVariable()) && !(obj.isBlank())) {
+                log.debug("[QueryGeneralizer4::generalize] this is the uri object that is going to be generalized " +obj.getURI());
                 Var templateVarObj = ifObjectIsNotD2ThenGenerateVariableNew(obj);
+                log.debug("[QueryGeneralizer4::generalize] templateVarObj " +templateVarObj.toString());
+                
                 if (templateVarObj != null) {
                     Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, obj, templateVarObj);
                     this.originalQueryCopy = genQuery;
@@ -192,35 +204,48 @@ public class QueryGeneralizer4 {
             String o = obj.getURI();
             //System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
             if ((rdfd1.getClassSet().contains(o)) && !(rdfd2.getClassSet().contains(o))) {
+                log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here A "+rdfd1.getClassSet().toString());
                 result = Var.alloc(classVarTable.generateIFAbsentClassVar(o));
                 return result;
             } else if (rdfd1.isInObjectPropertySet(o) && !(rdfd2.isInObjectPropertySet(o))) {
+                                log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here B ");
+
                 //if (!(rdfd2.isInObjectPropertySet(o))) {                
                 result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(o));
                 //          System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
                 return result;
             } else if (rdfd1.isInDatatypePropertySet(o) && !(rdfd2.isInDatatypePropertySet(o))) {
+                                log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here C ");
+
                 //if (!(rdfd2.isInDatatypePropertySet(o))) {
 
                 result = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(o));
                 //    System.out.println("[QTTree::generalize] The Sub is an datatype Property URI");
                 return result;
             } else if (rdfd1.isInRDFVocabulary(o) && !(rdfd2.isInRDFVocabulary(o))) {
+                                log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here D ");
+
                 //if (!(rdfd2.isInRDFVocabulary(o))) {
 
                 result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(o));
                 //System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
                 return result;
             } else {
+                    log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here E " +rdfd1.getClassSet().toString());
+
                 // this means that it is an individual
                 result = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(o));
                 return result;
             }
         } else if (obj.isLiteral()) {
+                            log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here F ");
+
             String subjAsString = obj.getLiteralValue().toString();
             result = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(subjAsString));
             return result;
         } else {
+                            log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here Gs ");
+
             //subject = tp.getSubject();
             result = (Var) obj;
             return result;
