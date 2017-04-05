@@ -11,4 +11,5 @@ package some.tests;
  */
 public class BranchMFSTest {
     
+    private String testattribute; 
 }
