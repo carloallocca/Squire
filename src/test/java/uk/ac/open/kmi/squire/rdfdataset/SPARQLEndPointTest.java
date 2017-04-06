@@ -488,7 +488,7 @@ public class SPARQLEndPointTest {
 
 
     
-//    @Test
+    @Test
     public void testAddSPARQLEndPointSignature() {
         FileInputStream fstream = null;
 //        org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.OFF);
@@ -498,7 +498,8 @@ public class SPARQLEndPointTest {
 
             System.out.println("[SPARQLEndPointBasedRDFDatasetTest::testAddSPARQLEndPointSignature]");
             //String indexDir="/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/Led2Pro/SPARQEndPointIndex";
-            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
+            //String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
+            String fileName = "D:/Squire/endpointlist";
 
             // Open the file
             fstream = new FileInputStream(fileName);

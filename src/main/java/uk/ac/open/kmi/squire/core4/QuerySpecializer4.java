@@ -148,6 +148,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
         //C. Compute the QueryTempVarSolutionSpace
         QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
         List<QuerySolution> qTsol = temVarValueSpace.compute(qr, this.rdfd2);
+        
+        // RDF view of generalized query in order to optimized other queries execution
+        IRDFDataset rdfView = temVarValueSpace.buildViewFromParent(qr, rdfd2);
+        
 
         //Map<Var, Set<RDFNode>> qTsolMap=temVarValueSpace.compute(qr, this.rdfd2, null);
         //D. Build the QueryAndContextNode from the query
@@ -159,6 +163,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
 
         qAndcNode.setRdfD1(d1);
         qAndcNode.setRdfD2(d2);
+        qAndcNode.setRdfD2(rdfView); // Alsa save a view of target dataset 
 
         qAndcNode.setEntityqO("");
         qAndcNode.setEntityqR("");

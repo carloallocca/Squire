@@ -29,7 +29,6 @@ import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
@@ -38,7 +37,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import some.tests.ApacheHttpClientExample;
 
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
 import uk.ac.open.kmi.squire.utils.FromStringToArrayList;

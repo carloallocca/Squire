@@ -30,7 +30,8 @@ public class QueryAndContextNode {
 
     private  IRDFDataset rdfD1;
     private  IRDFDataset rdfD2;
-
+    private  IRDFDataset rdfD2View;
+    
     private Query qO;
     private Query qR;
 
@@ -241,6 +242,10 @@ public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
         this.rdfD2 = rdfD2;
     }
 
+    public void setRdfD2View(IRDFDataset rdfD2View) {
+        this.rdfD2View = rdfD2View;
+    }
+
     public void setqO(Query qO) {
         this.qO = qO;
     }
@@ -328,6 +333,10 @@ public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
 
     public IRDFDataset getRdfD2() {
         return rdfD2;
+    }
+        
+    public IRDFDataset getRdfD2View() {
+        return rdfD2View;
     }
 
     public Query getqO() {

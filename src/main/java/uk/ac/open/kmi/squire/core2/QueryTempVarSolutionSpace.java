@@ -21,11 +21,14 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.sparql.algebra.Algebra;
+import org.apache.jena.sparql.algebra.Op;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+import uk.ac.open.kmi.squire.rdfdataset.MaterializedRDFView;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
 
 /**
@@ -177,5 +180,22 @@ public class QueryTempVarSolutionSpace {
         }
 
     }
+    
+    public IRDFDataset buildViewFromParent(Query parentQuery, IRDFDataset dataset){
+        
+        Query constructQuery = QueryFactory.create();
+        
+        constructQuery.setQueryConstructType();         
+        constructQuery.setConstructTemplate(QueryFactory.createTemplate(this.getListOfTriplePattern(parentQuery)));
+        constructQuery.setQueryPattern(parentQuery.getQueryPattern());
+        
+        return new MaterializedRDFView(constructQuery.toString(), dataset) ;
+    }
 
+    private String getListOfTriplePattern(Query query) {
+     
+        Op queryexpr = Algebra.compile(query);
+        // TODO        
+        return null; 
+    }
 }
