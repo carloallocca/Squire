@@ -25,6 +25,7 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
 
@@ -56,6 +57,7 @@ public class QueryTempVarSolutionSpace {
                     // 1. Transform the the query qChild into a query containg the template variable only.
                     Query qT = rewriteQueryWithTemplateVar(qChild);
                     // 2. Compute the QuerySolution for qT;
+                    qT.setLimit(1000);
                     List<QuerySolution> qTsol = computeSolutionSpace(qT, rdfd2);
                     Map<Var, Set<RDFNode>> qTsolMap = tranformToMap(qTsol, qChild);
                     return qTsolMap;
@@ -82,6 +84,9 @@ public class QueryTempVarSolutionSpace {
         return new HashMap();
     }
        
+        private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+        
+        
     public List<QuerySolution> compute(Query qChild, IRDFDataset rdfd2) {
         // 0. Check if the input query has aany template variable, otherwise qTsol is empty
         Set<Var> templateVarSet = getQueryTemplateVariableSet(qChild);
@@ -90,7 +95,14 @@ public class QueryTempVarSolutionSpace {
                 // 1. Transform the the query qChild into a query containg the template variable only.
                 Query qT = rewriteQueryWithTemplateVar(qChild);
                 // 2. Compute the QuerySolution for qT;
+                
+                qT.setLimit(1000);
+                
+                log.info("[QueryTempVarSolutionSpace::compute]qT.setLimit(1000); " +qT.toString());
+                
                 List<QuerySolution> qTsol = computeSolutionSpace(qT, rdfd2);
+                log.info("[QueryTempVarSolutionSpace::compute]qTsol size; " +qTsol.size());
+
                 return qTsol;
             } catch (Exception ex) {
                 Logger.getLogger(QueryTempVarSolutionSpace.class.getName()).log(Level.SEVERE, null, ex);
@@ -123,9 +135,12 @@ public class QueryTempVarSolutionSpace {
 
     private List<QuerySolution> computeSolutionSpace(Query q, IRDFDataset rdfd2) throws java.net.ConnectException {
         try{
-            QueryExecution qexec = new QueryEngineHTTP((String) rdfd2.getPath(), q);
+            QueryExecution qexec = new QueryEngineHTTP((String) rdfd2.getEndPointURL(), q);
             ResultSet results = qexec.execSelect();
+            
             List<QuerySolution> solList = ResultSetFormatter.toList(results);//.out(, results, q);
+            log.info("[computeSolutionSpace]solList " +solList.size());
+
             return solList;
         }catch(Exception ex){
             throw ex;

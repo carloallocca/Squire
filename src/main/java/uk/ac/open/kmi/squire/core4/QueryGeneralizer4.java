@@ -84,12 +84,13 @@ public class QueryGeneralizer4 {
         
         
         SPARQLQueryGeneralization qg = new SPARQLQueryGeneralization();
+        Query genQuery;
         //SUBJECT
         for (Node subj : subjects) {
             if (!(subj.isVariable()) && !(subj.isBlank())) {
                 Var templateVarSub = ifSubjectIsNotD2ThenGenerateVariableNew(subj);
                 if (templateVarSub != null) {
-                    Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, subj, templateVarSub);
+                    genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, subj, templateVarSub);
                     this.originalQueryCopy = genQuery;
                 }
             }
@@ -97,11 +98,15 @@ public class QueryGeneralizer4 {
         //PREDICATE
         for (Node pred : predicates) {
             if (!(pred.isVariable()) && !(pred.isBlank())) {
+                log.debug("[QueryGeneralizer4::generalize] this is the predicate uri object that is going to be generalized " +pred.getURI());              
                 Var templateVarPred = ifPredicateIsNotD2ThenGenerateVariableNew(pred);
+                
                 if (templateVarPred != null) {
-                    Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, pred, templateVarPred);
+                   log.debug("[QueryGeneralizer4::generalize] templateVarPred " +templateVarPred.toString());
+                    genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, pred, templateVarPred);
                     this.originalQueryCopy = genQuery;
                 }
+                
             }
         }
         //OBEJCT
@@ -109,10 +114,9 @@ public class QueryGeneralizer4 {
             if (!(obj.isVariable()) && !(obj.isBlank())) {
                 log.debug("[QueryGeneralizer4::generalize] this is the uri object that is going to be generalized " +obj.getURI());
                 Var templateVarObj = ifObjectIsNotD2ThenGenerateVariableNew(obj);
-                log.debug("[QueryGeneralizer4::generalize] templateVarObj " +templateVarObj.toString());
-                
                 if (templateVarObj != null) {
-                    Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, obj, templateVarObj);
+                    log.debug("[QueryGeneralizer4::generalize] templateVarObj " +templateVarObj.toString());
+                    genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, obj, templateVarObj);
                     this.originalQueryCopy = genQuery;
                 }
             }
@@ -158,7 +162,8 @@ public class QueryGeneralizer4 {
             return result;
         } else {
             //subject = tp.getSubject();
-            result = (Var) subj;
+            //result = (Var) subj;
+            result = null;
             return result;
         }
     }
@@ -171,6 +176,14 @@ public class QueryGeneralizer4 {
         final Var result;
         if (pred.isURI()) {
             String pre = pred.getURI();
+            log.info("predicate " +pred.getURI());
+            
+            log.info("rdfd1 object property list " +rdfd1.getObjectPropertySet());
+            log.info("rdfd1 datatype property list " +rdfd1.getDatatypePropertySet());
+
+            log.info("rdfd2 object property list " +rdfd2.getObjectPropertySet());
+            log.info("rdfd2 datatype property list " +rdfd2.getDatatypePropertySet());
+            
             if (rdfd1.isInObjectPropertySet(pre) && !(rdfd2.isInObjectPropertySet(pre))) {
                 result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(pre));
                 return result;
@@ -186,7 +199,7 @@ public class QueryGeneralizer4 {
                 return result;
             }
         } else {
-            result = (Var) pred;
+            result =null;
             return result;
         }
 
@@ -203,6 +216,14 @@ public class QueryGeneralizer4 {
             // s= classURI
             String o = obj.getURI();
             //System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
+            
+            if((rdfd1.getClassSet().contains(o))){
+                                    log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here F " +rdfd1.getClassSet().toString());
+                                    log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here G " +rdfd2.getClassSet().toString());
+
+            }
+            
+            
             if ((rdfd1.getClassSet().contains(o)) && !(rdfd2.getClassSet().contains(o))) {
                 log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here A "+rdfd1.getClassSet().toString());
                 result = Var.alloc(classVarTable.generateIFAbsentClassVar(o));
@@ -233,12 +254,14 @@ public class QueryGeneralizer4 {
             } else {
                     log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here E " +rdfd1.getClassSet().toString());
 
-                // this means that it is an individual
-                result = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(o));
-                return result;
+                    result = null;
+                    return result;
+//                // this means that it is an individual or it could be present in both lists (classes, obj and dtp). 
+//                result = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(o));
+//                return result;
             }
         } else if (obj.isLiteral()) {
-                            log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here F ");
+            log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here F ");
 
             String subjAsString = obj.getLiteralValue().toString();
             result = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(subjAsString));
@@ -247,7 +270,7 @@ public class QueryGeneralizer4 {
                             log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here Gs ");
 
             //subject = tp.getSubject();
-            result = (Var) obj;
+            result = null;
             return result;
         }
 //        return result;

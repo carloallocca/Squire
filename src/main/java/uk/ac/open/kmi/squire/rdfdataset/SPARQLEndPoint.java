@@ -59,6 +59,7 @@ public class SPARQLEndPoint implements IRDFDataset {
     private ArrayList<String> individualSet = new ArrayList();
     private ArrayList<String> rdfVocabulary = new ArrayList();
     private ArrayList<String> propertySet = new ArrayList();
+    private Document signatureDoc;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -117,7 +118,7 @@ public class SPARQLEndPoint implements IRDFDataset {
         }
     }
 
-    private Document signatureDoc;
+
 
     private void createSPARQLEndPoint() throws IOException, LockObtainFailedException {
 //       Document d = this.signatureDoc;
@@ -276,7 +277,7 @@ public class SPARQLEndPoint implements IRDFDataset {
     }
 
     @Override
-    public Object getPath() {
+    public Object getEndPointURL() {
         return this.endpointURL;// throw new UnsupportedOperationException("Not supported yet."); //To change
         // body of generated methods, choose Tools | Templates.
     }

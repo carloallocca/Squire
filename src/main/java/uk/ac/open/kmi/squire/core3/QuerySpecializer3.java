@@ -193,7 +193,7 @@ public class QuerySpecializer3 implements Callable {
 //        qAndcNode.setqRTemplateVariableSet(qRTemplateVariableSet);
 //        qAndcNode.setqRTriplePathSet(qRTriplePatternSet);
         //...set the QueryTempVarSolutionSpace
-        qAndcNode.setQueryTempVarSolutionSpace(qTsol);
+        qAndcNode.setSolutionSpace(qTsol);
         //qAndcNode.setQueryTempVarValueMap(qTsolMap);
 
         //E. Sorted Insert of the QueryAndContextNode into the specializableQueryList
@@ -327,7 +327,7 @@ public class QuerySpecializer3 implements Callable {
         //..set the RDF dataset 1
         IRDFDataset rdfD1 = parentQueryAndContextNode.getRdfD1();
         if (rdfD1 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getPath()),
+            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD1().getGraph());
             childQueryAndContextNode.setRdfD1(newRdfD1);
         } else { // TO ADD the case of FILEBASED dataset
@@ -335,7 +335,7 @@ public class QuerySpecializer3 implements Callable {
         //..set the RDF dataset 2
         IRDFDataset rdfD2 = parentQueryAndContextNode.getRdfD2();
         if (rdfD2 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getPath()),
+            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD2().getGraph());
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace
@@ -346,7 +346,7 @@ public class QuerySpecializer3 implements Callable {
             List<QuerySolution> qTsol = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
             List<QuerySolution> qTsolChild = new ArrayList();
             qTsolChild.addAll(qTsol);
-            childQueryAndContextNode.setQueryTempVarSolutionSpace(qTsolChild);
+            childQueryAndContextNode.setSolutionSpace(qTsolChild);
         } else { // TO ADD the case of FILEBASED dataset
         }
 
@@ -501,7 +501,7 @@ public class QuerySpecializer3 implements Callable {
         //..set the RDF dataset 1
         IRDFDataset rdfD1 = parentQueryAndContextNode.getRdfD1();
         if (rdfD1 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getPath()),
+            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD1().getGraph());
             childQueryAndContextNode.setRdfD1(newRdfD1);
         } else { // TO ADD the case of FILEBASED dataset
@@ -509,7 +509,7 @@ public class QuerySpecializer3 implements Callable {
         //..set the RDF dataset 2
         IRDFDataset rdfD2 = parentQueryAndContextNode.getRdfD2();
         if (rdfD2 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getPath()),
+            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD2().getGraph());
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace
@@ -520,7 +520,7 @@ public class QuerySpecializer3 implements Callable {
             List<QuerySolution> qTsol = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
             List<QuerySolution> qTsolChild = new ArrayList();
             qTsolChild.addAll(qTsol);
-            childQueryAndContextNode.setQueryTempVarSolutionSpace(qTsolChild);
+            childQueryAndContextNode.setSolutionSpace(qTsolChild);
         } else { // TO ADD the case of FILEBASED dataset
         }
 

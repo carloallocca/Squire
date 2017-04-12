@@ -5,20 +5,35 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.cache.ResourceFactory;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.jena.query.ParameterizedSparqlString;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -486,7 +501,130 @@ public class SPARQLEndPointTest {
 //
 //    }
 
+    
+    
+    
+    //   @Test
+     public void testAddSPARQLEndPointSignature3() {
+        ParameterizedSparqlString qs = new ParameterizedSparqlString( "" +
+                "prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "\n" +
+                "select ?resource where {\n" +
+                "  ?resource rdfs:label ?label\n" +
+                "}" );
 
+             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+                + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                + "prefix owl:<http://www.w3.org/2002/07/owl#> "
+                + " SELECT DISTINCT ?class where "
+                + "{ "
+                + " ?ind a ?class . "
+                + "}";
+        
+        
+//        Literal london = ResourceFactory..createLangLiteral( "London", "en" );
+//        qs.setParam( "label", london );
+
+        System.out.println( qs );
+
+//        QueryExecution exec = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", qs.asQuery() );
+        QueryExecution exec = QueryExecutionFactory.sparqlService( "http://dbpedia.org/sparql", qString);
+
+        // Normally you'd just do results = exec.execSelect(), but I want to 
+        // use this ResultSet twice, so I'm making a copy of it.  
+        ResultSet results = ResultSetFactory.copyResults( exec.execSelect() );
+
+        while ( results.hasNext() ) {
+            // As RobV pointed out, don't use the `?` in the variable
+            // name here. Use *just* the name of the variable.
+            System.out.println( results.next().get( "resource" ));
+        }
+
+        // A simpler way of printing the results.
+        ResultSetFormatter.out( results );
+    }
+
+
+  
+   @Test
+    public void testAddSPARQLEndPointSignature1() {
+     String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+                + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                + "prefix owl:<http://www.w3.org/2002/07/owl#> "
+                + " SELECT DISTINCT ?class where "
+                + "{ "
+                + " ?ind a ?class . "
+                + "}";
+//        QueryExecution qexec = QueryExecutionFactory.sparqlService("http://data.open.ac.uk/query", qString, "");
+   //     QueryExecution qexec = new QueryEngineHTTP("http://dbpedia.org/sparql", qString);
+        QueryExecution qexec = QueryExecutionFactory.sparqlService( "http://datos.artium.org:8890/sparql", qString);
+        ResultSet results = qexec.execSelect();
+        String a=ResultSetFormatter.asText(results);
+        System.out.println("#Class " +a);     
+    }
+    
+    
+//    @Test
+//    public void testAddSPARQLEndPointSignature2() {
+//    
+//            try {
+//            String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+//                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+//                    + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?class where "
+//                    + "{ " + " ?ind a ?class . " + "}";
+//            String encodedQuery = URLEncoder.encode(qString, "UTF-8");
+//            String GET_URL = "https://dbpedia.org/sparql" + "?query=" + encodedQuery;
+//            DefaultHttpClient httpClient = new DefaultHttpClient();
+//            HttpGet getRequest = new HttpGet(GET_URL);
+//            getRequest.addHeader("accept", "application/sparql-results+json");
+//            HttpResponse response = httpClient.execute(getRequest);
+//            if (response.getStatusLine().getStatusCode() != 200) {
+//                throw new RuntimeException("Failed : HTTP error code : "
+//                        + response.getStatusLine().getStatusCode());
+//            }
+//            BufferedReader br = new BufferedReader(
+//                    new InputStreamReader((response.getEntity().getContent())));
+//            String output;
+//            String result = "";
+//            while ((output = br.readLine()) != null) {
+//                result = result + output;
+//            }
+//            ArrayList<String> classList = parseSparqlResultsJson(result, "class");
+//            
+//            httpClient.getConnectionManager().shutdown();
+//        } catch (ClientProtocolException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//    
+//    }
+    
+    
+        private ArrayList<String> parseSparqlResultsJson(String result, String varString) {
+
+        ArrayList<String> output = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonArray results = jsonParser.parse(result)
+                .getAsJsonObject().get("results")
+                .getAsJsonObject().getAsJsonArray("bindings");
+        for (JsonElement result1 : results) {
+            JsonObject _class = result1.getAsJsonObject().getAsJsonObject(varString);
+            String value = _class.get("value").getAsString();
+            try {
+                URI valueURI = new URI(value);
+                output.add(value);
+//                System.out.println(valueURI);
+            } catch (URISyntaxException ex) {
+                System.out.println(ex.getReason());
+            }
+        }
+        return output;
+    }
+
+    
+    
     
 //    @Test
     public void testAddSPARQLEndPointSignature() {
@@ -498,7 +636,8 @@ public class SPARQLEndPointTest {
 
             System.out.println("[SPARQLEndPointBasedRDFDatasetTest::testAddSPARQLEndPointSignature]");
             //String indexDir="/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/Led2Pro/SPARQEndPointIndex";
-            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
+            //String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
+            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointTestlist";
 
             // Open the file
             fstream = new FileInputStream(fileName);

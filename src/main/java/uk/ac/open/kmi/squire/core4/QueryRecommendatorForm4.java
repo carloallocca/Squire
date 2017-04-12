@@ -129,7 +129,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
         qs.register(this);
         boolean querySat = false;
         try {
-            log.debug("Checking satisfiability against source dataset <{}>", rdfd1.getPath());
+            log.debug("Checking satisfiability against source dataset <{}>", rdfd1.getEndPointURL());
             querySat = qs.isSatisfiableWRTResultsWithToken(query, rdfd1);
             log.debug(" ... is satisfiable? {}", querySat);
         } catch (Exception ex) {

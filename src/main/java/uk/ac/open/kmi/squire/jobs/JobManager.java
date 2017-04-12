@@ -126,11 +126,8 @@ public class JobManager implements IQueryRecommendationObserver {
             map.put(strToken, new RecommendationJobStatus());
 
         }
-
         try {
-
             IRDFDataset d1 = new SPARQLEndPoint(endPointURI, graphName);
-
             if (!d1.isIndexed()) {
 //                RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 

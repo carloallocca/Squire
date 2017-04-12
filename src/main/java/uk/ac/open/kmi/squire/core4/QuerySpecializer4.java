@@ -16,12 +16,15 @@ import java.util.Set;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
 import uk.ac.open.kmi.squire.core2.QueryTempVarSolutionSpace;
 import uk.ac.open.kmi.squire.core2.VarTemplateAndEntityQoQr;
@@ -41,6 +44,7 @@ import uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
+import uk.ac.open.kmi.squire.utils.PowerSetFactory;
 
 /**
  *
@@ -51,7 +55,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
     private static String INSTANCE_OP = "I";
     private static String REMOVE_TP_OP = "R";
 
-    private final List<QueryAndContextNode> specializableQueryList = new ArrayList();
+    private final List<QueryAndContextNode> specializableQueryAndContextNodeList = new ArrayList();
     private final List<QueryAndContextNode> recommandedQueryList = new ArrayList();
 
     private HashMap<String, Query> queryIndex = new HashMap<>();
@@ -79,8 +83,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
     private static final String DT_PROP_TEMPLATE_VAR = "dpt";
     private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
     private static final String LITERAL_TEMPLATE_VAR = "lt";
-
     
+
+
+    private final Logger log = LoggerFactory.getLogger(getClass());
     
     
     public QuerySpecializer4() {
@@ -126,18 +132,26 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
         // 2)...QueryResultTypeSimilarity
         QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
         float resulttypeSim = qRTS.computeQueryResultTypeSim(this.qO, this.rdfd1, this.qR, this.rdfd2);
-
+        log.debug("[QueryGeneralizer4::QuerySpecializer4] resulttypeSim " +resulttypeSim);
+        
         // 3)...QuerySpecificityDistance        
         QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
         float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(this.qO, this.qR);
+                log.debug("[QueryGeneralizer4::QuerySpecializer4] qSpecDistSimVar " +qSpecDistSimVar);
+                
         float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(this.qO, this.qR);
-
+        log.debug("[QueryGeneralizer4::QuerySpecializer4] qSpecDistSimTriplePattern " +qSpecDistSimTriplePattern);
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
 
+        
+        
         float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDist) + (resultTypeSimilarityDegree * resulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistSimVar + qSpecDistSimTriplePattern)));
         //float recommentedQueryScore = resulttypeSim + qSpecDistSimVar+qSpecDistSimTriplePattern;//This is working as it should but it does not consider the similarity distance between the replased entities
 
+        log.debug("[QueryGeneralizer4::QuerySpecializer4] recommentedQueryScore " +recommentedQueryScore);
+        
+        
         String op = ""; //It can be either R (for Removal) or I (Instanciation).
         ArrayList<String> operationList = new ArrayList();
 
@@ -151,7 +165,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
 
         //Map<Var, Set<RDFNode>> qTsolMap=temVarValueSpace.compute(qr, this.rdfd2, null);
         //D. Build the QueryAndContextNode from the query
-        QueryAndContextNode qAndcNode = new QueryAndContextNode();
+        
+       QueryAndContextNode qAndcNode = new QueryAndContextNode();
 
         //...set the original query and the recommendated query;
         qAndcNode.setqO(qo);
@@ -164,13 +179,13 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
         qAndcNode.setEntityqR("");
         
         
-//...SET THE CLASS, OBJECT AND DATATYPE PROPERTIES SETs...;        
+////...SET THE CLASS, OBJECT AND DATATYPE PROPERTIES SETs...;        
 //        qAndcNode.setcSetD2(d2.getClassSet());
 //        qAndcNode.setDpSetD2(d2.getDatatypePropertySet());
 //        qAndcNode.setOpSetD2(d2.getObjectPropertySet());
 //        qAndcNode.setlSetD2(d2.getLiteralSet());
 //        qAndcNode.setIndSetD2(d2.getIndividualSet());
-//        // As we have the issue of indexing long String when merging dpPropertySet and opPropertySet, I do not index and I do their merging here
+////        // As we have the issue of indexing long String when merging dpPropertySet and opPropertySet, I do not index and I do their merging here
 //        ArrayList<String> propertySet = new ArrayList();
 //        propertySet.addAll(d2.getDatatypePropertySet());
 //        propertySet.addAll(d2.getObjectPropertySet());
@@ -191,25 +206,77 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
 //        qAndcNode.setqRTemplateVariableSet(qRTemplateVariableSet);
 //        qAndcNode.setqRTriplePathSet(qRTriplePatternSet);
         //...set the QueryTempVarSolutionSpace
-        qAndcNode.setQueryTempVarSolutionSpace(qTsol);
+        qAndcNode.setSolutionSpace(qTsol);
         //qAndcNode.setQueryTempVarValueMap(qTsolMap);
 
-        //E. Sorted Insert of the QueryAndContextNode into the specializableQueryList
-        //specializableQueryList.add(qAndcNode);
+        log.info("[QueryGeneralizer4::QuerySpecializer4] qTsol size =  " +qTsol.size());
+        
+        //E. Sorted Insert of the QueryAndContextNode into the specializableQueryAndContextNodeList
         if(qTsol.size()>=1){
             specializableQueryListInsertSorted(qAndcNode);
-            System.out.println("");
-            System.out.println("[QuerySpecializer] WE WILL START THE SPECIALIZATION PROCESS...");
-            System.out.println("");
+            log.info("");
+            log.info("WE WILL START THE SPECIALIZATION PROCESS...");
+            log.info("");
         }
+        
 
 
 //        this.recommandedQueryList.add(qAndcNode);
     }
 
     public List<QueryAndContextNode> specialize() throws Exception {
- 
-        while (this.specializableQueryList.size() > 0) {
+//        log.info("::specialize() " +this.specializableQueryAndContextNodeList.size());
+//        if((this.specializableQueryAndContextNodeList.size()==1) && (this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().isEmpty())){
+//            log.info("WE WILL START THE SPECIALIZATION SUB PROCESS...");
+//            // 1. Get and Remove the QueryAndContextNode with qRScore max
+//            QueryAndContextNode parentQueryAndContextNode = getMaxQueryAndContextNode();
+//            log.info("getqO "+parentQueryAndContextNode.getqO());
+//            log.info("getqR "+parentQueryAndContextNode.getqR());
+//            //ADD the code for generating the subqueries with removed triple patterns (QueryAndContextNode)
+//            // The power set of the triple pattern set.
+//            // P.S. Look at the code down in the section 3. 
+//            Query parentqRCopy = QueryFactory.create(parentQueryAndContextNode.getqR());
+//            Set<TriplePath> triplePathSet = getQueryTriplePathSet(parentqRCopy);
+//
+//            List<List<TriplePath>> triplePathPowerSet=PowerSetFactory.powerset(triplePathSet);
+//            
+//            log.info("PowerSetFactory... " +triplePathPowerSet.toString());
+//
+//            for(List<TriplePath> triplePathSubSet:triplePathPowerSet){
+//                
+//                if(!triplePathSubSet.isEmpty()){
+//                    log.info("triplePathSubSet... " +triplePathSubSet.toString());
+//                    for(TriplePath tp:triplePathSubSet){
+//                        //apply the removal operation:
+//                        
+//                        // 4.1.1. Remove the TriplePath tp from the  parentqRCopy                    
+//                        Query qToProcess = QueryFactory.create(parentqRCopy);
+//
+//                        RemoveTriple instance = new RemoveTriple();
+//                        Query qWithoutTriple = instance.removeTP(qToProcess, tp.asTriple());
+//
+//                        Query q = QueryFactory.create(query, Syntax.syntaxSPARQL_11);
+//                        
+//                        
+//                        ElementPathBlock el = new ElementPathBlock();
+//                        el.addTriple(tp);
+//                        
+//                        
+//                        
+//                        
+//                    }
+//                    
+//                    
+//                }
+//            }
+//            
+//            
+//            
+//        }
+        log.info("WE WILL START THE SPECIALIZATION PROCESS...");
+
+        
+        while (this.specializableQueryAndContextNodeList.size() > 0) {
 
             // 1. Get and Remove the QueryAndContextNode with qRScore max
             QueryAndContextNode parentQueryAndContextNode = getMaxQueryAndContextNode();
@@ -288,7 +355,6 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
                                 specializableQueryListInsertSorted(childNode);
                                 
                                 this.notifyQueryRecommendation(childNode.getqR(), childNode.getqRScore());
-            
                                 
                                 //add qWithoutTriple to the index
                                 addQueryToIndexIFAbsent(childQueryCopyInstanciated);
@@ -324,7 +390,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
         //..set the RDF dataset 1
         IRDFDataset rdfD1 = parentQueryAndContextNode.getRdfD1();
         if (rdfD1 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getPath()),
+            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD1().getGraph());
             childQueryAndContextNode.setRdfD1(newRdfD1);
         } else { // TO ADD the case of FILEBASED dataset
@@ -332,7 +398,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
         //..set the RDF dataset 2
         IRDFDataset rdfD2 = parentQueryAndContextNode.getRdfD2();
         if (rdfD2 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getPath()),
+            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD2().getGraph());
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace
@@ -343,7 +409,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
             List<QuerySolution> qTsol = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
             List<QuerySolution> qTsolChild = new ArrayList();
             qTsolChild.addAll(qTsol);
-            childQueryAndContextNode.setQueryTempVarSolutionSpace(qTsolChild);
+            childQueryAndContextNode.setSolutionSpace(qTsolChild);
         } else { // TO ADD the case of FILEBASED dataset
         }
 
@@ -449,7 +515,6 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
 
     
     
-
     private String getEntityQo(Var tv) {
         String entityQo = "";
         String varName = tv.getVarName();
@@ -498,7 +563,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
         //..set the RDF dataset 1
         IRDFDataset rdfD1 = parentQueryAndContextNode.getRdfD1();
         if (rdfD1 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getPath()),
+            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD1().getGraph());
             childQueryAndContextNode.setRdfD1(newRdfD1);
         } else { // TO ADD the case of FILEBASED dataset
@@ -506,7 +571,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
         //..set the RDF dataset 2
         IRDFDataset rdfD2 = parentQueryAndContextNode.getRdfD2();
         if (rdfD2 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getPath()),
+            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD2().getGraph());
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace
@@ -517,7 +582,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
             List<QuerySolution> qTsol = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
             List<QuerySolution> qTsolChild = new ArrayList();
             qTsolChild.addAll(qTsol);
-            childQueryAndContextNode.setQueryTempVarSolutionSpace(qTsolChild);
+            childQueryAndContextNode.setSolutionSpace(qTsolChild);
         } else { // TO ADD the case of FILEBASED dataset
         }
 
@@ -587,8 +652,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
     }
 
     private void specializableQueryListInsertSorted(QueryAndContextNode d1) {
-        this.specializableQueryList.add(d1);
-        Collections.sort(this.specializableQueryList, new QueryAndContextNode.QRScoreComparator());
+        this.specializableQueryAndContextNodeList.add(d1);
+        Collections.sort(this.specializableQueryAndContextNodeList, new QueryAndContextNode.QRScoreComparator());
     }
 
     private Set<TriplePath> getQueryTriplePathSet(Query q) {
@@ -656,8 +721,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
     }
 
     private QueryAndContextNode getMaxQueryAndContextNode() {
-        QueryAndContextNode maxNode = this.specializableQueryList.get(0);
-        this.specializableQueryList.remove(maxNode);
+        QueryAndContextNode maxNode = this.specializableQueryAndContextNodeList.get(0);
+        this.specializableQueryAndContextNodeList.remove(maxNode);
         return maxNode;
     }
 
@@ -705,7 +770,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable{
 //
 //                //In generale guarda dall'altra procedura per capire cosa manca
 //                
-//                // 7. devo aggiungere to specializableQueryList in order to be further specialized
+//                // 7. devo aggiungere to specializableQueryAndContextNodeList in order to be further specialized
 //                specializableQueryListInsertSorted(qRScoreMaxNodeCloned);
 //            
 //                this.recommandedQueryList.add(qRScoreMaxNodeCloned);

@@ -54,7 +54,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 
 
     public boolean isSatisfiableWRTResults(Query q, IRDFDataset d) {
-        String datasetPath = (String) d.getPath();
+        String datasetPath = (String) d.getEndPointURL();
         Query qTMP = QueryFactory.create(q.toString());
         qTMP.setLimit(2);
 
@@ -63,7 +63,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
         } // TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPoint
         else if (d instanceof SPARQLEndPoint) {
             List<QuerySolution> resList;
-//                QueryExecution qexec = new QueryEngineHTTP((String) d.getPath(), q);
+//                QueryExecution qexec = new QueryEngineHTTP((String) d.getEndPointURL(), q);
 //                ResultSet results = qexec.execSelect();
 //                resList = ResultSetFormatter.toList(results); //.out(, results, q);
 //                return resList.size() >= 1;
@@ -117,7 +117,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
     }
 
     public boolean isSatisfiableWRTResultsWithToken(Query q, IRDFDataset d) throws Exception{
-        String datasetPath = (String) d.getPath();
+        String datasetPath = (String) d.getEndPointURL();
         Query qTMP = QueryFactory.create(q.toString());
         qTMP.setLimit(2);
         if (datasetPath == null || datasetPath.isEmpty()) {
@@ -125,7 +125,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
             return false;
         } else if (d instanceof SPARQLEndPoint) {
             List<QuerySolution> resList;
-//                QueryExecution qexec = new QueryEngineHTTP((String) d.getPath(), q);
+//                QueryExecution qexec = new QueryEngineHTTP((String) d.getEndPointURL(), q);
 //                ResultSet results = qexec.execSelect();
 //                resList = ResultSetFormatter.toList(results); //.out(, results, q);
 //                return resList.size() >= 1;               
@@ -224,7 +224,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
     
 
     //    public boolean isSatisfiableWRTResults(Query q, IRDFDataset d) {
-//        String datasetPath = (String) d.getPath();
+//        String datasetPath = (String) d.getEndPointURL();
 ////        System.out.println("[SPARQLQuerySatisfiable::isSatisfiableWRTResults]"+datasetPath);
 //        if (datasetPath == null || datasetPath.isEmpty()) {
 //            //return false; //it should return false

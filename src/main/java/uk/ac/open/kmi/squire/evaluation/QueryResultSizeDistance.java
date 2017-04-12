@@ -120,9 +120,9 @@ public class QueryResultSizeDistance {
         int cardinality = 0;
         try {
             OntModel inf = ModelFactory.createOntologyModel();
-            InputStream in = new FileInputStream((String) d1.getPath());
+            InputStream in = new FileInputStream((String) d1.getEndPointURL());
             if (in == null) {
-                throw new IllegalArgumentException("File: " + (String) d1.getPath() + " not found");
+                throw new IllegalArgumentException("File: " + (String) d1.getEndPointURL() + " not found");
             }   //...import the content of the owl file in the Jena model. 
             inf.read(in, "");
             //...querying ...
@@ -146,7 +146,7 @@ public class QueryResultSizeDistance {
     private int computeSPARQLEndPointQueryResultSetCardinality(Query qOri, IRDFDataset d1) {
         int cardinality = 0;
 
-        String endpoint = (String) d1.getPath();
+        String endpoint = (String) d1.getEndPointURL();
         QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint, qOri, (String)d1.getGraph());
 
 //        QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint, qOri);
@@ -206,9 +206,9 @@ public class QueryResultSizeDistance {
         int card = 0;
         try {
             OntModel inf = ModelFactory.createOntologyModel();
-            InputStream in = new FileInputStream((String) d1.getPath());
+            InputStream in = new FileInputStream((String) d1.getEndPointURL());
             if (in == null) {
-                throw new IllegalArgumentException("File: " + (String) d1.getPath() + " not found");
+                throw new IllegalArgumentException("File: " + (String) d1.getEndPointURL() + " not found");
             }   //...import the content of the owl file in the Jena model. 
             inf.read(in, "");
             //...querying ...
@@ -246,7 +246,7 @@ public class QueryResultSizeDistance {
                 + "{ "
                 + " ?indiv rdf:type <" + classe + "> . "
                 + "}";
-        QueryExecution qexec = QueryExecutionFactory.sparqlService((String) d1.getPath(), qString, (String) d1.getGraph());
+        QueryExecution qexec = QueryExecutionFactory.sparqlService((String) d1.getEndPointURL(), qString, (String) d1.getGraph());
         ResultSet results = qexec.execSelect();
         List<QuerySolution> resList = ResultSetFormatter.toList(results);//.out(, results, q);
         card = resList.size();
@@ -301,9 +301,9 @@ public class QueryResultSizeDistance {
         int card = 0;
         try {
             OntModel inf = ModelFactory.createOntologyModel();
-            InputStream in = new FileInputStream((String) d1.getPath());
+            InputStream in = new FileInputStream((String) d1.getEndPointURL());
             if (in == null) {
-                throw new IllegalArgumentException("File: " + (String) d1.getPath() + " not found");
+                throw new IllegalArgumentException("File: " + (String) d1.getEndPointURL() + " not found");
             }   //...import the content of the owl file in the Jena model. 
             inf.read(in, "");
             //...querying ...
@@ -363,7 +363,7 @@ public class QueryResultSizeDistance {
                 + " {?class2 rdf:type rdfs:Class .} "
                 + " ?indiv1  <" + prop + "> ?indiv2 . "
                 + "}";
-        try (QueryExecution qexec = QueryExecutionFactory.sparqlService((String) d1.getPath(), qString, (String) d1.getGraph())) {
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService((String) d1.getEndPointURL(), qString, (String) d1.getGraph())) {
             ResultSet results = qexec.execSelect();
             List<QuerySolution> resList = ResultSetFormatter.toList(results);//.out(, results, q);
             card = resList.size();
@@ -419,9 +419,9 @@ public class QueryResultSizeDistance {
         int card = 0;
         try {
             OntModel inf = ModelFactory.createOntologyModel();
-            InputStream in = new FileInputStream((String) d1.getPath());
+            InputStream in = new FileInputStream((String) d1.getEndPointURL());
             if (in == null) {
-                throw new IllegalArgumentException("File: " + (String) d1.getPath() + " not found");
+                throw new IllegalArgumentException("File: " + (String) d1.getEndPointURL() + " not found");
             }   //...import the content of the owl file in the Jena model. 
             inf.read(in, "");
             //...querying ...
@@ -462,7 +462,7 @@ public class QueryResultSizeDistance {
                 + " <" + prop + "> rdf:type owl:DatatypeProperty . "
                 + " ?indiv1  <" + prop + "> ?indiv2 . "
                 + "}";
-        try (QueryExecution qexec = QueryExecutionFactory.sparqlService((String) d1.getPath(), qString, (String) d1.getGraph())) {
+        try (QueryExecution qexec = QueryExecutionFactory.sparqlService((String) d1.getEndPointURL(), qString, (String) d1.getGraph())) {
             ResultSet results = qexec.execSelect();
             List<QuerySolution> resList = ResultSetFormatter.toList(results);//.out(, results, q);
             card = resList.size();

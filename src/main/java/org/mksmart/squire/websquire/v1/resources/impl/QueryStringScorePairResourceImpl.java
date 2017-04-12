@@ -60,6 +60,8 @@ public class QueryStringScorePairResourceImpl implements QueryStringScorePairRes
         } catch (IOException e) {
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
+        
+        
 
         String depToken1 = jobMan.doRDFDatasetIndexing(source_endpoint);
         log.debug("Check-and-index job {} submitted for <{}>", depToken1, source_endpoint);
@@ -91,6 +93,8 @@ public class QueryStringScorePairResourceImpl implements QueryStringScorePairRes
             return null;
         }
         log.info("Indices complete, should now proceed with recommendation.");
+        
+        
         JobStatement jb;
         String token = jobMan.doQueryRecommendation(qo, d1, d2, resultTypeSimilarityDegree,
                 queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree);

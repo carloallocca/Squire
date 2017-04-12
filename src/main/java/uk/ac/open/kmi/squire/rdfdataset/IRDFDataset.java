@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public interface IRDFDataset extends  Runnable{
     
-    public Object getPath();
+    public Object getEndPointURL();
     public void setPath(Object path);
     
     public Object getGraph();

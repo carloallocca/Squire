@@ -22,6 +22,8 @@ import uk.ac.open.kmi.squire.entityvariablemapping.ObjectPropertyVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.RDFVocVarMapping;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  *
  * @author carloallocca
@@ -29,7 +31,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 public class QueryRecommendator4 <T>  extends AbstractQueryRecommendationObservable implements IQueryRecommendationObserver {
 
 //    private final HashMap<String, TreeNode<T>> treeNodeIndex = new HashMap<>();
-
+    private final Logger log = LoggerFactory.getLogger(getClass());
     private final IRDFDataset rdfD1;
     private final Query q0;
     private final Query q0Copy;
@@ -119,6 +121,9 @@ public class QueryRecommendator4 <T>  extends AbstractQueryRecommendationObserva
         //RANKING...
         this.qRList=qS.getRecommandedQueryList();
         applyRankingToRecommandedQueryList(qRList);
+        
+//        log.info("[buildRecommendation] " +this.qRList.toString());
+
         
     }
 

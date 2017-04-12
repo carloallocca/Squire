@@ -202,7 +202,7 @@ public class AbstractedRDFDataset implements IRDFDataset {
     }
 
     @Override
-    public Object getPath() {
+    public Object getEndPointURL() {
         return this.datasetPath;//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

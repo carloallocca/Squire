@@ -91,8 +91,15 @@ public class QueryAndContextNode {
         return queryTempVarSolutionSpace;
     }
 
-    public void setQueryTempVarSolutionSpace(List<QuerySolution> queryTempVarSolutionSpace) {
-        this.queryTempVarSolutionSpace = queryTempVarSolutionSpace;
+    public void setSolutionSpace(List<QuerySolution> queryTempVarSolutionSpace) {
+        if(queryTempVarSolutionSpace==null){
+            this.queryTempVarSolutionSpace = new ArrayList();
+        }
+        else{
+            this.queryTempVarSolutionSpace = queryTempVarSolutionSpace;
+        }
+            
+
     }
 
 public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
@@ -188,7 +195,7 @@ public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
         //...set the QueryTempVarSolutionSpace
         List<QuerySolution> clonedQueryTempVarSolutionSpace = new ArrayList();        
         clonedQueryTempVarSolutionSpace.addAll(qRScoreMaxNode.getQueryTempVarSolutionSpace());
-        clonedNode.setQueryTempVarSolutionSpace(clonedQueryTempVarSolutionSpace);
+        clonedNode.setSolutionSpace(clonedQueryTempVarSolutionSpace);
             
         return clonedNode;
         
@@ -197,6 +204,7 @@ public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
    
     public static class QRScoreComparator implements Comparator<QueryAndContextNode>
     {
+        //@Override
     	public int compare(QueryAndContextNode p1, QueryAndContextNode p2)
     	{
             float score1 = p1.getqRScore();
