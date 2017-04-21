@@ -859,7 +859,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -894,7 +894,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -929,7 +929,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -964,7 +964,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
                             /////////////////////////////////////////////////////////////////// THIS IS THE POINT WHERE I MAKE THE INSTANTIATION
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -1019,10 +1019,10 @@ public class QueryRecommendation<T> {
                         //System.out.println("childQuery ====BEFORE== " + childQuery.toString());
                         // Step 3: Instantiate From VarTemplate To Node
                         // Query childQueryInstantiated
-                        //         = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                        //         = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                         //System.out.println("PROPERTY::== " + property);
                         //System.out.println("templateVar::== " + templateVar.getName());
-                        childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                        childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
 
 //                        System.out.println(" ");
 //                        System.out.println(" ");
@@ -1077,7 +1077,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -1112,7 +1112,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -1147,7 +1147,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -1182,7 +1182,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                             TreeNode<Query> childNode;
                             childNode = new TreeNode(childQuery, null);
@@ -1359,7 +1359,7 @@ public class QueryRecommendation<T> {
                             ArrayList<String> chilLitL = new ArrayList<String>();
                             chilLitL.addAll(parentLitL);
                             Query childQuery = QueryFactory.create(parentQuery.toString());
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
                             String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
                             String entityqR = clas;
                             ArrayList<String> childOperationList = new ArrayList();
@@ -1401,7 +1401,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -1450,7 +1450,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -1501,7 +1501,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
                             /////////////////////////////////////////////////////////////////// THIS IS THE POINT WHERE I MAKE THE INSTANTIATION
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = "";
@@ -1571,7 +1571,7 @@ public class QueryRecommendation<T> {
                         Query childQuery = QueryFactory.create(parentQuery.toString());
                         //childQuery = parentQuery; parentQuery
 
-                        childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                        childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
 
                         String entityqO = null;
                         if (templateVarString.contains("opt")) {
@@ -1637,7 +1637,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
 
                             String entityqO = this.classVarTable.getClassFromVar(templateVarString);
                             String entityqR = clas;
@@ -1687,7 +1687,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -1738,7 +1738,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -1788,7 +1788,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = null;
@@ -1926,7 +1926,7 @@ public class QueryRecommendation<T> {
                             ArrayList<String> chilLitL = new ArrayList<String>();
                             chilLitL.addAll(parentLitL);
                             Query childQuery = QueryFactory.create(parentQuery.toString());
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
                             String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
                             String entityqR = clas;
                             ArrayList<String> childOperationList = new ArrayList();
@@ -1968,7 +1968,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -2017,7 +2017,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -2068,7 +2068,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
                             /////////////////////////////////////////////////////////////////// THIS IS THE POINT WHERE I MAKE THE INSTANTIATION
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = "";
@@ -2138,7 +2138,7 @@ public class QueryRecommendation<T> {
                         Query childQuery = QueryFactory.create(parentQuery.toString());
                         //childQuery = parentQuery; parentQuery
 
-                        childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                        childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
 
                         String entityqO = null;
                         if (templateVarString.contains("opt")) {
@@ -2204,7 +2204,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
 
                             String entityqO = this.classVarTable.getClassFromVar(templateVarString);
                             String entityqR = clas;
@@ -2254,7 +2254,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -2305,7 +2305,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -2355,7 +2355,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = null;
@@ -2453,7 +2453,7 @@ public class QueryRecommendation<T> {
                             ArrayList<String> chilLitL = new ArrayList<String>();
                             chilLitL.addAll(parentLitL);
                             Query childQuery = QueryFactory.create(parentQuery.toString());
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
                             String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
                             String entityqR = clas;
                             ArrayList<String> childOperationList = new ArrayList();
@@ -2496,7 +2496,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -2546,7 +2546,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -2599,7 +2599,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
                             /////////////////////////////////////////////////////////////////// THIS IS THE POINT WHERE I MAKE THE INSTANTIATION
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = "";
@@ -2669,7 +2669,7 @@ public class QueryRecommendation<T> {
                         Query childQuery = QueryFactory.create(parentQuery.toString());
                         //childQuery = parentQuery; parentQuery
 
-                        childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                        childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
 
                         String entityqO = null;
                         if (templateVarString.contains("opt")) {
@@ -2736,7 +2736,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
 
                             String entityqO = this.classVarTable.getClassFromVar(templateVarString);
                             String entityqR = clas;
@@ -2788,7 +2788,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -2841,7 +2841,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -2893,7 +2893,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = null;
@@ -3025,7 +3025,7 @@ public class QueryRecommendation<T> {
                             ArrayList<String> chilLitL = new ArrayList<String>();
                             chilLitL.addAll(parentLitL);
                             Query childQuery = QueryFactory.create(parentQuery.toString());
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
                             String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
                             String entityqR = clas;
                             ArrayList<String> childOperationList = new ArrayList();
@@ -3067,7 +3067,7 @@ public class QueryRecommendation<T> {
                     //                            // Step 2: Create a childQuery
                     //                            Query childQuery = QueryFactory.create(parentQuery.toString());
                     //
-                    //                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                    //                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                     //                            // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                     //
                     //                            String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -3117,7 +3117,7 @@ public class QueryRecommendation<T> {
                     //                            // Step 2: Create a childQuery
                     //                            Query childQuery = QueryFactory.create(parentQuery.toString());
                     //
-                    //                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                    //                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                     //                            // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                     //
                     //                            String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -3170,7 +3170,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
                             /////////////////////////////////////////////////////////////////// THIS IS THE POINT WHERE I MAKE THE INSTANTIATION
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = "";
@@ -3234,7 +3234,7 @@ public class QueryRecommendation<T> {
                         // Step 2: Create a childQuery
                         Query childQuery = QueryFactory.create(parentQuery.toString());
                         //childQuery = parentQuery; parentQuery
-                        childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                        childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                         String entityqO = null;
                         if (templateVarString.contains("opt")) {
                             entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
@@ -3297,7 +3297,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(clas));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(clas));
 
                             String entityqO = this.classVarTable.getClassFromVar(templateVarString);
                             String entityqR = clas;
@@ -3349,7 +3349,7 @@ public class QueryRecommendation<T> {
                     //                            // Step 2: Create a childQuery
                     //                            Query childQuery = QueryFactory.create(parentQuery.toString());
                     //
-                    //                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(individual));
+                    //                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(individual));
                     //                            // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                     //
                     //                            String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
@@ -3402,7 +3402,7 @@ public class QueryRecommendation<T> {
                     //                            // Step 2: Create a childQuery
                     //                            Query childQuery = QueryFactory.create(parentQuery.toString());
                     //
-                    //                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(literal));
+                    //                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(literal));
                     //                            // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
                     //
                     //                            String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
@@ -3454,7 +3454,7 @@ public class QueryRecommendation<T> {
                             // Step 2: Create a childQuery
                             Query childQuery = QueryFactory.create(parentQuery.toString());
 
-                            childQuery = qi.instantiateFromVarTemplateToNode(childQuery, templateVar, NodeFactory.createURI(property));
+                            childQuery = qi.instantiateVarTemplate(childQuery, templateVar, NodeFactory.createURI(property));
                             // Step 4: creating a childNode and we add it to the Tree, if it is not added alrady.
 
                             String entityqO = null;

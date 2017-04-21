@@ -72,8 +72,8 @@ public class RDFDatasetIndexerTest {
             //String indexDir="/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/Led2Pro/SPARQEndPointIndex";
             //String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
             //This file contains the endpoints for the gold-standard
-            //String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlistNew";
-            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointTestlist";
+            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlistNew";
+            //String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointTestlist";
             
             
 

@@ -49,6 +49,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
+import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
 
 /**
@@ -58,7 +59,7 @@ import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
  */
 public class RDFDatasetIndexer {
 
-    private static Log log = LogFactory.getLog(RDFDatasetIndexer.class);
+ private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
     private final Version version = Version.LUCENE_5_4_0;
 
     private static RDFDatasetIndexer me ;
@@ -222,6 +223,13 @@ public class RDFDatasetIndexer {
         // SPARQLEndPoint output= new SPARQLEndPoint(urlAddress, graphName);
         try {
             if (null != graphName || !graphName.isEmpty()) {
+                
+                
+                if(this.alreadyExists(urlAddress, graphName)){
+                    log.info("sparql endpoint:" +urlAddress);
+                }
+                
+                                
                 Path path = Paths.get(this.datasetIndexDir);
                 Directory index1 = FSDirectory.open(path);
                 IndexReader reader = DirectoryReader.open(index1);

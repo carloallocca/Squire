@@ -87,7 +87,7 @@ public class QueryTempVarSolutionSpace {
         private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
         
         
-    public List<QuerySolution> compute(Query qChild, IRDFDataset rdfd2) {
+    public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2) {
         // 0. Check if the input query has aany template variable, otherwise qTsol is empty
         Set<Var> templateVarSet = getQueryTemplateVariableSet(qChild);
         if (templateVarSet.size() > 0) {
@@ -96,9 +96,9 @@ public class QueryTempVarSolutionSpace {
                 Query qT = rewriteQueryWithTemplateVar(qChild);
                 // 2. Compute the QuerySolution for qT;
                 
-                qT.setLimit(1000);
+//                qT.setLimit(1000);
                 
-                log.info("[QueryTempVarSolutionSpace::compute]qT.setLimit(1000); " +qT.toString());
+                log.info("[QueryTempVarSolutionSpace::compute]qT.setLimit(1000); " +qT);
                 
                 List<QuerySolution> qTsol = computeSolutionSpace(qT, rdfd2);
                 log.info("[QueryTempVarSolutionSpace::compute]qTsol size; " +qTsol.size());

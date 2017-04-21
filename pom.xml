@@ -26,7 +26,7 @@
         -->
 
         <!-- JSON tax -->
-<!--        <dependency>
+        <!--        <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
@@ -97,6 +97,11 @@
             <version>2.6.2</version>
             <type>jar</type>
         </dependency>
+<dependency>
+    <groupId>org.apache.jena</groupId>
+    <artifactId>jena-querybuilder</artifactId>
+    <version>3.1.0</version>
+</dependency>
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-web-api</artifactId>

@@ -16,6 +16,7 @@ import org.apache.jena.query.QueryParseException;
 import org.mksmart.squire.websquire.v1.resources.QueryStringScorePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.open.kmi.squire.core.QueryScorePair;
 
 import uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
@@ -138,19 +139,20 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 
         // Phase 2 : check dataset similarity
         if (querySat) {
+                
             try {
-                this.notifyQuerySatisfiableValue(true);
-                RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
-                querySim.register(this);
-                float score = querySim.computeSim(rdfd1, rdfd2);
-
                 // Phase 3 : recommend
                 QueryRecommendator4 qR = new QueryRecommendator4(query, rdfd1, rdfd2,
                         resultTypeSimilarityDegree, queryRootDistanceDegree, resultSizeSimilarityDegree,
                         querySpecificityDistanceDegree);
+
+                this.notifyQuerySatisfiableValue(true);
+                RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
+                querySim.register(this);
+                float score = querySim.computeSim(rdfd1, rdfd2);
                 qR.register(this);
                 qR.buildRecommendation();
-
+//                log.info("::size list of reccomended queries: "+qR.getSortedRecomQueryList().size());
             } catch (Exception ex) {
                 log.error("", ex);
             }

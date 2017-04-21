@@ -83,7 +83,7 @@ public class Test {
         
         
        SPARQLQueryInstantiation qi= new SPARQLQueryInstantiation();
-       Query intQuery2=qi.instantiateFromVarTemplateToNode(query3, varTemplate2, node2);
+       Query intQuery2=qi.instantiateVarTemplate(query3, varTemplate2, node2);
        System.out.println("[Test::main()]");
 //       System.out.println(query2.toString());
        System.out.println(intQuery2.toString());

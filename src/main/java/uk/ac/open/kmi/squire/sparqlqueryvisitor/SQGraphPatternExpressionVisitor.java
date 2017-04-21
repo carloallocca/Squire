@@ -35,7 +35,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  */
 public class SQGraphPatternExpressionVisitor extends ElementVisitorBase {
 
-    private Set<String> queryGPE = new HashSet<String>();
+    private Set<TriplePath> queryGPE = new HashSet<TriplePath>();
 
     public SQGraphPatternExpressionVisitor() {
         super();
@@ -50,11 +50,11 @@ public class SQGraphPatternExpressionVisitor extends ElementVisitorBase {
         ListIterator<TriplePath> it = el.getPattern().iterator();
         while (it.hasNext()) {
             final TriplePath tp = it.next();
-            queryGPE.add(tp.toString());
+            queryGPE.add(tp);
         }
     }
 
-    public Set<String> getQueryGPE() {
+    public Set<TriplePath> getQueryGPE() {
         return queryGPE;
     }
     

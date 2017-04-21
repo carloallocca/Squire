@@ -5,14 +5,27 @@
  */
 package uk.ac.open.kmi.squire.operation;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.query.Query;
@@ -27,6 +40,7 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.core4.AbstractQueryRecommendationObservable;
 import uk.ac.open.kmi.squire.core4.IQueryRecommendationObservable;
 import uk.ac.open.kmi.squire.core4.IQueryRecommendationObserver;
@@ -41,7 +55,7 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
 public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservable {
 
 
-
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
     public SPARQLQuerySatisfiable(String token) {
         this.token = token;
     }
@@ -115,6 +129,14 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
         }
         return false;
     }
+
+//    public boolean isSatisfiableWRTResultsWithToken(Query q, IRDFDataset d) throws Exception{
+//        boolean result=isSatWRTResultsWithToken(q, d);
+//        this.notifyQuerySatisfiableValue(result);
+//        return result;
+//    }
+
+    
 
     public boolean isSatisfiableWRTResultsWithToken(Query q, IRDFDataset d) throws Exception{
         String datasetPath = (String) d.getEndPointURL();
@@ -210,85 +232,70 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
     
     
     
-    
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+       private boolean isSatWRTResultsWithToken(Query q, IRDFDataset d) {
+        try {
+            Query qTMP = QueryFactory.create(q.toString());
+            qTMP.setLimit(2);
+            List<String> outputVarList=qTMP.getResultVars();
+            String encodedQuery = URLEncoder.encode(qTMP.toString(), "UTF-8");
+            String GET_URL = d.getEndPointURL() + "?query=" + encodedQuery;
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpGet getRequest = new HttpGet(GET_URL);
+            getRequest.addHeader("accept", "application/sparql-results+json");
+            HttpResponse response = httpClient.execute(getRequest);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+            String output;
+            String result = "";
+            while ((output = br.readLine()) != null) {
+                result = result + output;
+            }
 
-    //    public boolean isSatisfiableWRTResults(Query q, IRDFDataset d) {
-//        String datasetPath = (String) d.getEndPointURL();
-////        System.out.println("[SPARQLQuerySatisfiable::isSatisfiableWRTResults]"+datasetPath);
-//        if (datasetPath == null || datasetPath.isEmpty()) {
-//            //return false; //it should return false
-//            return false;
-//        } // TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPoint
-//        else if (datasetPath.startsWith("http://") || datasetPath.startsWith("https://")) {
-//            //manage the case of SPARQL endpoint
-////            String ontology_service = "http://ambit.uni-plovdiv.bg:8080/ontology";
-////            String endpoint = "otee:Endpoints";
-////            String endpointsSparql
-////                    = "PREFIX ot:<http://www.opentox.org/api/1.1#>\n"
-////                    + "	PREFIX ota:<http://www.opentox.org/algorithms.owl#>\n"
-////                    + "	PREFIX owl:<http://www.w3.org/2002/07/owl#>\n"
-////                    + "	PREFIX dc:<http://purl.org/dc/elements/1.1/>\n"
-////                    + "	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
-////                    + "	PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n"
-////                    + "	PREFIX otee:<http://www.opentox.org/echaEndpoints.owl#>\n"
-////                    + "		select ?url ?title\n"
-////                    + "		where {\n"
-////                    + "		?url rdfs:subClassOf %s.\n"
-////                    + "		?url dc:title ?title.\n"
-////                    + "		}\n";
-////
-////            QueryExecution x = QueryExecutionFactory.sparqlService(ontology_service, String.format(endpointsSparql, endpoint));
-////            ResultSet results = x.execSelect();
-////            ResultSetFormatter.out(System.out, results);
-//
-//            return true;
-//        } else {
-//
-//            //InputStream in=null ;
-//            try {
-//
-//                OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_MICRO_RULE_INF);// m = ModelFactory.createOntologyModel();
-//                InputStream in = new FileInputStream(datasetPath);
-//                if (in == null) {
-//                    throw new IllegalArgumentException("File: " + datasetPath + " not found");
-//                }
-//                //...import the content of the owl file in the Jena model. 
-//                m.read(in, "");
-//
-//                //...querying ...
-//                QueryExecution qexec = QueryExecutionFactory.create(q, m);
-//                if (q.isSelectType()) {
-//                    ResultSet results = qexec.execSelect();
-//
-//                    // Output query results	
-//                    List<QuerySolution> resList = ResultSetFormatter.toList(results);//.out(, results, q);
-//                    qexec.close();
-//                    return resList.size() >= 1;
-//                }
-//                return false;
-//            } catch (FileNotFoundException ex) {
-//                Logger.getLogger(SPARQLQuerySatisfiable.class.getName()).log(Level.SEVERE, null, ex);
-//            } finally {
-////                try {
-////                    in.close();
-////                } catch (IOException ex) {
-////                    Logger.getLogger(SPARQLQuerySatisfiable.class.getName()).log(Level.SEVERE, null, ex);
-////                }
-//            }
-//        }
-//        return false;
-//    }
+            if(!outputVarList.isEmpty()){
+                String firstVar=outputVarList.get(0);
+                ArrayList<String> resList = parseSparqlResultsJson(result, firstVar);
+                return resList.size()>0;   
+            }
+            httpClient.getConnectionManager().shutdown();                        
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+ 
+    private ArrayList<String> parseSparqlResultsJson(String result, String varString) {
 
+        ArrayList<String> output = new ArrayList<>();
+        JsonParser jsonParser = new JsonParser();
+        JsonArray results = jsonParser.parse(result)
+                .getAsJsonObject().get("results")
+                .getAsJsonObject().getAsJsonArray("bindings");
+        for (JsonElement result1 : results) {
+            JsonObject _class = result1.getAsJsonObject().getAsJsonObject(varString);
+            String value = _class.get("value").getAsString();
+            try {
+                URI valueURI = new URI(value);
+                output.add(value);
+//                System.out.println(valueURI);
+            } catch (URISyntaxException ex) {
+                log.error("Bad URI synax for string '{}'", value);
+            }
+        }
+        return output;
+    }
+
+    
+    
+    
+    
+    
+    
+   
 
 }

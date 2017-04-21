@@ -58,10 +58,10 @@ public class QueryResultTypeSimilarity {
         float sim;
         List<VarTypeMap> qOri_d1_signature = computeQueryVariableSignature(qOri, d1);
         
-        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeSim] qOri_d1_signature" +qOri_d1_signature.size());
+//        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeSim] qOri_d1_signature" +qOri_d1_signature.size());
         List<VarTypeMap> qRec_d2_signature = computeQueryVariableSignature(qRec, d2);
         
-        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeSim] qRec_d2_signature" +qRec_d2_signature.size());        
+//        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeSim] qRec_d2_signature" +qRec_d2_signature.size());        
         sim = computeRTQSim(qOri_d1_signature, qRec_d2_signature);
         return sim;
     }
@@ -71,11 +71,11 @@ public class QueryResultTypeSimilarity {
         float sim = 0;
         int cardSignatureQo = qOri_d1_signature.size();
         
-        log.info("[QueryResultTypeSimilarity::computeRTQSim] cardSignatureQo" +cardSignatureQo);
+//        log.info("[QueryResultTypeSimilarity::computeRTQSim] cardSignatureQo" +cardSignatureQo);
         
         int cardSignatureQr = qRec_d2_signature.size();
 
-                log.info("[QueryResultTypeSimilarity::computeRTQSim] cardSignatureQr" +cardSignatureQr);
+//                log.info("[QueryResultTypeSimilarity::computeRTQSim] cardSignatureQr" +cardSignatureQr);
 
         if (!(cardSignatureQo == 0) && !(cardSignatureQr == 0)) {
             int intersection = 0;
@@ -87,7 +87,7 @@ public class QueryResultTypeSimilarity {
 
             //            sim =(float) (1.0*(((1.0*qOvarList.size())/(1.0*qRvarList.size()))));
             
-            log.info("[QueryResultTypeSimilarity::computeRTQSim] intersection" +intersection);
+//            log.info("[QueryResultTypeSimilarity::computeRTQSim] intersection" +intersection);
             int cardUnionSignature = computeUnionCardinality(qOri_d1_signature, qRec_d2_signature);
             sim = (float) ((1.0 * intersection) / (1.0 * cardUnionSignature));
             //System.out.println("[ResultTypeQuerySimilarity::computeRTQS] computeRTQSim sim:: " + sim);
@@ -161,9 +161,9 @@ public class QueryResultTypeSimilarity {
         if (qOri.isSelectType()) {
             Query newqOri = QueryFactory.create(qOri.toString(), Syntax.syntaxSPARQL_11);
             newqOri.setLimit(1);            
-            log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] newqOri.setLimit(1)" +newqOri);
+//            log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] newqOri.setLimit(1)" +newqOri);
             try (QueryExecution qexec = new QueryEngineHTTP(endpoint, newqOri)) {
-                log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] qOri" +qOri);
+//                //log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] qOri" +qOri);
 //                try (QueryExecution qexec = QueryExecutionFactory.sparqlService(endpoint, qOri, (String)d1.getGraph());) {
                 ResultSet results = qexec.execSelect();
                                 
@@ -174,18 +174,18 @@ public class QueryResultTypeSimilarity {
                     Iterator<String> varIter = firstSol.varNames();
                     while (varIter.hasNext()) {
                         final String varName = varIter.next();
-                        log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] varName " +varName);
+//                        log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] varName " +varName);
                         
                         final String varType;
                         RDFNode varValue = firstSol.get(varName);
                         
-                        log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] varValue " +varValue);
+//                        log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] varValue " +varValue);
                         if (varValue.isURIResource()) {
                             varType = TYPE_OF_URI;
                         } else if (varValue.isLiteral()) {
                             RDFDatatype literalValue = varValue.asLiteral().getDatatype();
                             varType = literalValue.getURI();
-                            log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] varType " +varType);
+//                            log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] varType " +varType);
                         } else {
                             varType = "";
                         }
@@ -193,7 +193,7 @@ public class QueryResultTypeSimilarity {
                         VarTypeMap vtm = new VarTypeMap(varName, varType);
                         signature.add(vtm);
                     }
-                    log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] signature " +signature.size());
+//                   // log.info("[QueryResultTypeSimilarity::computeSPARQLEndPointBasedQVS] signature " +signature.size());
                         
                     return signature;
                 }

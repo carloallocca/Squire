@@ -144,9 +144,9 @@ public class QuerySpecializer {
 
         //C. Compute the QueryTempVarSolutionSpace
         QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-        List<QuerySolution> qTsol = temVarValueSpace.compute(qr, this.rdfd2);
+        List<QuerySolution> qTsol = temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2);
 
-        //Map<Var, Set<RDFNode>> qTsolMap=temVarValueSpace.compute(qr, this.rdfd2, null);
+        //Map<Var, Set<RDFNode>> qTsolMap=temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2, null);
         //D. Build the QueryAndContextNode from the query
         QueryAndContextNode qAndcNode = new QueryAndContextNode();
 
@@ -176,7 +176,7 @@ public class QuerySpecializer {
 //        qAndcNode.setRdfVD2(d2.getRDFVocabulary());
 
         //...set the score measurements
-        qAndcNode.setQueryRootDistance(queryRootDist); // do also for the other measurements, compute them...
+        qAndcNode.setQueryRootDistance(queryRootDist); // do also for the other measurements, computeTempVarSolutionSpace them...
         qAndcNode.setQueryResultTypeSimilarity(resulttypeSim);
         qAndcNode.setQuerySpecificityDistance(qSpecDistSimVar + qSpecDistSimTriplePattern);
         qAndcNode.setQueryResultSizeSimilarity(queryResultSizeSimilarity);
@@ -259,7 +259,7 @@ public class QuerySpecializer {
                     for (Var tv : qTempVarSet) {
                         RDFNode node = sol.get(tv.getName());
                         SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
-                        childQueryCopyInstanciated = instOP.instantiateFromVarTemplateToNode(childQueryCopy, tv, node.asNode());
+                        childQueryCopyInstanciated = instOP.instantiateVarTemplate(childQueryCopy, tv, node.asNode());
 
                         String entityQo = getEntityQo(tv);
                         String entityQr = node.asNode().getURI(); //as it is the name of a concrete node and not of a variable;
@@ -327,8 +327,8 @@ public class QuerySpecializer {
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace
 //            QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-//            // [REPLACED]    List<QuerySolution> qTsolMap = temVarValueSpace.compute(clonedqR, this.rdfd2);
-//            //Map<Var, Set<RDFNode>> qTsolMap = temVarValueSpace.compute(clonedqR, this.rdfd2, null);
+//            // [REPLACED]    List<QuerySolution> qTsolMap = temVarValueSpace.computeTempVarSolutionSpace(clonedqR, this.rdfd2);
+//            //Map<Var, Set<RDFNode>> qTsolMap = temVarValueSpace.computeTempVarSolutionSpace(clonedqR, this.rdfd2, null);
 //            childQueryAndContextNode.setQueryTempVarValueMap(qTsolMap);
             List<QuerySolution> qTsol = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
             List<QuerySolution> qTsolChild = new ArrayList();
@@ -460,7 +460,7 @@ public class QuerySpecializer {
         for (Var tv : qTempVarSet) {
             RDFNode node = sol.get(tv.getName());
             SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
-            queryChild = instOP.instantiateFromVarTemplateToNode(queryChild, tv, node.asNode());
+            queryChild = instOP.instantiateVarTemplate(queryChild, tv, node.asNode());
 
 //            String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
 //            String entityqR = clas;
@@ -501,8 +501,8 @@ public class QuerySpecializer {
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace
 //            QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-//            // [REPLACED]    List<QuerySolution> qTsolMap = temVarValueSpace.compute(clonedqR, this.rdfd2);
-//            //Map<Var, Set<RDFNode>> qTsolMap = temVarValueSpace.compute(clonedqR, this.rdfd2, null);
+//            // [REPLACED]    List<QuerySolution> qTsolMap = temVarValueSpace.computeTempVarSolutionSpace(clonedqR, this.rdfd2);
+//            //Map<Var, Set<RDFNode>> qTsolMap = temVarValueSpace.computeTempVarSolutionSpace(clonedqR, this.rdfd2, null);
 //            childQueryAndContextNode.setQueryTempVarValueMap(qTsolMap);
             List<QuerySolution> qTsol = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
             List<QuerySolution> qTsolChild = new ArrayList();

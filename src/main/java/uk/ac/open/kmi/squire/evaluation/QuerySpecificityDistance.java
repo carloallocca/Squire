@@ -9,6 +9,8 @@ import java.util.List;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQClassVisitor;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
@@ -18,6 +20,9 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
  * @author carloallocca
  */
 public class QuerySpecificityDistance {
+    
+    
+        private final Logger log = LoggerFactory.getLogger(getClass());
 
     public QuerySpecificityDistance() {
         super();
@@ -26,14 +31,10 @@ public class QuerySpecificityDistance {
     public float computeQuerySpecificityDistanceWRTQueryVariable(Query qO, Query qR) {
         float sim;
 
-//        System.out.println("[QuerySpecificityDistance::computeQuerySpecificityDistanceWRTQueryVariable] Query qO "+qO.toString());
         List<String> qOvarList = computeQueryVariableSet(qO);
-//        System.out.println("[QuerySpecificityDistance::computeQuerySpecificityDistanceWRTQueryVariable] qOvarList size "+qOvarList.size());
-
-//        System.out.println("[QuerySpecificityDistance::computeQuerySpecificityDistanceWRTQueryVariable] Query qR "+qR.toString());
+//        log.info("qOvarList " +qOvarList.toString());
         List<String> qRvarList = computeQueryVariableSet(qR);
-//        System.out.println("[QuerySpecificityDistance::computeQuerySpecificityDistanceWRTQueryVariable] qRvarList size "+qRvarList.size());
-
+//        log.info("qRvarList " +qRvarList.toString());
         sim = computeQSsim(qOvarList, qRvarList);
         return sim;
     }
@@ -42,23 +43,22 @@ public class QuerySpecificityDistance {
         SQVariableVisitor v = new SQVariableVisitor();
         //... This will walk through all parts of the query
         ElementWalker.walk(qO.getQueryPattern(), v);
-//        System.out.println("[QuerySpecificityDistance::computeQueryVariableSet] v.getQueryClassSet()  " + v.getQueryClassSet().toString());
         return v.getQueryVariableSet();
     }
 
     private float computeQSsim(List<String> qOvarList, List<String> qRvarList) {
-        float sim = 0;//;
+        float sim = 0;
         if (qOvarList.size() > 0 && qRvarList.size() > 0) {
-            sim = (float) (1.0 * (((1.0 * qOvarList.size()) / (1.0 * qRvarList.size()))));
-//            System.out.println("[QuerySpecificityDistance::computeQSsim] sim "+sim);
+            sim = (float) (1.0 * (((1.0 * qRvarList.size()) / (1.0 * qOvarList.size()))));
+            //log.info("computeQSsim " +sim);
             return sim;
         }
         return sim;
     }
 
     public float computeQuerySpecificityDistanceWRTQueryTriplePatter(Query originalQuery, Query qR) {
-        float sim = 0;//;
-        
+        float sim = 0;
+
         QueryGPESim simQuery= new QueryGPESim();
         sim=simQuery.computeQueryPatternsSim(originalQuery, qR);
         return sim;

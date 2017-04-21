@@ -243,12 +243,18 @@ public class SPARQLEndPoint implements IRDFDataset {
 
     @Override
     public boolean isInObjectPropertySet(String opUri) {
-        return objectPropertySet.contains(opUri);
+        boolean a = objectPropertySet.contains(opUri);
+        log.info("::here 1 " +a);
+        return a;
     }
 
     @Override
     public boolean isInDatatypePropertySet(String dpUri) {
-        return datatypePropertySet.contains(dpUri);
+        boolean a = datatypePropertySet.contains(dpUri);
+        log.info("::here 2 " +a);
+        return a;
+
+
     }
 
     @Override
@@ -378,7 +384,7 @@ public class SPARQLEndPoint implements IRDFDataset {
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
                     + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
                     + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . " + " FILTER (isLiteral(?o)) "
-                    + "} LIMIT 30";
+                    + "} ";
 
             String encodedQuery = URLEncoder.encode(qString, "UTF-8");
             String GET_URL = this.endpointURL + "?query=" + encodedQuery;
@@ -431,6 +437,10 @@ public class SPARQLEndPoint implements IRDFDataset {
         return output;
     }
 
+    
+    
+    
+    
 //    // the old version, 05 04 2017
 //    @Override
 //    public void computeClassSet() {

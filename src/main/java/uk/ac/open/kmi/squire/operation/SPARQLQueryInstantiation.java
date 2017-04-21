@@ -23,7 +23,7 @@ public class SPARQLQueryInstantiation {
         super();
     }
 
-    public Query instantiateFromVarTemplateToNode(Query q, Var varTemplate,Node n) {
+    public Query instantiateVarTemplate(Query q, Var varTemplate,Node n) {
         if (q == null || n == null || varTemplate == null) {
             throw new IllegalArgumentException("[SPARQLQueryGeneralization::generalize()]The Query or the Node or the Var is null!!");
         }
