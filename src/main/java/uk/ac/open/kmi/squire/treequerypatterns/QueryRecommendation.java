@@ -173,7 +173,7 @@ public class QueryRecommendation<T> {
 
                 // QUERY RESULT TYPE SIMILARITY            
                 QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-                float resulttypeSim = qRTS.computeQueryResultTypeSim(((DataNode) n.getData()).qO, this.rdfd1, ((DataNode) n.getData()).qR, this.rdfd2);
+                float resulttypeSim = qRTS.computeQueryResultTypeDistance(((DataNode) n.getData()).qO, this.rdfd1, ((DataNode) n.getData()).qR, this.rdfd2);
                 System.out.println("[QueryRecommendation,printQueryTemplateTree1] QUERY RESULT TYPE SIMILARITY " + resulttypeSim);
                 //System.out.println("");
 
@@ -220,8 +220,8 @@ public class QueryRecommendation<T> {
 
                 // QUERY RESULT TYPE SIMILARITY            
                 QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-//                float resulttypeSim = qRTS.computeQueryResultTypeSim(((DataNode) n.getData()).qO, this.rdfd1, ((DataNode) n.getData()).qR, this.rdfd2);
-                float resulttypeSim = qRTS.computeQueryResultTypeSim(this.originalQuery, this.rdfd1, ((DataNode) n.getData()).qR, this.rdfd2);
+//                float resulttypeSim = qRTS.computeQueryResultTypeDistance(((DataNode) n.getData()).qO, this.rdfd1, ((DataNode) n.getData()).qR, this.rdfd2);
+                float resulttypeSim = qRTS.computeQueryResultTypeDistance(this.originalQuery, this.rdfd1, ((DataNode) n.getData()).qR, this.rdfd2);
                 
 //                System.out.println("[QueryRecommendation,computeRecommendateQueryScore] QUERY RESULT TYPE SIMILARITY " + resulttypeSim);
 //                System.out.println("");
@@ -236,14 +236,14 @@ public class QueryRecommendation<T> {
 //            System.out.println("[QueryRecommendation,printQueryTemplateTree1] TOTAL " +(queryRootDist+queryResultSizeSim));
                 // Query Specificity Distance            
                 QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-//                float qSpecDistSim = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(((DataNode) n.getData()).qO, ((DataNode) n.getData()).qR);
+//                float qSpecDistSim = qSpecDist.computeQSDwrtQueryVariable(((DataNode) n.getData()).qO, ((DataNode) n.getData()).qR);
 
 //                System.out.println("[QueryRecommendation,printQueryTemplateTree1] Original Query " + this.originalQuery.toString());
-                float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(this.originalQuery, ((DataNode) n.getData()).qR);
+                float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(this.originalQuery, ((DataNode) n.getData()).qR);
 //                System.out.println("[QueryRecommendation,computeRecommendateQueryScore] QuerySpecificityDistanceWRT Var " + qSpecDistSimVar);
 //                System.out.println("");
 
-                float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(this.originalQuery, ((DataNode) n.getData()).qR);
+                float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(this.originalQuery, ((DataNode) n.getData()).qR);
 //                System.out.println("[QueryRecommendation,computeRecommendateQueryScore] qSpecDistSimTriplePattern " + qSpecDistSimTriplePattern);
 //                System.out.println("");
 

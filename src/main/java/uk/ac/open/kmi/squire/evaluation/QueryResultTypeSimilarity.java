@@ -54,29 +54,22 @@ public class QueryResultTypeSimilarity {
 
     }
 
-    public float computeQueryResultTypeSim(Query qOri, IRDFDataset d1, Query qRec, IRDFDataset d2) {
-        float sim;
+    public float computeQueryResultTypeDistance(Query qOri, IRDFDataset d1, Query qRec, IRDFDataset d2) {
+        float dist;
         List<VarTypeMap> qOri_d1_signature = computeQueryVariableSignature(qOri, d1);
         
-//        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeSim] qOri_d1_signature" +qOri_d1_signature.size());
+//        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeDistance] qOri_d1_signature" +qOri_d1_signature.size());
         List<VarTypeMap> qRec_d2_signature = computeQueryVariableSignature(qRec, d2);
         
-//        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeSim] qRec_d2_signature" +qRec_d2_signature.size());        
-        sim = computeRTQSim(qOri_d1_signature, qRec_d2_signature);
-        return sim;
+//        log.info("[QueryResultTypeSimilarity::computeQueryResultTypeDistance] qRec_d2_signature" +qRec_d2_signature.size());        
+        dist = 1- computeRTQOverlapRate(qOri_d1_signature, qRec_d2_signature);
+        return dist;
     }
 
-    private float computeRTQSim(List<VarTypeMap> qOri_d1_signature, List<VarTypeMap> qRec_d2_signature) {
-
-        float sim = 0;
-        int cardSignatureQo = qOri_d1_signature.size();
-        
-//        log.info("[QueryResultTypeSimilarity::computeRTQSim] cardSignatureQo" +cardSignatureQo);
-        
+    private float computeRTQOverlapRate(List<VarTypeMap> qOri_d1_signature, List<VarTypeMap> qRec_d2_signature) {
+        float overlapRate = 0;
+        int cardSignatureQo = qOri_d1_signature.size();        
         int cardSignatureQr = qRec_d2_signature.size();
-
-//                log.info("[QueryResultTypeSimilarity::computeRTQSim] cardSignatureQr" +cardSignatureQr);
-
         if (!(cardSignatureQo == 0) && !(cardSignatureQr == 0)) {
             int intersection = 0;
             for (VarTypeMap map : qOri_d1_signature) {
@@ -84,16 +77,12 @@ public class QueryResultTypeSimilarity {
                     intersection++;
                 }
             }
-
-            //            sim =(float) (1.0*(((1.0*qOvarList.size())/(1.0*qRvarList.size()))));
-            
-//            log.info("[QueryResultTypeSimilarity::computeRTQSim] intersection" +intersection);
-            int cardUnionSignature = computeUnionCardinality(qOri_d1_signature, qRec_d2_signature);
-            sim = (float) ((1.0 * intersection) / (1.0 * cardUnionSignature));
-            //System.out.println("[ResultTypeQuerySimilarity::computeRTQS] computeRTQSim sim:: " + sim);
-            return sim;
+            //            dist =(float) (1.0*(((1.0*qOvarList.size())/(1.0*qRvarList.size()))));
+            int cardUnionSignature = computeUnionCardinality(qOri_d1_signature, qRec_d2_signature, intersection);
+            overlapRate = (float) ((1.0 * intersection) / (1.0 * cardUnionSignature));
+            return overlapRate;
         }
-        return sim;
+        return overlapRate;
     }
 
     private List<VarTypeMap> computeQueryVariableSignature(Query qOri, IRDFDataset d1) {
@@ -229,16 +218,10 @@ public class QueryResultTypeSimilarity {
         return false;
     }
 
-    private int computeUnionCardinality(List<VarTypeMap> qOri_d1_signature, List<VarTypeMap> qRec_d2_signature) {
-
-        List<VarTypeMap> union = new ArrayList<VarTypeMap>();
-        union.addAll(qOri_d1_signature);
-        for (VarTypeMap map : qRec_d2_signature) {
-            if (!contains(union, map)) {
-                union.add(map);
-            }
-        }
-        return union.size();
+    private int computeUnionCardinality(List<VarTypeMap> qOri_d1_signature, 
+                                        List<VarTypeMap> qRec_d2_signature,
+                                        int intersection) {
+        return (qOri_d1_signature.size()+qRec_d2_signature.size())-intersection;
     }
 
 }

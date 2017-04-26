@@ -125,26 +125,32 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         this.token = token;
 
         //A. Compute the query recommentedQueryScore:
-        // 1)...QueryRootDistance
+        // 1)...QueryRootDistance ... we start with both value set to 0
         float queryRootDist = 0;
+        float queryRootDistSim = 0;
+        
 
-        // 2)...QueryResultTypeSimilarity
-        QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-        float resulttypeSim = qRTS.computeQueryResultTypeSim(this.qO, this.rdfd1, this.qR, this.rdfd2);
-        //log.debug("[QueryGeneralizer4::QuerySpecializer4] resulttypeSim " + resulttypeSim);
-
-        // 3)...QuerySpecificityDistance        
+        // 2)...QuerySpecificityDistance        
         QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-        float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(this.qO, this.qR);
-        //log.debug("[QueryGeneralizer4::QuerySpecializer4] qSpecDistSimVar " + qSpecDistSimVar);
+        float qSpecDistVar = qSpecDist.computeQSDwrtQueryVariable(this.qO, this.qR);
+        float qSpecDistTP = qSpecDist.computeQSDwrtQueryTP(this.qO, this.qR);
+        float qSpecificitySim = 1-(qSpecDistVar + qSpecDistTP);
 
-        float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(this.qO, this.qR);
-        //log.debug("[QueryGeneralizer4::QuerySpecializer4] qSpecDistSimTriplePattern " + qSpecDistSimTriplePattern);
+        
+        // 3)...QueryResultTypeSimilarity
+        QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
+        float resulTtypeDist = qRTS.computeQueryResultTypeDistance(this.qO, this.rdfd1, this.qR, this.rdfd2);
+        float resultTypeSim = 1 - resulTtypeDist;
+        
+        
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
 
-        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDist) + (resultTypeSimilarityDegree * resulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistSimVar + qSpecDistSimTriplePattern)));
-        //float recommentedQueryScore = resulttypeSim + qSpecDistSimVar+qSpecDistSimTriplePattern;//This is working as it should but it does not consider the similarity distance between the replased entities
+        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim) 
+                                    + (resultTypeSimilarityDegree * resultTypeSim) 
+                                    + (querySpecificityDistanceDegree * (qSpecificitySim)));
+//        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDist) + (resultTypeSimilarityDegree * resulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistVar + qSpecDistTP)));
+        //float recommentedQueryScore = resulttypeSim + qSpecDistVar+qSpecDistTP;//This is working as it should but it does not consider the similarity distance between the replased entities
 
         //log.debug("[QueryGeneralizer4::QuerySpecializer4] recommentedQueryScore " + recommentedQueryScore);
 
@@ -193,12 +199,19 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 //        qAndcNode.setpSetD2(propertySet);
 //        qAndcNode.setRdfVD2(d2.getRDFVocabulary());
         //...set the score measurements
-        qAndcNode.setQueryRootDistance(queryRootDist); // do also for the other measurements, computeTempVarSolutionSpace them...
-        qAndcNode.setQueryResultTypeSimilarity(resulttypeSim);
-        qAndcNode.setQuerySpecificityDistance(qSpecDistSimVar + qSpecDistSimTriplePattern);
+
+        
+        qAndcNode.setQueryRootDistance(queryRootDist);
+        qAndcNode.setQueryRootDistanceSimilarity(queryRootDistSim); // do also for the other measurements, computeTempVarSolutionSpace them...
+       
+
+// qAndcNode.setQuerySpecificityDistanceSimilarity(qSpecDistVar + qSpecDistTP);
+        qAndcNode.setQuerySpecificityDistanceSimilarity(qSpecificitySim);
+        
+        qAndcNode.setQueryResultTypeSimilarity(resultTypeSim);                
         qAndcNode.setQueryResultSizeSimilarity(queryResultSizeSimilarity);
         qAndcNode.setqRScore(recommentedQueryScore);
-
+        
         qAndcNode.setOp(op);
         qAndcNode.setOperationList(operationList);
 
@@ -479,35 +492,38 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                 = parentQueryAndContextNode.getQueryRootDistance()
                 + computeInstanciationOperationCost(templVarEntityQoQrInstanciatedList);
         childQueryAndContextNode.setQueryRootDistance(newQueryRootDist);
+        
+        float simWRTQueryRootDist= 1 - newQueryRootDist;
+        childQueryAndContextNode.setQueryRootDistanceSimilarity(simWRTQueryRootDist);
+        
+          // 2)...QuerySpecificityDistance        
+        QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
+        float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(this.qO, this.qR);
+        float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(this.qO, this.qR);
+        float qSpecificitySim = 1-(qSpecDistSimVar + qSpecDistSimTriplePattern);
+        childQueryAndContextNode.setQuerySpecificityDistanceSimilarity(qSpecificitySim);
+
+        
         //log.info("newQueryRootDistI " +newQueryRootDist);
-        // 2)...QueryResultTypeSimilarity
+        // 3)...QueryResultTypeSimilarity
         QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-        float newResulttypeSim = qRTS.computeQueryResultTypeSim(childQueryAndContextNode.getqO(), this.rdfd1, childQueryAndContextNode.getqR(), this.rdfd2); 
+        float newResulttypeSim = qRTS.computeQueryResultTypeDistance(childQueryAndContextNode.getqO(), this.rdfd1, childQueryAndContextNode.getqR(), this.rdfd2); 
        // log.info("newQueryRootDistI " +newQueryRootDist);
         log.info("newResulttypeSimI " +newResulttypeSim);
-        
         childQueryAndContextNode.setQueryResultTypeSimilarity(newResulttypeSim);
-        // 3)...QuerySpecificityDistance        
-        QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-        float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        log.info("qSpecDistSimVarI " +qSpecDistSimVar);
-        
-        
-        float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-          
-        childQueryAndContextNode.setQuerySpecificityDistance(qSpecDistSimVar + qSpecDistSimTriplePattern);
+
         
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
-       // float recommentedQueryScore = ((queryRootDistanceDegree * newQueryRootDist) + (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistSimVar+qSpecDistSimTriplePattern)));
-        //float recommentedQueryScore = newQueryRootDist + newResulttypeSim +  (qSpecDistSimVar/qSpecDistSimTriplePattern);
+       // float recommentedQueryScore = ((queryRootDistanceDegree * newQueryRootDist) + (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistVar+qSpecDistTP)));
+        //float recommentedQueryScore = newQueryRootDist + newResulttypeSim +  (qSpecDistVar/qSpecDistSimTriplePattern);
         
         float recommentedQueryScore = (newResulttypeSim +  (qSpecDistSimVar+qSpecDistSimTriplePattern));
        
         log.info("qSpecDistSimTriplePatternI " +qSpecDistSimTriplePattern);
         log.info("qSpecDistSimVar/qSpecDistSimTriplePatternI " +(qSpecDistSimVar+qSpecDistSimTriplePattern));
         log.info("recommentedQueryScoreI " +recommentedQueryScore);
-//        float justSUM= 1* newQueryRootDist +newResulttypeSim + (qSpecDistSimVar/qSpecDistSimTriplePattern);
+//        float justSUM= 1* newQueryRootDist +newResulttypeSim + (qSpecDistVar/qSpecDistSimTriplePattern);
 //        log.info("recommentedQueryScoreI2 "+justSUM );
 
         log.info("clonedqR I " +clonedqR);
@@ -519,77 +535,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
     }
 
-    private float computeInstanciationOperationCost(ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
-        int size = templVarEntityQoQrInstanciatedList.size();
-        float nodeCost = 0;
-        if (size > 0) {
-            for (VarTemplateAndEntityQoQr item : templVarEntityQoQrInstanciatedList) {
-                String entityqO_TMP = getLocalName(item.getEntityQo());
-                String entityqR_TMP = getLocalName(item.getEntityQr());
-                nodeCost = nodeCost + computeInstanciateOperationCost(entityqO_TMP, entityqR_TMP);
-            }
-        }
-        return nodeCost / size;
-    }
-
-    private float computeInstanciateOperationCost(String entityqO, String entityqR) {
-        if (entityqO == null || entityqR == null) {
-            return (float) 0.0;
-        }
-        JaroWinklerSimilarity jwSim = new JaroWinklerSimilarity();
-        float sim = jwSim.computeMatchingScore(entityqO, entityqR);
-        //return (float) (1.0 - sim);
-        return sim;
-    }
-
-    private String getLocalName(String entityqO) {
-        String localName = "";
-        if (entityqO.startsWith("http://") || entityqO.startsWith("https://")) {
-            if (entityqO.contains("#")) {
-                localName = entityqO.substring(entityqO.indexOf("#") + 1, entityqO.length());
-                return localName;
-            }
-            localName = entityqO.substring(entityqO.lastIndexOf("/") + 1, entityqO.length());
-            return localName;
-        } else {
-            return entityqO;
-        }
-    }
-
-    private String getEntityQo(Var tv) {
-        String entityQo = "";
-        String varName = tv.getVarName();
-
-        if (varName.startsWith(CLASS_TEMPLATE_VAR)) {
-            entityQo = this.classVarTable.getClassFromVar(varName);
-        } else if (varName.startsWith(OBJ_PROP_TEMPLATE_VAR)) {
-            entityQo = this.objectProperyVarTable.getObjectProperyFromVar(varName);
-        } else if (varName.startsWith(DT_PROP_TEMPLATE_VAR)) {
-            entityQo = this.datatypePropertyVarTable.getDatatypeProperyFromVar(varName);
-        }
-        return entityQo;
-    }
-
-    private Query applyInstanciationOP(Query queryChild, QuerySolution sol) {
-
-        Set<Var> qTempVarSet = getQueryTemplateVariableSet(queryChild);
-        for (Var tv : qTempVarSet) {
-            RDFNode node = sol.get(tv.getName());
-            SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
-            queryChild = instOP.instantiateVarTemplate(queryChild, tv, node.asNode());
-
-//            String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
-//            String entityqR = clas;
-//            
-//            ArrayList<String> childOperationList = new ArrayList();
-//            childOperationList.addAll(pNode.getOperationList());
-//            childOperationList.add(INSTANCE_OP);
-//            String op = INSTANCE_OP;
-        }
-        return queryChild;
-    }
-
-    private QueryAndContextNode createNewQueryAndContextNodeForRemovalOp(Query qWithoutTriple, QueryAndContextNode parentQueryAndContextNode) throws Exception {
+    
+    private QueryAndContextNode createNewQueryAndContextNodeForRemovalOp(
+                Query qWithoutTriple, 
+                QueryAndContextNode parentQueryAndContextNode) throws Exception {
         QueryAndContextNode childQueryAndContextNode = new QueryAndContextNode();
         //...set the original query and the recommendated query;
         Query clonedqO = QueryFactory.create(parentQueryAndContextNode.getqO());
@@ -673,46 +622,65 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         childQueryAndContextNode.setOp(REMOVE_TP_OP);
         //...set the score measurements
 
-        //A. Compute the query recommentedQueryScore:
-        // 1)...QueryRootDistance
+        /* Compute the query recommentedQueryScore:    
+            1)QueryRootDistance
+        */
         float newQueryRootDist
                 = parentQueryAndContextNode.getQueryRootDistance()
                 + computeRemoveOperationCost(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
         childQueryAndContextNode.setQueryRootDistance(newQueryRootDist);
+        float queryRootDistSim = 1 - newQueryRootDist;
+        childQueryAndContextNode.setQueryRootDistanceSimilarity(queryRootDistSim);
 
-       // log.info("newQueryRootDistR " + Float.toString(newQueryRootDist));
-
-        // 2)...QueryResultTypeSimilarity
-        QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-        float newResulttypeSim = qRTS.computeQueryResultTypeSim(childQueryAndContextNode.getqO(), this.rdfd1, childQueryAndContextNode.getqR(), this.rdfd2);
-        childQueryAndContextNode.setQueryResultTypeSimilarity(newResulttypeSim);
-
-        log.info("newResulttypeSimR " + Float.toString(newResulttypeSim));
-
-        // 3)...QuerySpecificityDistance        
+        
+        
+            // 2)...QuerySpecificityDistance        
         QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-        float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        childQueryAndContextNode.setQuerySpecificityDistance(qSpecDistSimVar+qSpecDistSimTriplePattern);
+        float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(this.qO, this.qR);
+        float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(this.qO, this.qR);
+        float qSpecificitySim = 1-(qSpecDistSimVar + qSpecDistSimTriplePattern);
+        childQueryAndContextNode.setQuerySpecificityDistanceSimilarity(qSpecificitySim);
 
-//        log.info("qSpecDistSimVarR " + Float.toString(qSpecDistSimVar));
-//        log.info("qSpecDistSimTriplePatternR " + Float.toString(qSpecDistSimTriplePattern));
+        
+        
+            // 3)...QueryResultTypeSimilarity
+        QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
+        float resulTtypeDist = qRTS.computeQueryResultTypeDistance(this.qO, this.rdfd1, this.qR, this.rdfd2);
+        float resultTypeSim = 1 - resulTtypeDist;
+        childQueryAndContextNode.setQueryResultTypeSimilarity(resultTypeSim);
+
+        
+        log.info("newResulttypeSimR " + Float.toString(resultTypeSim));
+
+
+        
+        
+        
+        
+//        log.info("qSpecDistSimVarR " + Float.toString(qSpecDistVar));
+//        log.info("qSpecDistSimTriplePatternR " + Float.toString(qSpecDistTP));
 
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
 //        float recommentedQueryScore = ( (queryRootDistanceDegree * newQueryRootDist) + 
 //                                        (resultTypeSimilarityDegree * newResulttypeSim) + 
-//                                        (querySpecificityDistanceDegree * (qSpecDistSimVar+qSpecDistSimTriplePattern)));
+//                                        (querySpecificityDistanceDegree * (qSpecDistVar+qSpecDistTP)));
 
 //float recommentedQueryScore = ( (  newQueryRootDist) + 
 //                                        (  newResulttypeSim) + 
-//                                        (  (qSpecDistSimVar/qSpecDistSimTriplePattern)));
+//                                        (  (qSpecDistVar/qSpecDistSimTriplePattern)));
 
-    log.info("qSpecDistSimVar/qSpecDistSimTriplePattern " + (qSpecDistSimVar+qSpecDistSimTriplePattern));
+//    log.info("qSpecDistSimVar/qSpecDistSimTriplePattern " + (qSpecDistSimVar+qSpecDistSimTriplePattern));
 
-    float recommentedQueryScore = (  
-                                        (  newResulttypeSim) + 
-                                        (  (qSpecDistSimVar+qSpecDistSimTriplePattern)));
+
+        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim) 
+                                    + (resultTypeSimilarityDegree * resultTypeSim) 
+                                    + (querySpecificityDistanceDegree * (qSpecificitySim)));
+
+
+//    float recommentedQueryScore = (  
+//                                        (  newResulttypeSim) + 
+//                                        (  (qSpecDistSimVar+qSpecDistSimTriplePattern)));
 
 
         log.info("recommentedQueryScoreR " + recommentedQueryScore);
@@ -723,6 +691,82 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         
         return childQueryAndContextNode;
     }
+
+    
+    
+    private float computeInstanciationOperationCost(ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
+        int size = templVarEntityQoQrInstanciatedList.size();
+        float nodeCost = 0;
+        if (size > 0) {
+            for (VarTemplateAndEntityQoQr item : templVarEntityQoQrInstanciatedList) {
+                String entityqO_TMP = getLocalName(item.getEntityQo());
+                String entityqR_TMP = getLocalName(item.getEntityQr());
+                nodeCost = nodeCost + computeInstanciateOperationCost(entityqO_TMP, entityqR_TMP);
+            }
+        return (float) 1 - (nodeCost / size); //we divide by size as we want the value to be between 0 and 1.       
+        }
+        return 0;
+    }
+
+    
+    
+    private float computeInstanciateOperationCost(String entityqO, String entityqR) {
+        if (entityqO == null || entityqR == null) {
+            return (float) 0.0;
+        }
+        JaroWinklerSimilarity jwSim = new JaroWinklerSimilarity();
+        float sim = jwSim.computeMatchingScore(entityqO, entityqR);
+        //return (float) (1.0 - sim);
+        return sim;
+    }
+
+    private String getLocalName(String entityqO) {
+        String localName = "";
+        if (entityqO.startsWith("http://") || entityqO.startsWith("https://")) {
+            if (entityqO.contains("#")) {
+                localName = entityqO.substring(entityqO.indexOf("#") + 1, entityqO.length());
+                return localName;
+            }
+            localName = entityqO.substring(entityqO.lastIndexOf("/") + 1, entityqO.length());
+            return localName;
+        } else {
+            return entityqO;
+        }
+    }
+
+    private String getEntityQo(Var tv) {
+        String entityQo = "";
+        String varName = tv.getVarName();
+
+        if (varName.startsWith(CLASS_TEMPLATE_VAR)) {
+            entityQo = this.classVarTable.getClassFromVar(varName);
+        } else if (varName.startsWith(OBJ_PROP_TEMPLATE_VAR)) {
+            entityQo = this.objectProperyVarTable.getObjectProperyFromVar(varName);
+        } else if (varName.startsWith(DT_PROP_TEMPLATE_VAR)) {
+            entityQo = this.datatypePropertyVarTable.getDatatypeProperyFromVar(varName);
+        }
+        return entityQo;
+    }
+
+    private Query applyInstanciationOP(Query queryChild, QuerySolution sol) {
+
+        Set<Var> qTempVarSet = getQueryTemplateVariableSet(queryChild);
+        for (Var tv : qTempVarSet) {
+            RDFNode node = sol.get(tv.getName());
+            SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
+            queryChild = instOP.instantiateVarTemplate(queryChild, tv, node.asNode());
+
+//            String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
+//            String entityqR = clas;
+//            
+//            ArrayList<String> childOperationList = new ArrayList();
+//            childOperationList.addAll(pNode.getOperationList());
+//            childOperationList.add(INSTANCE_OP);
+//            String op = INSTANCE_OP;
+        }
+        return queryChild;
+    }
+
 
     public List<QueryAndContextNode> getRecommandedQueryList() {
         return recommandedQueryList;
@@ -899,8 +943,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
     private float computeRemoveOperationCost(Query originalQuery, Query childQuery) {
         QueryGPESim queryGPEsim = new QueryGPESim();
         float sim = queryGPEsim.computeQueryPatternsSim(originalQuery, childQuery);
-//        return (float) 1.0 - sim;
-        return sim;
+        return (float) 1.0 - sim;
+//        return sim;
 //          return 0;
     }
 

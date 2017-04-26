@@ -47,16 +47,43 @@ public class QueryGPESim {
 //        log.info("qRGPE : " +qRGPE.toString());
 
         //this is as it was before 13-04-2017        
+        if (qRGPE.size() > 0 && qOGPE.size() > 0) {
+            return 1 - ((float) (((1.0) * qRGPE.size()) / ((1.0) * qOGPE.size())));
+        }
+        return (float) 0.0;
+
+// this is the new one, after 13-04-2017
+//        float r = 1 - computeSim(qOGPE, qRGPE);
+//      return r;
+    }
+    
+
+    public float computeQueryPatternsSimWithWeighedNonCommonTriplePattern(Query qO, Query qR) {
+        //...get the GPE of  qOri        
+        SQGraphPatternExpressionVisitor gpeVisitorO = new SQGraphPatternExpressionVisitor();
+        ElementWalker.walk(qO.getQueryPattern(), gpeVisitorO);
+        Set<TriplePath> qOGPE = gpeVisitorO.getQueryGPE();
+//        log.info("qOGPE : " +qOGPE.toString());
+
+        //...get the GPE of  qRec                
+        SQGraphPatternExpressionVisitor gpeVisitorR = new SQGraphPatternExpressionVisitor();
+        ElementWalker.walk(qR.getQueryPattern(), gpeVisitorR);
+        Set<TriplePath> qRGPE = gpeVisitorR.getQueryGPE();
+//        log.info("qRGPE : " +qRGPE.toString());
+
+//        //this is as it was before 13-04-2017        
 //        if (qRGPE.size() > 0 && qOGPE.size() > 0) {
-//            return (float) (((1.0) * qRGPE.size()) / ((1.0) * qOGPE.size()));
+//            return 1 - ((float) (((1.0) * qRGPE.size()) / ((1.0) * qOGPE.size())));
 //        }
 //        return (float) 0.0;
-// this is the new one
-        float r = computeSim(qOGPE, qRGPE);
-        //log.info("computeQueryPatternsSim : " + r);
 
-        return r;
+// this is the new one, after 13-04-2017
+        float r = 1 - computeSim(qOGPE, qRGPE);
+      return r;
     }
+    
+        
+    
 
     private float computeSim(Set<TriplePath> qOGPE, Set<TriplePath> qRGPE) {
         if (!(qOGPE.isEmpty() && !(qRGPE.isEmpty()))) {
@@ -185,7 +212,7 @@ public class QueryGPESim {
             }
         }
         
-        return weigh;   
+        return weigh/3;   
         
     }
     

@@ -45,6 +45,8 @@ public class QueryAndContextNode {
 
     private float queryResultTypeSimilarity;
     private float queryRootDistance;
+    private float queryRootDistanceSim;
+    
     private float queryResultSizeSimilarity;
     private float querySpecificityDistance;
     
@@ -70,14 +72,6 @@ public class QueryAndContextNode {
     }
 
     
-//    public ArrayList<VarTemplateAndEntityQoQr> getTvEntityQoQrInstanciatedList() {
-//        return tvEntityQoQrInstanciatedList;
-//    }
-//
-//    public void setTvEntityQoQrInstanciatedList(ArrayList<VarTemplateAndEntityQoQr> tvEntityQoQrInstanciatedList) {
-//        this.tvEntityQoQrInstanciatedList = tvEntityQoQrInstanciatedList;
-//    }
-
     
     public Map<Var, Set<RDFNode>> getQueryTempVarValueMap() {
         return queryTempVarValueMap;
@@ -161,13 +155,13 @@ public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
         //...set the score measurements
         
         float clonedQueryRootDistance=qRScoreMaxNode.getQueryRootDistance();
-        clonedNode.setQueryRootDistance(clonedQueryRootDistance);
+        clonedNode.setQueryRootDistanceSimilarity(clonedQueryRootDistance);
         
         float clonedQueryResultTypeSimilarity=qRScoreMaxNode.getQueryResultTypeSimilarity();
         clonedNode.setQueryResultTypeSimilarity(clonedQueryResultTypeSimilarity);
         
         float clonedQuerySpecificityDistance=qRScoreMaxNode.getQuerySpecificityDistance();
-        clonedNode.setQuerySpecificityDistance(clonedQuerySpecificityDistance);
+        clonedNode.setQuerySpecificityDistanceSimilarity(clonedQuerySpecificityDistance);
         
         float clonedQueryResultSizeSimilarity=qRScoreMaxNode.getQueryResultSizeSimilarity();
         clonedNode.setQueryResultSizeSimilarity(clonedQueryResultSizeSimilarity);
@@ -282,15 +276,21 @@ public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
         this.queryResultTypeSimilarity = queryResultTypeSimilarity;
     }
 
+    public void setQueryRootDistanceSimilarity(float queryRootDistance) {
+        this.queryRootDistanceSim = queryRootDistance;
+    }
+
     public void setQueryRootDistance(float queryRootDistance) {
         this.queryRootDistance = queryRootDistance;
     }
 
+    
+    
     public void setQueryResultSizeSimilarity(float queryResultSizeSimilarity) {
         this.queryResultSizeSimilarity = queryResultSizeSimilarity;
     }
 
-    public void setQuerySpecificityDistance(float querySpecificityDistance) {
+    public void setQuerySpecificityDistanceSimilarity(float querySpecificityDistance) {
         this.querySpecificityDistance = querySpecificityDistance;
     }
 
@@ -374,6 +374,11 @@ public QueryAndContextNode cloneMe(QueryAndContextNode qRScoreMaxNode) {
     public float getQueryRootDistance() {
         return queryRootDistance;
     }
+    
+    public float getQueryRootDistanceSimilarity() {
+        return this.queryRootDistanceSim;
+    }
+    
 
     public float getQueryResultSizeSimilarity() {
         return queryResultSizeSimilarity;

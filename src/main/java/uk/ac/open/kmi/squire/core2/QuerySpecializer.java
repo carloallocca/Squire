@@ -122,12 +122,12 @@ public class QuerySpecializer {
 
         // 2)...QueryResultTypeSimilarity
         QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-        float resulttypeSim = qRTS.computeQueryResultTypeSim(this.qO, this.rdfd1, this.qR, this.rdfd2);
+        float resulttypeSim = qRTS.computeQueryResultTypeDistance(this.qO, this.rdfd1, this.qR, this.rdfd2);
 
         // 3)...QuerySpecificityDistance        
         QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-        float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(this.qO, this.qR);
-        float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(this.qO, this.qR);
+        float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(this.qO, this.qR);
+        float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(this.qO, this.qR);
 
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
@@ -176,9 +176,9 @@ public class QuerySpecializer {
 //        qAndcNode.setRdfVD2(d2.getRDFVocabulary());
 
         //...set the score measurements
-        qAndcNode.setQueryRootDistance(queryRootDist); // do also for the other measurements, computeTempVarSolutionSpace them...
+        qAndcNode.setQueryRootDistanceSimilarity(queryRootDist); // do also for the other measurements, computeTempVarSolutionSpace them...
         qAndcNode.setQueryResultTypeSimilarity(resulttypeSim);
-        qAndcNode.setQuerySpecificityDistance(qSpecDistSimVar + qSpecDistSimTriplePattern);
+        qAndcNode.setQuerySpecificityDistanceSimilarity(qSpecDistSimVar + qSpecDistSimTriplePattern);
         qAndcNode.setQueryResultSizeSimilarity(queryResultSizeSimilarity);
         qAndcNode.setqRScore(recommentedQueryScore);
 
@@ -380,17 +380,17 @@ public class QuerySpecializer {
         float newQueryRootDist
                 = parentQueryAndContextNode.getQueryRootDistance()
                 + computeInstanciationOperationCost(templVarEntityQoQrInstanciatedList);                
-        childQueryAndContextNode.setQueryRootDistance(newQueryRootDist);
+        childQueryAndContextNode.setQueryRootDistanceSimilarity(newQueryRootDist);
         
         // 2)...QueryResultTypeSimilarity
         QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-        float newResulttypeSim = qRTS.computeQueryResultTypeSim(childQueryAndContextNode.getqO(), this.rdfd1, childQueryAndContextNode.getqR(), this.rdfd2);
+        float newResulttypeSim = qRTS.computeQueryResultTypeDistance(childQueryAndContextNode.getqO(), this.rdfd1, childQueryAndContextNode.getqR(), this.rdfd2);
         childQueryAndContextNode.setQueryResultTypeSimilarity(newResulttypeSim);
         // 3)...QuerySpecificityDistance        
         QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-        float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        childQueryAndContextNode.setQuerySpecificityDistance(qSpecDistSimVar + qSpecDistSimTriplePattern);
+        float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
+        float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
+        childQueryAndContextNode.setQuerySpecificityDistanceSimilarity(qSpecDistSimVar + qSpecDistSimTriplePattern);
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
         float recommentedQueryScore = ((queryRootDistanceDegree * newQueryRootDist) + (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistSimVar + qSpecDistSimTriplePattern)));
@@ -554,16 +554,16 @@ public class QuerySpecializer {
         float newQueryRootDist
                 = parentQueryAndContextNode.getQueryRootDistance()
                 + computeRemoveOperationCost(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        childQueryAndContextNode.setQueryRootDistance(newQueryRootDist);
+        childQueryAndContextNode.setQueryRootDistanceSimilarity(newQueryRootDist);
         // 2)...QueryResultTypeSimilarity
         QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-        float newResulttypeSim = qRTS.computeQueryResultTypeSim(childQueryAndContextNode.getqO(), this.rdfd1, childQueryAndContextNode.getqR(), this.rdfd2);
+        float newResulttypeSim = qRTS.computeQueryResultTypeDistance(childQueryAndContextNode.getqO(), this.rdfd1, childQueryAndContextNode.getqR(), this.rdfd2);
         childQueryAndContextNode.setQueryResultTypeSimilarity(newResulttypeSim);
         // 3)...QuerySpecificityDistance        
         QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-        float qSpecDistSimVar = qSpecDist.computeQuerySpecificityDistanceWRTQueryVariable(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        float qSpecDistSimTriplePattern = qSpecDist.computeQuerySpecificityDistanceWRTQueryTriplePatter(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
-        childQueryAndContextNode.setQuerySpecificityDistance(qSpecDistSimVar + qSpecDistSimTriplePattern);
+        float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
+        float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
+        childQueryAndContextNode.setQuerySpecificityDistanceSimilarity(qSpecDistSimVar + qSpecDistSimTriplePattern);
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
         float recommentedQueryScore = ((queryRootDistanceDegree * newQueryRootDist) + (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistSimVar + qSpecDistSimTriplePattern)));

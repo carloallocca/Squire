@@ -17,6 +17,7 @@ import uk.ac.open.kmi.squire.treequerypatterns.TreeNode;
  */
 public class QueryRootDistance {
 
+    
 //    public QueryRootDistance() {
 //        super();
 //    }
