@@ -225,10 +225,10 @@ public class RDFDatasetIndexer {
             if (null != graphName || !graphName.isEmpty()) {
                 
                 
-                if(this.alreadyExists(urlAddress, graphName)){
-                    log.info("sparql endpoint:" +urlAddress);
-                }
-                
+//                if(this.alreadyExists(urlAddress, graphName)){
+//                    log.info("sparql endpoint:" +urlAddress);
+//                }
+//                
                                 
                 Path path = Paths.get(this.datasetIndexDir);
                 Directory index1 = FSDirectory.open(path);

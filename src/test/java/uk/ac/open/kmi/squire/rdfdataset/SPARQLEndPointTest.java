@@ -564,42 +564,46 @@ public class SPARQLEndPointTest {
     }
     
     
-//    @Test
-//    public void testAddSPARQLEndPointSignature2() {
-//    
-//            try {
-//            String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//                    + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?class where "
-//                    + "{ " + " ?ind a ?class . " + "}";
-//            String encodedQuery = URLEncoder.encode(qString, "UTF-8");
-//            String GET_URL = "https://dbpedia.org/sparql" + "?query=" + encodedQuery;
-//            DefaultHttpClient httpClient = new DefaultHttpClient();
-//            HttpGet getRequest = new HttpGet(GET_URL);
-//            getRequest.addHeader("accept", "application/sparql-results+json");
-//            HttpResponse response = httpClient.execute(getRequest);
-//            if (response.getStatusLine().getStatusCode() != 200) {
-//                throw new RuntimeException("Failed : HTTP error code : "
-//                        + response.getStatusLine().getStatusCode());
-//            }
-//            BufferedReader br = new BufferedReader(
-//                    new InputStreamReader((response.getEntity().getContent())));
-//            String output;
-//            String result = "";
-//            while ((output = br.readLine()) != null) {
-//                result = result + output;
-//            }
-//            ArrayList<String> classList = parseSparqlResultsJson(result, "class");
-//            
-//            httpClient.getConnectionManager().shutdown();
-//        } catch (ClientProtocolException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    
-//    }
+    //@Test
+    public void testAddSPARQLEndPointSignature2() {
+    
+            try {
+            String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                    + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?class where "
+                    + "{ " + " ?ind a ?class . " + "}";
+            
+            String endEndPoint="http://opendatacommunities.org/sparql";
+            //"https://dbpedia.org/sparql"
+            
+            String encodedQuery = URLEncoder.encode(qString, "UTF-8");
+            String GET_URL = endEndPoint + "?query=" + encodedQuery;
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpGet getRequest = new HttpGet(GET_URL);
+            getRequest.addHeader("accept", "application/sparql-results+json");
+            HttpResponse response = httpClient.execute(getRequest);
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+            }
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+            String output;
+            String result = "";
+            while ((output = br.readLine()) != null) {
+                result = result + output;
+            }
+            ArrayList<String> classList = parseSparqlResultsJson(result, "class");
+            
+            httpClient.getConnectionManager().shutdown();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    
+    }
     
     
         private ArrayList<String> parseSparqlResultsJson(String result, String varString) {
