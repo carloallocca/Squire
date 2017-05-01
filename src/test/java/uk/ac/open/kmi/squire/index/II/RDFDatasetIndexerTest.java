@@ -11,8 +11,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.sparql.vocabulary.FOAF;
+import org.apache.jena.vocabulary.RDF;
 import org.apache.lucene.document.Document;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -94,6 +99,9 @@ public class RDFDatasetIndexerTest {
                         System.out.println("classes");
                         System.out.println(endPoint.getClassSet().toString());
                         
+ 
+//                        endPoint.computeObjectPropertySet(1, 0, new HashSet<Property>());
+                        
                         endPoint.computeObjectPropertySet();
                         System.out.println("Obj");
                         System.out.println(endPoint.getObjectPropertySet().toString());
@@ -107,8 +115,8 @@ public class RDFDatasetIndexerTest {
                         //index the signature
                         RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
                         instance.indexSignature(strLine, "",
-                                endPoint.getClassSet(),
-                                endPoint.getObjectPropertySet(),
+                               endPoint.getClassSet(),
+                               endPoint.getObjectPropertySet(),
                                 endPoint.getDatatypePropertySet(),
                                 endPoint.getIndividualSet(),
                                 endPoint.getLiteralSet(),

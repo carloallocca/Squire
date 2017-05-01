@@ -52,7 +52,7 @@ public class QueryStringScorePairResourceImplTest {
 
     
     @Test
-    public void testEducationIWithQueryRootDistance() {
+    public void testEducationI() {
         String qo1 = "Select distinct ?mod ?title where {?mod a <http://purl.org/vocab/aiiso/schema#Module>.?mod <http://purl.org/dc/terms/title> ?title .}";
         String qo2 = "SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module>. ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/vocab/aiiso/schema#code> ?code . }";
         String qo3 = "Select distinct ?mod ?title ?code ?regulation where {?mod a <http://purl.org/vocab/aiiso/schema#Module>. ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/vocab/aiiso/schema#code> ?code .?mod <http://xcri.org/profiles/catalog/1.2/regulations> ?regulation .}";
@@ -88,7 +88,7 @@ public class QueryStringScorePairResourceImplTest {
 
     // the two RDF datasets are very similar to each other...
 //    @Test
-    public void testArtWithQueryRootDistance() {
+    public void testArt() {
         String qo1 = "SELECT distinct ?physicalThing ?hasType ?descr WHERE { ?physicalThing a <http://erlangen-crm.org/current/E18_Physical_Thing> .?physicalThing <http://erlangen-crm.org/current/P2_has_type> ?hasType . ?physicalThing <http://erlangen-crm.org/current/P1_is_identified_by> ?id . ?id <http://erlangen-crm.org/current/P3_has_note> ?descr.}";
         String qo2 = "SELECT distinct ?creation ?partecipant WHERE {?creation a <http://erlangen-crm.org/current/E65_Creation> .?creation <http://erlangen-crm.org/current/P14_carried_out_by> ?partecipant}";
         String qo3 = "SELECT distinct ?deathEntity ?deathTimeSpan WHERE {?deathEntity a <http://erlangen-crm.org/current/E69_Death> . ?deathEntity <http://erlangen-crm.org/current/P4_has_time-span> ?deathTimeSpan .}";
@@ -128,7 +128,7 @@ public class QueryStringScorePairResourceImplTest {
     }
     
 //    @Test
-    public void testEducationIIWithQueryRootDistance() {
+    public void testEducationII() {
         String qo1 = "SELECT distinct ?thing ?description where {?thing a <http://data.open.ac.uk/podcast/ontology/VideoPodcast>. ?thing <http://purl.org/dc/terms/description> ?description .}";
         String qo2 = "SELECT distinct ?podcast ?download ?published ?this WHERE {?podcast <http://purl.org/dc/terms/published> ?published .?podcast <http://digitalbazaar.com/media/download> ?download . ?podcast <http://purl.org/dc/terms/isPartOf> ?this .}";
         String qo3 = "SELECT distinct ?patent ?label ?date ?title ?creator ?status ?authorList WHERE {?patent a <http://purl.org/ontology/bibo/Patent> .?patent <http://www.w3.org/2000/01/rdf-schema#label> ?label .?patent <http://purl.org/dc/terms/date> ?date .?patent <http://purl.org/dc/terms/title> ?title .?patent <http://purl.org/dc/terms/creator> ?creator .?patent <http://purl.org/ontology/bibo/status> ?status .?patent <http://purl.org/ontology/bibo/authorList> ?authorList .}";
@@ -174,7 +174,7 @@ public class QueryStringScorePairResourceImplTest {
     
     
     //    @Test
-    public void testMuseumWithQueryRootDistance() {
+    public void testMuseum() {
         String qo1 = "SELECT distinct ?place ?pLabel WHERE {?place a <http://www.europeana.eu/schemas/edm/Place>.?place <http://www.w3.org/2004/02/skos/core#prefLabel> ?pLabel.}";
         String qo2 = "SELECT distinct ?collection ?parentCollection ?parentId ?parentDescr WHERE {?collection <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#OrderedCollection> . ?collection <http://www.w3.org/2004/02/skos/core#member> ?parentCollection .?parentCollection <http://purl.org/dc/elements/1.1/identifier> ?parentId .?parentCollection <http://vocab.getty.edu/ontology#parentString> ?parentDescr .}";
         String qo3 = "SELECT distinct ?concept ?prefLabel WHERE {?concept a <http://www.w3.org/2004/02/skos/core#Concept> .?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel . }";

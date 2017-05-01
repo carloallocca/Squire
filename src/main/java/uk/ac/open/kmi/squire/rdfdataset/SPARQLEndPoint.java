@@ -18,6 +18,7 @@ import java.net.URLEncoder;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.apache.http.HttpResponse;
@@ -33,6 +34,8 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.store.LockObtainFailedException;
@@ -328,6 +331,72 @@ public class SPARQLEndPoint implements IRDFDataset {
         }
     }
 
+    public void computeObjectPropertySet(int stepLength, int iteration, Set<Property> exclusions) {
+        StringBuilder qS = new StringBuilder();
+        qS.append("SELECT DISTINCT ?op where { [] ?op ?o ");
+        qS.append(" FILTER ( isUri(?o)");
+        int count = 0;
+        if(!exclusions.isEmpty()) {
+            qS.append(" && ?op NOT IN (");
+            
+            for(Iterator<Property> it = exclusions.iterator(); it.hasNext();count++) {
+                if(count>0) qS.append(",");
+                qS.append("<"+it.next().getURI()+">");              
+            }
+            qS.append(" )");
+                    }
+        qS.append(" ) } LIMIT ");
+        qS.append(stepLength);
+      //  if(iteration > 0) {
+      //      qS.append(" OFFSET ");
+      //      qS.append(stepLength*iteration);
+      //  }
+        System.out.println(qS.toString());
+     try {   
+                    String encodedQuery = URLEncoder.encode(qS.toString(), "UTF-8");
+            String GET_URL = this.endpointURL + "?query=" + encodedQuery;
+
+            // set the connection timeout value to 30 seconds (30000 milliseconds)
+            final HttpParams httpParams = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 300000000);
+            DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
+//            DefaultHttpClient httpClient = new DefaultHttpClient();
+
+            HttpGet getRequest = new HttpGet(GET_URL);
+
+            getRequest.addHeader("accept", "application/sparql-results+json");
+            HttpResponse response = httpClient.execute(getRequest);
+            if (response.getStatusLine().getStatusCode() != 200) {
+
+                String reason = response.getStatusLine().getReasonPhrase();
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + response.getStatusLine().getStatusCode());
+
+            }
+            BufferedReader br = new BufferedReader(
+                    new InputStreamReader((response.getEntity().getContent())));
+            String output;
+            String result = "";
+            while ((output = br.readLine()) != null) {
+                result = result + output;
+            }
+            
+            ArrayList<String> objectPropertyList = parseSparqlResultsJson(result, "op");
+            this.objectPropertySet.addAll(objectPropertyList);
+            if(stepLength == objectPropertyList.size()) {
+                for(String op : objectPropertyList)
+                    exclusions.add(ResourceFactory.createProperty(op));
+            System.out.println(this.objectPropertySet.size() + " object properties indexed so far");
+                computeObjectPropertySet(stepLength, iteration+1, exclusions);
+            }
+
+             } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }   
+    }
+    
     @Override
     public void computeObjectPropertySet() {
         try {
@@ -337,6 +406,13 @@ public class SPARQLEndPoint implements IRDFDataset {
                     + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . " + " FILTER (isURI(?o)) "
                     + "}";
 
+            // just for the opendatacommunity
+//            String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+//                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+//                    + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
+//                    + "}";
+
+            
             String encodedQuery = URLEncoder.encode(qString, "UTF-8");
             String GET_URL = this.endpointURL + "?query=" + encodedQuery;
 
@@ -385,6 +461,12 @@ public class SPARQLEndPoint implements IRDFDataset {
                     + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
                     + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . " + " FILTER (isLiteral(?o)) "
                     + "} ";
+
+            // just for the opendatacommunity
+//            String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+//                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+//                    + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . "
+//                    + "} ";
 
             String encodedQuery = URLEncoder.encode(qString, "UTF-8");
             String GET_URL = this.endpointURL + "?query=" + encodedQuery;
