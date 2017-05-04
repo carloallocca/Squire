@@ -40,7 +40,41 @@
       "source":"http://opendatacommunities.org/sparql",
       "target":"http://data.admin.ch/sparql/",
       "queries":[
-
+         {
+            "description":"Tell me everything about all the administrative districts.",
+            "original":"SELECT DISTINCT ?s ?p ?o WHERE {?s a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District> . ?s ?p ?o }",
+            "expected":[
+               "SELECT DISTINCT ?s ?p ?o WHERE { ?s a <https://gont.ch/District> . ?s ?p ?o }"
+            ]
+         },
+         {
+            "description":"Tell me the codes of all the administrative districts.",
+            "original":"SELECT DISTINCT ?dist ?code WHERE { ?dist a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District> . ?dist <http://www.w3.org/2004/02/skos/core#notation> ?code }",
+            "expected":[
+               "SELECT DISTINCT ?dis ?id WHERE { ?dis a <https://gont.ch/District> . ?dis <https://gont.ch/id> ?id }"
+            ]
+         },
+         {
+            "description":"List the labels and identifiers of all local authorities.",
+            "original":"SELECT DISTINCT ?s ?id ?label WHERE { ?s a <http://opendatacommunities.org/def/local-government/LocalAuthority> .?s <http://data.ordnancesurvey.co.uk/ontology/admingeo/gssCode> ?id . ?s <http://www.w3.org/2000/01/rdf-schema#label> ?label }",
+            "expected":[
+               "SELECT DISTINCT ?authority ?id ?label WHERE { ?authority a  <http://lindas-data.ch/def/top/Authority> . ?authority <http://purl.org/dc/elements/1.1/identifier> ?id . ?authority <http://www.w3.org/2004/02/skos/core#prefLabel> ?label }"
+            ]
+         },
+         {
+            "description":"List the labels and denominations of all schools.",
+            "original":"SELECT DISTINCT ?school ?label ?notation WHERE { ?school rdf:type <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority> . ?school <http://www.w3.org/2004/02/skos/core#prefLabel> ?label . ?school <http://www.w3.org/2004/02/skos/core#notation> ?notation }",
+            "expected":[
+               "SELECT DISTINCT ?school ?denomination ?label WHERE { ?school a <http://schema.org/School> . ?school <http://gov.genealogy.net/ontology.owl#hasDenomination> ?notation . ?school <http://schema.org/legalName> ?label }"
+            ]
+         },
+         {
+            "description":"List the identifiers and descriptions of all administrative services.",
+            "original":"SELECT DISTINCT ?service ?description ?identifier WHERE { ?service a <http://def.esd.org.uk/Service> . ?service <http://purl.org/dc/terms/description> ?description . ?service <http://purl.org/dc/terms/identifier> ?identifier }",
+            "expected":[
+               "SELECT DISTINCT ?service ?description ?identifier WHERE { ?service a <http://lindas-data.ch/def/top/Service> . ?service <http://www.w3.org/2004/02/skos/core#prefLabel> ?description . ?service <http://purl.org/dc/elements/1.1/identifier> ?identifier }"
+            ]
+         }
       ]
    }
 ]
