@@ -1,0 +1,46 @@
+[
+   {
+      "description":"Educational data, set 1: Open University and Oxford University",
+      "source":"http://data.open.ac.uk/query",
+      "target":"https://data.ox.ac.uk/sparql/",
+      "queries":[
+         {
+            "description":"Give me the URIs and names of all course modules",
+            "original":"SELECT DISTINCT ?mod ?title WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module> . ?mod <http://purl.org/dc/terms/title> ?title }",
+            "expected":[
+               "SELECT DISTINCT  ?course ?title WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title }"
+            ]
+         },
+         {
+            "description":"Give me the URIs, names and codes of all course modules (may vary in interpretation)",
+            "original":"PREFIX aiiso: <http://purl.org/vocab/aiiso/schema#> SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a aiiso:Module . ?mod <http://purl.org/dc/terms/title> ?title . ?mod aiiso:code ?code }",
+            "expected":[
+               "SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a <http://xcri.org/profiles/1.2/course> ; <http://purl.org/dc/terms/title>  ?title ; <http://purl.org/dc/terms/identifier> ?code }",
+               "SELECT DISTINCT ?course ?name ?code WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?name . ?course <http://www.w3.org/2004/02/skos/core#notation> ?code }"
+            ]
+         },
+         {
+            "description":"Also give me the regulations of all course modules (example where properties are preserved)",
+            "original":"SELECT DISTINCT ?mod ?title ?code ?regulation WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module>. ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/vocab/aiiso/schema#code> ?code . ?mod <http://xcri.org/profiles/catalog/1.2/regulations> ?regulation }",
+            "expected":[
+               "SELECT DISTINCT ?course ?title ?code ?regulation WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title . ?course <http://www.w3.org/2004/02/skos/core#notation> ?code . ?course <http://xcri.org/profiles/1.2/regulations> ?regulation }"
+            ]
+         },
+         {
+            "description":"This and the previous one are examples of two equivalent source queries that have the same expected query",
+            "original":"SELECT DISTINCT ?mod ?title ?descr WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module> . ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/dc/elements/1.1/description> ?descr }",
+            "expected":[
+               "SELECT DISTINCT  ?course ?title ?descr ?regulation WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title . ?course <http://purl.org/dc/terms/description> ?descr }"
+            ]
+         }
+      ]
+   },
+   {
+      "description":"Open Government Data: UK and Switzerland",
+      "source":"http://opendatacommunities.org/sparql",
+      "target":"http://data.admin.ch/sparql/",
+      "queries":[
+
+      ]
+   }
+]
