@@ -76,5 +76,89 @@
             ]
          }
       ]
+   },
+   {
+      "description":"Art: Museum of Fine Arts Budapest & Artium",
+      "source":"http://data.szepmuveszeti.hu/sparql",
+      "target":"http://datos.artium.org:8890/sparql",
+      "queries":[
+         {
+            "description":"List types and descriptions of all catalogued physical art objects",
+            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?physicalThing ?hasType ?descr WHERE { ?physicalThing a ecrm:E18_Physical_Thing . ?physicalThing ecrm:P2_has_type ?hasType . ?physicalThing ecrm:P1_is_identified_by ?id . ?id ecrm:P3_has_note ?descr }",
+            "expected":[
+               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?physicalThing ?hasType ?descr WHERE { ?physicalThing a ecrm:E24_Physical_Man-Made_Thing . ?physicalThing ecrm:P2_has_type ?hasType . ?physicalThing ecrm:P3_has_note ?descr }"
+            ]
+         },
+         {
+            "description":"List who created what",
+            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?creation ?partecipant WHERE { ?creation a ecrm:E65_Creation . ?creation ecrm:P11_had_participant ?partecipant }",
+            "expected":[
+               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?creation ?partecipant WHERE { ?creation a ecrm:E65_Creation . ?creation ecrm:P14_carried_out_by ?partecipant }"
+            ]
+         },
+         {
+            "description":"List the periods in which people died (this is a case of the expected query matching the given one)",
+            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathTimeSpan WHERE {?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan }",
+            "expected":[
+               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathTimeSpan WHERE {?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan }"
+            ]
+         },
+         {
+            "description":"List the death dates of people",
+            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathDate WHERE {?deathEntity a ecrm:E69_Death .?deathEntity ecrm:P4_has_time-span ?deathTimeSpan . ?deathTimeSpan ecrm:P78_is_identified_by ?deathTimeSpanID . ?deathTimeSpanID ecrm:P3_has_note ?deathDate }",
+            "expected":[
+               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathDate WHERE { ?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan . ?deathTimeSpan ecrm:P78_is_identified_by ?deathTimeSpanID . ?deathTimeSpanID ecrm:P3_has_note ?deathDate }"
+            ]
+         },
+         {
+            "description":"List the labels and variants of all the topics in the dataset (another example of the expected query being the same, but with a different vocabulary)",
+            "original":"PREFIX mads: <http://www.loc.gov/mads/rdf/v1#> SELECT DISTINCT ?topic ?authoritativeLabel ?variant WHERE { ?topic a mads:Topic .?topic mads:authoritativeLabel ?authoritativeLabel . ?topic mads:hasVariant ?variant }",
+            "expected":[
+               "PREFIX mads: <http://www.loc.gov/mads/rdf/v1#> SELECT DISTINCT ?topic ?authoritativeLabel ?hasVariant WHERE { ?topic a mads:Topic . ?topic mads:authoritativeLabel ?authoritativeLabel . ?topic mads:hasVariant ?hasVariant }"
+            ]
+         }
+      ]
+   },
+   {
+      "description":"Educational data, set 1: Open University and Aalto University",
+      "source":"http://data.open.ac.uk/query",
+      "target":"http://data.aalto.fi/sparql",
+      "queries":[
+         {
+            "description":"List the URIs and descriptions of all video podcasts (course material)",
+            "original":"SELECT DISTINCT ?thing ?description WHERE { ?thing a <http://data.open.ac.uk/podcast/ontology/VideoPodcast> . ?thing <http://purl.org/dc/terms/description> ?description }",
+            "expected":[
+               "SELECT DISTINCT ?course ?descr { ?course a <http://linkedscience.org/teach/ns#Material> . ?course <http://linkedscience.org/teach/ns#hasTitle> ?descr }"
+            ]
+         },
+         {
+            "description":"List people with name and surname",
+            "original":"SELECT DISTINCT ?x WHERE { ?x <http://xmlns.com/foaf/0.1/familyName> ?y . ?x <http://xmlns.com/foaf/0.1/givenName> ?z }",
+            "expected":[
+               "SELECT DISTINCT ?x WHERE { ?x <http://xmlns.com/foaf/0.1/familyName> ?y . ?x <http://xmlns.com/foaf/0.1/firstName> ?z }"
+            ]
+         },
+         {
+            "description":"Metadata about course materials - note it is not semantically equivalent due to publisher/published but it is the closest satisfiable query",
+            "original":"PREFIX dc: <http://purl.org/dc/terms/> SELECT DISTINCT ?thing ?info ?published ?anotherThing WHERE { ?thing dc:published ?published . ?thing <http://digitalbazaar.com/media/download> ?info . ?thing dc:isPartOf ?anotherThing }",
+            "expected":[
+               "PREFIX dc: <http://purl.org/dc/terms/> SELECT DISTINCT ?thing ?info ?published ?anotherThing WHERE { ?thing dc:isPartOf ?anotherThing . ?thing dc:publisher ?published . ?thing dc:title ?info }"
+            ]
+         },
+         {
+            "description":"Data about catalogue patents",
+            "original":"PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?patent dc:date ?date .?patent dc:title ?title .?patent dc:creator ?creator . ?patent bibo:status ?status . ?patent bibo:authorList ?authorList }",
+            "expected":[
+               "PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent dc:date ?date . ?patent dc:title ?title . ?patent bibo:authorList ?authorList }"
+            ]
+         },
+         {
+            "description":"Names and postcodes of campus buildings",
+            "original":"SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://vocab.deri.ie/rooms#Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.geonames.org/ontology#name> ?buildName . ?building <http://www.geonames.org/ontology#postalCode> ?postCode }",
+            "expected":[
+               "SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://dbpedia.org/ontology/Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.w3.org/2006/vcard/ns#country-name> ?buildName . ?building <http://www.w3.org/2006/vcard/ns#postal-code> ?postCode }"
+            ]
+         }
+      ]
    }
 ]
