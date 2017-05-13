@@ -1,0 +1,36 @@
+
+
+Process Start Time 1494665505913
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.open.ac.uk/query
+endpoint target == http://data.aalto.fi/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?patent ?label ?date ?title ?creator ?status ?authorList
+WHERE
+  { ?patent  a                     <http://purl.org/ontology/bibo/Patent> ;
+             <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+             <http://purl.org/dc/terms/date>  ?date ;
+             <http://purl.org/dc/terms/title>  ?title ;
+             <http://purl.org/dc/terms/creator>  ?creator ;
+             <http://purl.org/ontology/bibo/status>  ?status ;
+             <http://purl.org/ontology/bibo/authorList>  ?authorList
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?patent ?label ?date ?title ?creator ?status ?authorList
+WHERE
+  { ?patent  a                     <http://purl.org/ontology/bibo/Patent> ;
+             <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+             <http://purl.org/dc/terms/date>  ?date ;
+             <http://purl.org/dc/terms/title>  ?title ;
+             ?opt1                 ?creator ;
+             ?opt2                 ?status ;
+             <http://purl.org/ontology/bibo/authorList>  ?authorList
+  }

@@ -1,0 +1,136 @@
+
+
+Process Start Time 1494667940147
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://opendatacommunities.org/sparql
+endpoint target == http://data.admin.ch/query/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  a                     <http://data.ordnancesurvey.co.uk/ontology/admingeo/District> ;
+        ?p                    ?o
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  ?dpt1  ?ct1 ;
+        ?p     ?o
+  }
+
+
+qR Arrival Time == 1494668006018
+qR Query Elapsed Time == 65871
+qR score == 0.7638889
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  a                     <http://data.admin.ch/vocab/Municipality> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668009543
+qR Query Elapsed Time == 69396
+qR score == 0.6666667
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  a                     <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668012974
+qR Query Elapsed Time == 72827
+qR score == 0.5
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2000/01/rdf-schema#domain>  <http://data.admin.ch/vocab/District> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668014432
+qR Query Elapsed Time == 74285
+qR score == 0.2638889
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2000/01/rdf-schema#domain>  <http://data.admin.ch/vocab/Municipality> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668015203
+qR Query Elapsed Time == 75056
+qR score == 0.22348487
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2000/01/rdf-schema#isDefinedBy>  <http://example/neologism/gz> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668015926
+qR Query Elapsed Time == 75779
+qR score == 0.4513889
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2002/07/owl#sameAs>  <http://dbpedia.org/resource/Riehen> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668016652
+qR Query Elapsed Time == 76505
+qR score == 0.4814815
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2002/07/owl#sameAs>  <http://dbpedia.org/resource/Stallikon> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668017394
+qR Query Elapsed Time == 77247
+qR score == 0.46198833
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2002/07/owl#sameAs>  <http://dbpedia.org/resource/Rickenbach,_Thurgau> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668018136
+qR Query Elapsed Time == 77989
+qR score == 0.4513889
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2002/07/owl#sameAs>  <http://dbpedia.org/resource/Jaberg> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668018891
+qR Query Elapsed Time == 78744
+qR score == 0.5
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2002/07/owl#sameAs>  <http://dbpedia.org/resource/Pigniu> ;
+        ?p                    ?o
+  }
+
+
+qR Arrival Time == 1494668019627
+qR Query Elapsed Time == 79480
+qR score == 0.5160354
+SELECT DISTINCT  ?s ?p ?o
+WHERE
+  { ?s  <http://www.w3.org/2002/07/owl#sameAs>  <http://dbpedia.org/resource/Richterswil> ;
+        ?p                    ?o
+  }

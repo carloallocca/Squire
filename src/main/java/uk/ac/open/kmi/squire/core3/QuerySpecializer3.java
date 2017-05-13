@@ -241,7 +241,7 @@ public class QuerySpecializer3 implements Callable {
 //                    if (!(isQueryIndexed(qWithoutTriple))) {
 //                        //...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 //                        SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-//                        if (qs.isSatisfiableWRTResults(qWithoutTriple, rdfd2)) {
+//                        if (qs.isSatisfiable(qWithoutTriple, rdfd2)) {
 //                            QueryAndContextNode childNode = createNewQueryAndContextNodeForRemovalOp(qWithoutTriple, parentQueryAndContextNode);
 //                            specializableQueryListInsertSorted(childNode);
 //                            //add qWithoutTriple to the index
@@ -287,7 +287,7 @@ public class QuerySpecializer3 implements Callable {
 
                             //...checking if the childQueryCopyInstanciated is satisfiable w.r.t. D2 ...
                             SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-                            if (qs.isSatisfiableWRTResults(childQueryCopyInstanciated, rdfd2)) {
+                            if (qs.isSatisfiable(childQueryCopyInstanciated, rdfd2)) {
                                 QueryAndContextNode childNode = 
                                         createNewQueryAndContextNodeForInstanciateOp(childQueryCopyInstanciated, parentQueryAndContextNode, templVarEntityQoQrInstanciatedList);
                                 specializableQueryListInsertSorted(childNode);

@@ -1,0 +1,32 @@
+
+
+Process Start Time 1494670229158
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://opendatacommunities.org/sparql
+endpoint target == http://data.admin.ch/query/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  a                     <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority> ;
+             <http://www.w3.org/2004/02/skos/core#prefLabel>  ?label ;
+             <http://www.w3.org/2004/02/skos/core#notation>  ?notation
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  ?dpt1  ?ct1 ;
+             ?opt1  ?label ;
+             ?opt2  ?notation
+  }
+
+
+Process Stop Time == 1494670320843
+Process Elapsed Time == 91685

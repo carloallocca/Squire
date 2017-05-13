@@ -98,7 +98,7 @@ public class QueryGeneralizer4 {
         //PREDICATE
         for (Node pred : predicates) {
             if (!(pred.isVariable()) && !(pred.isBlank())) {
-                log.debug("[QueryGeneralizer4::generalize] this is the predicate uri object that is going to be generalized " +pred.getURI());              
+                log.debug("[:generalize] this is the predicate uri object that is going to be generalized " +pred.getURI());              
                 Var templateVarPred = ifPredicateIsNotD2ThenGenerateVariableNew(pred);
                 
                 if (templateVarPred != null) {
@@ -218,8 +218,8 @@ public class QueryGeneralizer4 {
             //System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
             
             if((rdfd1.getClassSet().contains(o))){
-                                    log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here F " +rdfd1.getClassSet().toString());
-                                    log.debug("[QueryGeneralizer4::ifObjectIsNotD2ThenGenerateVariableNew] Here G " +rdfd2.getClassSet().toString());
+                log.debug("[:ifObjectIsNotD2ThenGenerateVariableNew] Here F " +rdfd1.getClassSet().toString());
+                log.debug("[:ifObjectIsNotD2ThenGenerateVariableNew] Here G " +rdfd2.getClassSet().toString());
 
             }
             

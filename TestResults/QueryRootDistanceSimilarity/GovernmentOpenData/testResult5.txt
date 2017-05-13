@@ -1,0 +1,32 @@
+
+
+Process Start Time 1494670322808
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://opendatacommunities.org/sparql
+endpoint target == http://data.admin.ch/query/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://def.esd.org.uk/Service> ;
+              <http://purl.org/dc/terms/description>  ?description ;
+              <http://purl.org/dc/terms/identifier>  ?identifier
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  ?dpt1  ?ct1 ;
+              ?opt1  ?description ;
+              ?opt2  ?identifier
+  }
+
+
+Process Stop Time == 1494670412330
+Process Elapsed Time == 89522

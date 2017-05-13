@@ -1,0 +1,36 @@
+
+
+Process Start Time 1494666270419
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/
+endpoint target == http://edan.si.edu/saam/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?collection ?parentCollection ?parentId ?parentDescr
+WHERE
+  { ?collection  a                  <http://www.w3.org/2004/02/skos/core#OrderedCollection> ;
+              <http://www.w3.org/2004/02/skos/core#member>  ?parentCollection .
+    ?parentCollection
+              <http://purl.org/dc/elements/1.1/identifier>  ?parentId ;
+              <http://vocab.getty.edu/ontology#parentString>  ?parentDescr
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?collection ?parentCollection ?parentId ?parentDescr
+WHERE
+  { ?collection  a                  ?ct1 ;
+              ?opt2                 ?parentCollection .
+    ?parentCollection
+              ?opt1                 ?parentId ;
+              ?dpt1                 ?parentDescr
+  }
+
+
+Process Stop Time == 1494667802999
+Process Elapsed Time == 1532580

@@ -157,7 +157,7 @@ public class QueryRecommendation<T> {
             SPARQLQuerySatisfiable qsat = new SPARQLQuerySatisfiable();
             Query qRec = ((DataNode) n.getData()).getqR();
 
-            boolean querySat = qsat.isSatisfiableWRTResults(qRec, this.rdfd2);
+            boolean querySat = qsat.isSatisfiable(qRec, this.rdfd2);
             System.out.println("[QueryRecommendation,printQueryTemplateTree1] querySat " + querySat);
 
             if (querySat) {
@@ -211,7 +211,7 @@ public class QueryRecommendation<T> {
 
             boolean querySatR1 = qsat.isSatisfiableWRTProjectVar(qRec);
 
-            boolean querySatR2 = qsat.isSatisfiableWRTResults(qRec, this.rdfd2);
+            boolean querySatR2 = qsat.isSatisfiable(qRec, this.rdfd2);
 
             if (querySatR2 && querySatR1) {
 

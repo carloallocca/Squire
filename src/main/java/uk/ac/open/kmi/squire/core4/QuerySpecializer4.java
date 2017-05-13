@@ -59,8 +59,29 @@ import uk.ac.open.kmi.squire.utils.PowerSetFactory;
  */
 public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
-    private static final String TEST_RESULT_DIR_PREFIX = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/TestResults/QueryRootDistanceSimilarity/testResult";
+    private static final String TEST_RESULT_DIR_PREFIX = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/TestResults/";
+//    private static final String TEST_RESULT_METRICS = "QueryRootDistanceSimilarity/";
+
+    private static final String TEST_RESULT_METRICS = "QueryRootDistanceSimilarity/";
+//    private static final String TEST_RESULT_METRICS = "QuerySpecificityDistanceSimilarity/";
+//    private static final String TEST_RESULT_METRICS = "QueryResultTypeSimilarity/";
+//    private static final String TEST_RESULT_METRICS = "All/";
+
+//    private final static String TEST_ONE = "EducationI/";
+//    private final static String TEST_TWO = "Art/";
+//    private final static String TEST_THREE = "EducationII/";
+//    private final static String TEST_FOUR = "Museum/";
+    private final static String TEST_FIVE = "GovernmentOpenData/";
+
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX;
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
+//private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
+//private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
+private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
+
+    private static final String TEST_RESULT_NAME_PREFIX = "testResult";
     private static int testResultIndex = 0;
+    private static int class_instanciation_number = 0;
 
     private static String INSTANCE_OP = "I";
     private static String REMOVE_TP_OP = "R";
@@ -96,11 +117,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private long stopTime ;
+    private long stopTime;
     private long elapsedTime;
     private long startTime;
 
-    
     public QuerySpecializer4() {
         super();
     }
@@ -120,6 +140,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         startTime = System.currentTimeMillis();
 
         QuerySpecializer4.testResultIndex++;
+        QuerySpecializer4.class_instanciation_number = QuerySpecializer4.class_instanciation_number + 1;
 
         this.qO = QueryFactory.create(qo.toString());
         this.qR = QueryFactory.create(qr.toString());
@@ -236,8 +257,29 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         addSpecializableQueryList(qAndcNode);
 //        this.recommandedQueryList.add(qAndcNode);
 
-        //add info to the rsutls test file
-        String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+//        String fullPrefix = "";
+//        switch (QuerySpecializer4.class_instanciation_number) {
+//            case 1:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 2:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 3:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 4:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 5:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            default:
+//                break;
+//        }
+        String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+        log.info("newTextFile 1 =======" + newTextFile);
+
         try {
             FileWriter fw = new FileWriter(newTextFile, true);
             fw.write("\n");
@@ -267,13 +309,14 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
             fw.write(qAndcNode.getqR().toString());
             fw.close();
         } catch (IOException e) {
+            log.info(e.getMessage());
             //exception handling left as an exercise for the reader
         }
 
     }
 
     public List<QueryAndContextNode> specialize() throws Exception {
-//        log.info("::specialize() " + this.specializableQueryAndContextNodeList.size());
+        log.info("::template query space size " + this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().size());
         if ((this.specializableQueryAndContextNodeList.size() == 1)
                 && (this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().isEmpty())
                 && (isIProcessable(this.specializableQueryAndContextNodeList.get(0)))) {
@@ -292,7 +335,6 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
             List<String> qRTemplateVariableSet = parentqRCopy.getResultVars();
 
             List<List<TriplePath>> triplePathPowerSet = PowerSetFactory.powerset(triplePathSet);
-
             List<List<TriplePath>> triplePathPowerSetOrdered = PowerSetFactory.order(triplePathPowerSet);
 
 //            log.info("triplePathPowerSetOrdered" + triplePathPowerSetOrdered.toString());
@@ -310,8 +352,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                     for (String var : qRTemplateVariableSet) {
                         sb.addVar(var);
                     }
+                    sb.setDistinct(true);
                     Query subQuery = sb.build();
-//                    log.info("qString... " + subQuery);
 
                     // add here the rest of the code, 
                     // including the fact that satisfiacibile and crete 
@@ -320,8 +362,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                     if (!(isQueryIndexed(subQuery))) {
                         //...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
                         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-                        if (qs.isSatisfiableWRTResults(subQuery, rdfd2)) {
+                        if (qs.isSatisfiableWRTResultsWithToken(subQuery, rdfd2)) {
+                            log.info("subQuery... " + subQuery);
                             QueryAndContextNode childNode = createNewQueryAndContextNodeForRemovalOp(subQuery, parentQueryAndContextNode);
+                            log.info("childNode Solution List... " + childNode.getQueryTempVarSolutionSpace().size());
 
                             addSpecializableQueryList(childNode);
                             // this.specializableQueryAndContextNodeList.add(childNode);
@@ -336,10 +380,61 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                 }
             }
         }
+        //The trivial case: 
+        SPARQLQuerySatisfiable qs1 = new SPARQLQuerySatisfiable();
+        if ((this.specializableQueryAndContextNodeList.size() == 1)
+                && (this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().isEmpty())
+                && (qs1.isSatisfiableWRTResultsWithToken(this.specializableQueryAndContextNodeList.get(0).getqO(), rdfd2))) {
+
+            QueryAndContextNode childNode
+                    = createEmptyQueryAndContextNode(this.specializableQueryAndContextNodeList.get(0).getqO());
+            addSpecializableQueryList(childNode);
+            this.recommandedQueryList.add(childNode);
+            this.notifyQueryRecommendation(this.specializableQueryAndContextNodeList.get(0).getqO(),
+                    1);
+            this.notifyQueryRecommendationCompletion(true);
+
+            String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+//                                    String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+            log.info("newTextFile 2 =======" + newTextFile);
+
+            try {
+                long qRArrivalTime = System.currentTimeMillis();
+                long queryElapsedTime = qRArrivalTime - startTime;
+
+                FileWriter fw = new FileWriter(newTextFile, true);
+                fw.write("\n");
+                fw.write("\n");
+                fw.write("qR Arrival Time == " + Long.toString(qRArrivalTime));
+                fw.write("\n");
+                fw.write("qR Query Elapsed Time == " + Long.toString(queryElapsedTime));
+                fw.write("\n");
+                fw.write("qR score == " + Float.toString(childNode.getqRScore()));
+                fw.write("\n");
+                fw.write(childNode.getqR().toString());
+
+                stopTime = System.currentTimeMillis();
+                elapsedTime = stopTime - startTime;
+                fw.write("\n");
+                fw.write("\n");
+                fw.write("Process Stop Time == " + Long.toString(stopTime));
+                fw.write("\n");
+                fw.write("Process Elapsed Time == " + Long.toString(elapsedTime));
+                fw.write("\n");
+                fw.close();
+
+                fw.close();
+            } catch (IOException e) {
+                //exception handling left as an exercise for the reader
+            }
+
+            return this.recommandedQueryList;
+        }
+
 //        log.info("WE WILL START THE SPECIALIZATION PROCESS...");
 //        log.info("this.specializableQueryAndContextNodeList.size() " + this.specializableQueryAndContextNodeList.size());
-
         while (this.specializableQueryAndContextNodeList.size() > 0) {
+
 
             // 1. Get and Remove the QueryAndContextNode with qRScore max
             QueryAndContextNode parentQueryAndContextNode = getMaxQueryAndContextNode();
@@ -366,7 +461,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 //                    if (!(isQueryIndexed(qWithoutTriple))) {
 //                        //...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 //                        SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-//                        if (qs.isSatisfiableWRTResults(qWithoutTriple, rdfd2)) {
+//                        if (qs.isSatisfiable(qWithoutTriple, rdfd2)) {
 //                            QueryAndContextNode childNode = createNewQueryAndContextNodeForRemovalOp(qWithoutTriple, parentQueryAndContextNode);
 //                            addSpecializableQueryList(childNode);
 //                            //add qWithoutTriple to the index
@@ -384,8 +479,15 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                     Query queryChild = QueryFactory.create(parentQueryAndContextNode.getqR());
                     List<QuerySolution> qSolList = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
 
-                    //log.info("qSolList " +qSolList.toString());
+                    log.info("queryChild Instanciation step: " + queryChild.toString());
+                    log.info("qSolList size: " + qSolList.size());
+
                     for (QuerySolution sol : qSolList) {
+
+                        for (int i = 0; i < 10; i++) {
+                            // calling repeatedly to increase chances of a clean-up
+                            System.gc();
+                        }
 
                         Query childQueryCopy = QueryFactory.create(queryChild.toString());
 
@@ -395,7 +497,11 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
                         ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList = new ArrayList(); // this contains all the tuples <varName, entityQo, entityQr> for each varName that is going to be instantiated
                         for (Var tv : qTempVarSet) {
+                            //log.info("Var tv: " +tv.getVarName());
+                            //log.info("Var tv: " +tv.getName());
                             RDFNode node = sol.get(tv.getName());
+                            //log.info("RDFNode node: " +node.toString());
+
                             SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
                             childQueryCopyInstanciated = instOP.instantiateVarTemplate(childQueryCopy, tv, node.asNode());
 
@@ -412,11 +518,11 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
                                 //...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
                                 SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-                                if (qs.isSatisfiableWRTResults(childQueryCopyInstanciated, rdfd2)) {
+                                if (qs.isSatisfiableWRTResultsWithToken(childQueryCopyInstanciated, rdfd2)) {
                                     QueryAndContextNode childNode
                                             = createNewQueryAndContextNodeForInstanciateOp(childQueryCopyInstanciated, parentQueryAndContextNode, templVarEntityQoQrInstanciatedList);
                                     addSpecializableQueryList(childNode);
-                                    
+
                                     long qRArrivalTime = System.currentTimeMillis();
                                     long queryElapsedTime = qRArrivalTime - startTime;
                                     log.info("qR score ======" + childNode.getqRScore());
@@ -428,15 +534,39 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                                     addQueryToIndexIFAbsent(childQueryCopyInstanciated);
                                     //printQuerySolutionSpaceMap(parentQueryAndContextNode);
 
-                                    String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+                                    /////////////// TESTING PURPOSE
+//                                    String fullPrefix = "";
+//                                    switch (QuerySpecializer4.class_instanciation_number) {
+//                                        case 1:
+//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX;
+//                                            break;
+//                                        case 2:
+//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
+//                                            break;
+//                                        case 3:
+//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
+//                                            break;
+//                                        case 4:
+//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
+//                                            break;
+//                                        case 5:
+//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
+//                                            break;
+//                                        default:
+//                                            break;
+//                                    }
+                                    String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+//                                    String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+                                    log.info("newTextFile 2 =======" + newTextFile);
+
                                     try {
                                         FileWriter fw = new FileWriter(newTextFile, true);
                                         fw.write("\n");
                                         fw.write("\n");
                                         fw.write("qR Arrival Time == " + Long.toString(qRArrivalTime));
                                         fw.write("\n");
-                                        fw.write("qR Query Elapsed Time == " + Long.toString(queryElapsedTime));                                     
-                                        fw.write("\n");                                        
+                                        fw.write("qR Query Elapsed Time == " + Long.toString(queryElapsedTime));
+                                        fw.write("\n");
                                         fw.write("qR score == " + Float.toString(childNode.getqRScore()));
                                         fw.write("\n");
                                         fw.write(childNode.getqR().toString());
@@ -445,6 +575,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                                         //exception handling left as an exercise for the reader
                                     }
 
+                                    //////////// START FOR TESTING PURPOSE
                                 } else {
                                     addQueryToIndexIFAbsent(childQueryCopyInstanciated);
                                 }
@@ -457,10 +588,31 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         }//end while
         this.notifyQueryRecommendationCompletion(true);
 
-
         stopTime = System.currentTimeMillis();
         elapsedTime = stopTime - startTime;
-        String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+//        String fullPrefix = "";
+//        switch (QuerySpecializer4.class_instanciation_number) {
+//            case 1:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 2:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 3:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 4:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            case 5:
+//                fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
+//                break;
+//            default:
+//                break;
+//        }
+        String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+//        log.info("newTextFile ======= 3" +newTextFile);      
+//        String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
         try {
             FileWriter fw = new FileWriter(newTextFile, true);
             fw.write("\n");
@@ -1089,6 +1241,21 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         } else {
             return qSolList;
         }
+
+    }
+
+    private QueryAndContextNode createEmptyQueryAndContextNode(Query qo) throws Exception {
+        QueryAndContextNode childQueryAndContextNode = new QueryAndContextNode();
+
+        Query clonedqO = QueryFactory.create(qo);
+        childQueryAndContextNode.setqO(clonedqO);
+
+        Query clonedqR = QueryFactory.create(qo);
+        childQueryAndContextNode.setqR(clonedqR);
+
+        childQueryAndContextNode.setqRScore(1);
+
+        return childQueryAndContextNode;
 
     }
 

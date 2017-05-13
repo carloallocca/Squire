@@ -16,6 +16,13 @@
     </properties>
 
     <dependencies>
+        
+        <dependency>
+            <groupId>org.eclipse.rdf4j</groupId>
+            <artifactId>rdf4j-repository-sparql</artifactId>
+            <version>2.1.6</version>
+        </dependency>
+        
 
         <!-- 
         <dependency> 
@@ -160,8 +167,10 @@
                     <compilerArguments>
                         <endorseddirs>${endorsed.dir}</endorseddirs>
                     </compilerArguments>
+
                 </configuration>
             </plugin>
+            
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

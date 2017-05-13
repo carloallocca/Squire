@@ -1,0 +1,1480 @@
+
+
+Process Start Time 1494664853343
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.open.ac.uk/query
+endpoint target == http://data.aalto.fi/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://data.open.ac.uk/podcast/ontology/VideoPodcast> ;
+            <http://purl.org/dc/terms/description>  ?description
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     ?ct1 ;
+            ?dpt1                 ?description
+  }
+
+
+qR Arrival Time == 1494664876115
+qR Query Elapsed Time == 22772
+qR score == 0.43434346
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://purl.org/ontology/bibo/producer>  ?description
+  }
+
+
+qR Arrival Time == 1494664877326
+qR Query Elapsed Time == 23983
+qR score == 0.39558083
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://purl.org/dc/terms/title>  ?description
+  }
+
+
+qR Arrival Time == 1494664878194
+qR Query Elapsed Time == 24851
+qR score == 0.48989904
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://purl.org/dc/terms/isPartOf>  ?description
+  }
+
+
+qR Arrival Time == 1494664878985
+qR Query Elapsed Time == 25642
+qR score == 0.4955808
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://purl.org/dc/terms/date>  ?description
+  }
+
+
+qR Arrival Time == 1494664880184
+qR Query Elapsed Time == 26841
+qR score == 0.41224748
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494664881058
+qR Query Elapsed Time == 27715
+qR score == 0.42739898
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://purl.org/dc/terms/publisher>  ?description
+  }
+
+
+qR Arrival Time == 1494664881895
+qR Query Elapsed Time == 28552
+qR score == 0.45391417
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://xmlns.com/foaf/0.1/homepage>  ?description
+  }
+
+
+qR Arrival Time == 1494664883060
+qR Query Elapsed Time == 29717
+qR score == 0.43876266
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://purl.org/ontology/bibo/isbn>  ?description
+  }
+
+
+qR Arrival Time == 1494664883950
+qR Query Elapsed Time == 30607
+qR score == 0.43876266
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Document> ;
+            <http://prismstandard.org/namespaces/basic/2.1/issn>  ?description
+  }
+
+
+qR Arrival Time == 1494664886266
+qR Query Elapsed Time == 32923
+qR score == 0.43434346
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/ontology/bibo/producer>  ?description
+  }
+
+
+qR Arrival Time == 1494664888097
+qR Query Elapsed Time == 34754
+qR score == 0.39558083
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/dc/terms/title>  ?description
+  }
+
+
+qR Arrival Time == 1494664888894
+qR Query Elapsed Time == 35551
+qR score == 0.48989904
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/dc/terms/isPartOf>  ?description
+  }
+
+
+qR Arrival Time == 1494664889661
+qR Query Elapsed Time == 36318
+qR score == 0.4955808
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/dc/terms/date>  ?description
+  }
+
+
+qR Arrival Time == 1494664890531
+qR Query Elapsed Time == 37188
+qR score == 0.41224748
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494664891367
+qR Query Elapsed Time == 38024
+qR score == 0.42739898
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/dc/terms/publisher>  ?description
+  }
+
+
+qR Arrival Time == 1494664892329
+qR Query Elapsed Time == 38986
+qR score == 0.45391417
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://xmlns.com/foaf/0.1/homepage>  ?description
+  }
+
+
+qR Arrival Time == 1494664894647
+qR Query Elapsed Time == 41304
+qR score == 0.43876266
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/ontology/bibo/isbn>  ?description
+  }
+
+
+qR Arrival Time == 1494664895595
+qR Query Elapsed Time == 42252
+qR score == 0.43876266
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://prismstandard.org/namespaces/basic/2.1/issn>  ?description
+  }
+
+
+qR Arrival Time == 1494664896508
+qR Query Elapsed Time == 43165
+qR score == 0.477399
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/ontology/bibo/authorList>  ?description
+  }
+
+
+qR Arrival Time == 1494664897451
+qR Query Elapsed Time == 44108
+qR score == 0.50012624
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Document> ;
+            <http://purl.org/dc/elements/1.1/contributor>  ?description
+  }
+
+
+qR Arrival Time == 1494664898215
+qR Query Elapsed Time == 44872
+qR score == 0.41085857
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494664899071
+qR Query Elapsed Time == 45728
+qR score == 0.43737376
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/name>  ?description
+  }
+
+
+qR Arrival Time == 1494664900031
+qR Query Elapsed Time == 46688
+qR score == 0.45252526
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://www.w3.org/ns/org#memberOf>  ?description
+  }
+
+
+qR Arrival Time == 1494664900831
+qR Query Elapsed Time == 47488
+qR score == 0.44116163
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/workInfoHomepage>  ?description
+  }
+
+
+qR Arrival Time == 1494664901684
+qR Query Elapsed Time == 48341
+qR score == 0.41237372
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/familyName>  ?description
+  }
+
+
+qR Arrival Time == 1494664903816
+qR Query Elapsed Time == 50473
+qR score == 0.36919188
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://schema.org/jobtitle>  ?description
+  }
+
+
+qR Arrival Time == 1494664905569
+qR Query Elapsed Time == 52226
+qR score == 0.47356904
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/firstName>  ?description
+  }
+
+
+qR Arrival Time == 1494664906285
+qR Query Elapsed Time == 52942
+qR score == 0.49852097
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/topic_interest>  ?description
+  }
+
+
+qR Arrival Time == 1494664907004
+qR Query Elapsed Time == 53661
+qR score == 0.44188315
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/skypeID>  ?description
+  }
+
+
+qR Arrival Time == 1494664907788
+qR Query Elapsed Time == 54445
+qR score == 0.21388888
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/plan>  ?description
+  }
+
+
+qR Arrival Time == 1494664908658
+qR Query Elapsed Time == 55315
+qR score == 0.45252526
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Agent> ;
+            <http://xmlns.com/foaf/0.1/jabberID>  ?description
+  }
+
+
+qR Arrival Time == 1494664909494
+qR Query Elapsed Time == 56151
+qR score == 0.41085857
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494664911567
+qR Query Elapsed Time == 58224
+qR score == 0.43737376
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/name>  ?description
+  }
+
+
+qR Arrival Time == 1494664917858
+qR Query Elapsed Time == 64515
+qR score == 0.45252526
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://www.w3.org/ns/org#memberOf>  ?description
+  }
+
+
+qR Arrival Time == 1494664923554
+qR Query Elapsed Time == 70211
+qR score == 0.44116163
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/workInfoHomepage>  ?description
+  }
+
+
+qR Arrival Time == 1494664928998
+qR Query Elapsed Time == 75655
+qR score == 0.41237372
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/familyName>  ?description
+  }
+
+
+qR Arrival Time == 1494664935003
+qR Query Elapsed Time == 81660
+qR score == 0.36919188
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://schema.org/jobtitle>  ?description
+  }
+
+
+qR Arrival Time == 1494664941843
+qR Query Elapsed Time == 88500
+qR score == 0.47356904
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/firstName>  ?description
+  }
+
+
+qR Arrival Time == 1494664949011
+qR Query Elapsed Time == 95668
+qR score == 0.49852097
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/topic_interest>  ?description
+  }
+
+
+qR Arrival Time == 1494664955948
+qR Query Elapsed Time == 102605
+qR score == 0.44188315
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/skypeID>  ?description
+  }
+
+
+qR Arrival Time == 1494664964864
+qR Query Elapsed Time == 111521
+qR score == 0.21388888
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/plan>  ?description
+  }
+
+
+qR Arrival Time == 1494664972465
+qR Query Elapsed Time == 119122
+qR score == 0.45252526
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/dc/terms/Agent> ;
+            <http://xmlns.com/foaf/0.1/jabberID>  ?description
+  }
+
+
+qR Arrival Time == 1494664982560
+qR Query Elapsed Time == 129217
+qR score == 0.4330808
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494664991434
+qR Query Elapsed Time == 138091
+qR score == 0.45959598
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/name>  ?description
+  }
+
+
+qR Arrival Time == 1494664996847
+qR Query Elapsed Time == 143504
+qR score == 0.47474748
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://www.w3.org/ns/org#memberOf>  ?description
+  }
+
+
+qR Arrival Time == 1494665004287
+qR Query Elapsed Time == 150944
+qR score == 0.46338385
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/workInfoHomepage>  ?description
+  }
+
+
+qR Arrival Time == 1494665015140
+qR Query Elapsed Time == 161797
+qR score == 0.43459594
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/familyName>  ?description
+  }
+
+
+qR Arrival Time == 1494665022356
+qR Query Elapsed Time == 169013
+qR score == 0.39141417
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://schema.org/jobtitle>  ?description
+  }
+
+
+qR Arrival Time == 1494665030005
+qR Query Elapsed Time == 176662
+qR score == 0.49579126
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/firstName>  ?description
+  }
+
+
+qR Arrival Time == 1494665041535
+qR Query Elapsed Time == 188192
+qR score == 0.5207432
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/topic_interest>  ?description
+  }
+
+
+qR Arrival Time == 1494665049649
+qR Query Elapsed Time == 196306
+qR score == 0.46410537
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/skypeID>  ?description
+  }
+
+
+qR Arrival Time == 1494665055490
+qR Query Elapsed Time == 202147
+qR score == 0.2361111
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/plan>  ?description
+  }
+
+
+qR Arrival Time == 1494665061314
+qR Query Elapsed Time == 207971
+qR score == 0.47474748
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/jabberID>  ?description
+  }
+
+
+qR Arrival Time == 1494665070790
+qR Query Elapsed Time == 217447
+qR score == 0.5770202
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://purl.org/vocab/aiiso/schema#organization>  ?description
+  }
+
+
+qR Arrival Time == 1494665079364
+qR Query Elapsed Time == 226021
+qR score == 0.41641414
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Person> ;
+            <http://xmlns.com/foaf/0.1/title>  ?description
+  }
+
+
+qR Arrival Time == 1494665088329
+qR Query Elapsed Time == 234986
+qR score == 0.47276336
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665095706
+qR Query Elapsed Time == 242363
+qR score == 0.49094516
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+            <http://www.w3.org/2000/01/rdf-schema#label>  ?description
+  }
+
+
+qR Arrival Time == 1494665102079
+qR Query Elapsed Time == 248736
+qR score == 0.42646706
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+            <http://www.w3.org/2004/02/skos/core#prefLabel>  ?description
+  }
+
+
+qR Arrival Time == 1494665107326
+qR Query Elapsed Time == 253983
+qR score == 0.5379149
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+            <http://www.w3.org/2004/02/skos/core#exactMatch>  ?description
+  }
+
+
+qR Arrival Time == 1494665114732
+qR Query Elapsed Time == 261389
+qR score == 0.5566378
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+            <http://purl.org/dc/terms/subject>  ?description
+  }
+
+
+qR Arrival Time == 1494665120313
+qR Query Elapsed Time == 266970
+qR score == 0.42474747
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665127040
+qR Query Elapsed Time == 273697
+qR score == 0.44292927
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://www.w3.org/2000/01/rdf-schema#label>  ?description
+  }
+
+
+qR Arrival Time == 1494665133166
+qR Query Elapsed Time == 279823
+qR score == 0.48030305
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://xmlns.com/foaf/0.1/member>  ?description
+  }
+
+
+qR Arrival Time == 1494665153476
+qR Query Elapsed Time == 300133
+qR score == 0.51132756
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://purl.org/vocab/aiiso/schema#part_of>  ?description
+  }
+
+
+qR Arrival Time == 1494665160337
+qR Query Elapsed Time == 306994
+qR score == 0.45126265
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://xmlns.com/foaf/0.1/name>  ?description
+  }
+
+
+qR Arrival Time == 1494665165654
+qR Query Elapsed Time == 312311
+qR score == 0.50934345
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://purl.org/vocab/aiiso/schema#code>  ?description
+  }
+
+
+qR Arrival Time == 1494665172492
+qR Query Elapsed Time == 319149
+qR score == 0.45577204
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://purl.org/vocab/aiiso/schema#teaches>  ?description
+  }
+
+
+qR Arrival Time == 1494665179399
+qR Query Elapsed Time == 326056
+qR score == 0.46641415
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://xmlns.com/foaf/0.1/homepage>  ?description
+  }
+
+
+qR Arrival Time == 1494665184651
+qR Query Elapsed Time == 331308
+qR score == 0.43989897
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://observedchange.com/tisc/ns#locatedAt>  ?description
+  }
+
+
+qR Arrival Time == 1494665191159
+qR Query Elapsed Time == 337816
+qR score == 0.45126265
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Department> ;
+            <http://purl.org/vocab/aiiso/schema#name>  ?description
+  }
+
+
+qR Arrival Time == 1494665198179
+qR Query Elapsed Time == 344836
+qR score == 0.4469697
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665203828
+qR Query Elapsed Time == 350485
+qR score == 0.4651515
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            <http://www.w3.org/2000/01/rdf-schema#label>  ?description
+  }
+
+
+qR Arrival Time == 1494665211388
+qR Query Elapsed Time == 358045
+qR score == 0.5025252
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            <http://xmlns.com/foaf/0.1/member>  ?description
+  }
+
+
+qR Arrival Time == 1494665222024
+qR Query Elapsed Time == 368681
+qR score == 0.5335498
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            <http://purl.org/vocab/aiiso/schema#part_of>  ?description
+  }
+
+
+qR Arrival Time == 1494665227327
+qR Query Elapsed Time == 373984
+qR score == 0.47348487
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            <http://xmlns.com/foaf/0.1/name>  ?description
+  }
+
+
+qR Arrival Time == 1494665232099
+qR Query Elapsed Time == 378756
+qR score == 0.53156567
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            <http://purl.org/vocab/aiiso/schema#code>  ?description
+  }
+
+
+qR Arrival Time == 1494665244753
+qR Query Elapsed Time == 391410
+qR score == 0.5909091
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            <http://purl.org/vocab/aiiso/schema#organization>  ?description
+  }
+
+
+qR Arrival Time == 1494665252615
+qR Query Elapsed Time == 399272
+qR score == 0.47348487
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#School> ;
+            <http://purl.org/vocab/aiiso/schema#name>  ?description
+  }
+
+
+qR Arrival Time == 1494665259729
+qR Query Elapsed Time == 406386
+qR score == 0.3556999
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#College> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665267029
+qR Query Elapsed Time == 413686
+qR score == 0.3738817
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#College> ;
+            <http://www.w3.org/2000/01/rdf-schema#label>  ?description
+  }
+
+
+qR Arrival Time == 1494665275952
+qR Query Elapsed Time == 422609
+qR score == 0.41125542
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#College> ;
+            <http://xmlns.com/foaf/0.1/member>  ?description
+  }
+
+
+qR Arrival Time == 1494665286761
+qR Query Elapsed Time == 433418
+qR score == 0.44227993
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#College> ;
+            <http://purl.org/vocab/aiiso/schema#part_of>  ?description
+  }
+
+
+qR Arrival Time == 1494665293857
+qR Query Elapsed Time == 440514
+qR score == 0.40450943
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Article> ;
+            <http://purl.org/dc/terms/title>  ?description
+  }
+
+
+qR Arrival Time == 1494665303423
+qR Query Elapsed Time == 450080
+qR score == 0.5045094
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Article> ;
+            <http://purl.org/dc/terms/date>  ?description
+  }
+
+
+qR Arrival Time == 1494665312236
+qR Query Elapsed Time == 458893
+qR score == 0.42117608
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Article> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665318231
+qR Query Elapsed Time == 464888
+qR score == 0.4863276
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Article> ;
+            <http://purl.org/ontology/bibo/authorList>  ?description
+  }
+
+
+qR Arrival Time == 1494665325756
+qR Query Elapsed Time == 472413
+qR score == 0.50905484
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Article> ;
+            <http://purl.org/dc/elements/1.1/contributor>  ?description
+  }
+
+
+qR Arrival Time == 1494665333095
+qR Query Elapsed Time == 479752
+qR score == 0.45808083
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Book> ;
+            <http://purl.org/dc/terms/title>  ?description
+  }
+
+
+qR Arrival Time == 1494665338246
+qR Query Elapsed Time == 484903
+qR score == 0.5580808
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Book> ;
+            <http://purl.org/dc/terms/date>  ?description
+  }
+
+
+qR Arrival Time == 1494665344911
+qR Query Elapsed Time == 491568
+qR score == 0.47474748
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Book> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665353088
+qR Query Elapsed Time == 499745
+qR score == 0.539899
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Book> ;
+            <http://purl.org/ontology/bibo/authorList>  ?description
+  }
+
+
+qR Arrival Time == 1494665358989
+qR Query Elapsed Time == 505646
+qR score == 0.56262624
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Book> ;
+            <http://purl.org/dc/elements/1.1/contributor>  ?description
+  }
+
+
+qR Arrival Time == 1494665365160
+qR Query Elapsed Time == 511817
+qR score == 0.43030304
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Report> ;
+            <http://purl.org/dc/terms/title>  ?description
+  }
+
+
+qR Arrival Time == 1494665373742
+qR Query Elapsed Time == 520399
+qR score == 0.530303
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Report> ;
+            <http://purl.org/dc/terms/date>  ?description
+  }
+
+
+qR Arrival Time == 1494665383095
+qR Query Elapsed Time == 529752
+qR score == 0.4469697
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Report> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665388307
+qR Query Elapsed Time == 534964
+qR score == 0.5121212
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Report> ;
+            <http://purl.org/ontology/bibo/authorList>  ?description
+  }
+
+
+qR Arrival Time == 1494665394284
+qR Query Elapsed Time == 540941
+qR score == 0.53484845
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Report> ;
+            <http://purl.org/dc/elements/1.1/contributor>  ?description
+  }
+
+
+qR Arrival Time == 1494665401318
+qR Query Elapsed Time == 547975
+qR score == 0.34696972
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Patent> ;
+            <http://purl.org/dc/terms/title>  ?description
+  }
+
+
+qR Arrival Time == 1494665412141
+qR Query Elapsed Time == 558798
+qR score == 0.4469697
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Patent> ;
+            <http://purl.org/dc/terms/date>  ?description
+  }
+
+
+qR Arrival Time == 1494665420843
+qR Query Elapsed Time == 567500
+qR score == 0.36363637
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Patent> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665426718
+qR Query Elapsed Time == 573375
+qR score == 0.4287879
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Patent> ;
+            <http://purl.org/ontology/bibo/authorList>  ?description
+  }
+
+
+qR Arrival Time == 1494665428865
+qR Query Elapsed Time == 575522
+qR score == 0.45151514
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Patent> ;
+            <http://purl.org/dc/elements/1.1/contributor>  ?description
+  }
+
+
+qR Arrival Time == 1494665433864
+qR Query Elapsed Time == 580521
+qR score == 0.36363637
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665446414
+qR Query Elapsed Time == 593071
+qR score == 0.40530306
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://xmlns.com/foaf/0.1/homepage>  ?description
+  }
+
+
+qR Arrival Time == 1494665454164
+qR Query Elapsed Time == 600821
+qR score == 0.44823235
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://purl.org/vocab/aiiso/schema#code>  ?description
+  }
+
+
+qR Arrival Time == 1494665455142
+qR Query Elapsed Time == 601799
+qR score == 0.16666669
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://purl.org/dc/terms/language>  ?description
+  }
+
+
+qR Arrival Time == 1494665456461
+qR Query Elapsed Time == 603118
+qR score == 0.44823235
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://linkedscience.org/teach/ns#ects>  ?description
+  }
+
+
+qR Arrival Time == 1494665458030
+qR Query Elapsed Time == 604687
+qR score == 0.45959598
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://linkedscience.org/teach/ns#courseTitle>  ?description
+  }
+
+
+qR Arrival Time == 1494665458978
+qR Query Elapsed Time == 605635
+qR score == 0.5495544
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://linkedscience.org/teach/ns#courseDescription>  ?description
+  }
+
+
+qR Arrival Time == 1494665461364
+qR Query Elapsed Time == 608021
+qR score == 0.40782833
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://linkedscience.org/teach/ns#academicTerm>  ?description
+  }
+
+
+qR Arrival Time == 1494665463319
+qR Query Elapsed Time == 609976
+qR score == 0.39466095
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://linkedscience.org/teach/ns#grading>  ?description
+  }
+
+
+qR Arrival Time == 1494665465025
+qR Query Elapsed Time == 611682
+qR score == 0.39696968
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://linkedscience.org/teach/ns#arrangedAt>  ?description
+  }
+
+
+qR Arrival Time == 1494665465946
+qR Query Elapsed Time == 612603
+qR score == 0.4035548
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/vocab/aiiso/schema#Course> ;
+            <http://linkedscience.org/teach/ns#hasAssignment>  ?description
+  }
+
+
+qR Arrival Time == 1494665466881
+qR Query Elapsed Time == 613538
+qR score == 0.4469697
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/12/cal/icaltzd#Vevent> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665467812
+qR Query Elapsed Time == 614469
+qR score == 0.49458873
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/12/cal/icaltzd#Vevent> ;
+            <http://www.w3.org/2002/12/cal/icaltzd#summary>  ?description
+  }
+
+
+qR Arrival Time == 1494665468823
+qR Query Elapsed Time == 615480
+qR score == 0.5308442
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/12/cal/icaltzd#Vevent> ;
+            <http://www.w3.org/2002/12/cal/icaltzd#dtstart>  ?description
+  }
+
+
+qR Arrival Time == 1494665470915
+qR Query Elapsed Time == 617572
+qR score == 0.51363635
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/12/cal/icaltzd#Vevent> ;
+            <http://www.w3.org/2002/12/cal/icaltzd#dtend>  ?description
+  }
+
+
+qR Arrival Time == 1494665471876
+qR Query Elapsed Time == 618533
+qR score == 0.47348487
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/12/cal/icaltzd#Vevent> ;
+            <http://linkedscience.org/teach/ns#room>  ?description
+  }
+
+
+qR Arrival Time == 1494665472860
+qR Query Elapsed Time == 619517
+qR score == 0.47799426
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/12/cal/icaltzd#Vevent> ;
+            <http://www.w3.org/2000/01/rdf-schema#comment>  ?description
+  }
+
+
+qR Arrival Time == 1494665473829
+qR Query Elapsed Time == 620486
+qR score == 0.4330808
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665475351
+qR Query Elapsed Time == 622008
+qR score == 0.4512626
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://www.w3.org/2000/01/rdf-schema#label>  ?description
+  }
+
+
+qR Arrival Time == 1494665477672
+qR Query Elapsed Time == 624329
+qR score == 0.47727275
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://www.w3.org/2006/vcard/ns#country-name>  ?description
+  }
+
+
+qR Arrival Time == 1494665479816
+qR Query Elapsed Time == 626473
+qR score == 0.2361111
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?description
+  }
+
+
+qR Arrival Time == 1494665480712
+qR Query Elapsed Time == 627369
+qR score == 0.4997475
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://dbpedia.org/ontology/owner>  ?description
+  }
+
+
+qR Arrival Time == 1494665481634
+qR Query Elapsed Time == 628291
+qR score == 0.2361111
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?description
+  }
+
+
+qR Arrival Time == 1494665483096
+qR Query Elapsed Time == 629753
+qR score == 0.5169553
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://dbpedia.org/ontology/address>  ?description
+  }
+
+
+qR Arrival Time == 1494665484178
+qR Query Elapsed Time == 630835
+qR score == 0.47601008
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://www.w3.org/2006/vcard/ns#region>  ?description
+  }
+
+
+qR Arrival Time == 1494665485307
+qR Query Elapsed Time == 631964
+qR score == 0.4693362
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://www.w3.org/2006/vcard/ns#street-address>  ?description
+  }
+
+
+qR Arrival Time == 1494665486437
+qR Query Elapsed Time == 633094
+qR score == 0.50505054
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://observedchange.com/tisc/ns#areasize>  ?description
+  }
+
+
+qR Arrival Time == 1494665487533
+qR Query Elapsed Time == 634190
+qR score == 0.48232323
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://dbpedia.org/ontology/Building> ;
+            <http://www.w3.org/2006/vcard/ns#postal-code>  ?description
+  }
+
+
+qR Arrival Time == 1494665488592
+qR Query Elapsed Time == 635249
+qR score == 0.4330808
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Organization> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665490149
+qR Query Elapsed Time == 636806
+qR score == 0.45959598
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://xmlns.com/foaf/0.1/Organization> ;
+            <http://xmlns.com/foaf/0.1/name>  ?description
+  }
+
+
+qR Arrival Time == 1494665491154
+qR Query Elapsed Time == 637811
+qR score == 0.455303
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://linkedscience.org/teach/ns#Assignment> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665492084
+qR Query Elapsed Time == 638741
+qR score == 0.5329546
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://linkedscience.org/teach/ns#Assignment> ;
+            <http://linkedscience.org/teach/ns#hasTitle>  ?description
+  }
+
+
+qR Arrival Time == 1494665493361
+qR Query Elapsed Time == 640018
+qR score == 0.67889607
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://linkedscience.org/teach/ns#Assignment> ;
+            <http://linkedscience.org/teach/ns#hasDescription>  ?description
+  }
+
+
+qR Arrival Time == 1494665495594
+qR Query Elapsed Time == 642251
+qR score == 0.5689394
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://linkedscience.org/teach/ns#Assignment> ;
+            <http://linkedscience.org/teach/ns#deadline>  ?description
+  }
+
+
+qR Arrival Time == 1494665496908
+qR Query Elapsed Time == 643565
+qR score == 0.47377342
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://linkedscience.org/teach/ns#Assignment> ;
+            <http://linkedscience.org/teach/ns#hasAssignmentMaterial>  ?description
+  }
+
+
+qR Arrival Time == 1494665497837
+qR Query Elapsed Time == 644494
+qR score == 0.41849744
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665498702
+qR Query Elapsed Time == 645359
+qR score == 0.43667924
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+            <http://www.w3.org/2000/01/rdf-schema#label>  ?description
+  }
+
+
+qR Arrival Time == 1494665499712
+qR Query Elapsed Time == 646369
+qR score == 0.41224748
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://linkedscience.org/teach/ns#Material> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665500648
+qR Query Elapsed Time == 647305
+qR score == 0.48989904
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://linkedscience.org/teach/ns#Material> ;
+            <http://linkedscience.org/teach/ns#hasTitle>  ?description
+  }
+
+
+qR Arrival Time == 1494665501515
+qR Query Elapsed Time == 648172
+qR score == 0.4330808
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Magazine> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665502471
+qR Query Elapsed Time == 649128
+qR score == 0.45959598
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://purl.org/ontology/bibo/Magazine> ;
+            <http://xmlns.com/foaf/0.1/name>  ?description
+  }
+
+
+qR Arrival Time == 1494665503528
+qR Query Elapsed Time == 650185
+qR score == 0.42593795
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+            a                     ?description
+  }
+
+
+qR Arrival Time == 1494665504602
+qR Query Elapsed Time == 651259
+qR score == 0.44411975
+SELECT DISTINCT  ?thing ?description
+WHERE
+  { ?thing  a                     <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+            <http://www.w3.org/2000/01/rdf-schema#label>  ?description
+  }
+
+
+Process Stop Time == 1494665504603
+Process Elapsed Time == 651260

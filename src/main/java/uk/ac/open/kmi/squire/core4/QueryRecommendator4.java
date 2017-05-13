@@ -122,8 +122,11 @@ public class QueryRecommendator4 <T>  extends AbstractQueryRecommendationObserva
         this.qRList=qS.getRecommandedQueryList();
         applyRankingToRecommandedQueryList(qRList);
         
+//        for(QueryAndContextNode n:this.qRList){
+//            log.info("[queryR] " +n.getqR());
+//            log.info("[query Score] " +n.getqRScore());
+//        }
         
-        log.info("[buildRecommendation] " +this.qRList.toString());
 
         
     }

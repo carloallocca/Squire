@@ -180,7 +180,7 @@ public class SQueryRecommendationWorker implements IQueryRecommendation, Runnabl
 //        }
 //        //...checking if the input query is satisfiable w.r.t. D1 ....
 //        SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-//        if (qs.isSatisfiableWRTResults(query, rdfd1)) {
+//        if (qs.isSatisfiable(query, rdfd1)) {
 //            System.out.println(query);
 //            System.out.println(" ");
 //
@@ -263,7 +263,7 @@ public class SQueryRecommendationWorker implements IQueryRecommendation, Runnabl
 //        }
 //        //...checking if the input query is satisfiable w.r.t. D1 ....
 //        SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-//        if (qs.isSatisfiableWRTResults(query, rdfd1)) {
+//        if (qs.isSatisfiable(query, rdfd1)) {
 //            //System.out.println(query);
 //            //System.out.println(" ");
 //            
@@ -324,7 +324,7 @@ public class SQueryRecommendationWorker implements IQueryRecommendation, Runnabl
         }
         //...checking if the input query is satisfiable w.r.t. D1 ....
         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-        if (qs.isSatisfiableWRTResults(query, rdfd1)) {
+        if (qs.isSatisfiable(query, rdfd1)) {
 
             QueryRecommendation qr = new QueryRecommendation(query, rdfd1, rdfd2);
             //... generalizing the input query into a SPARLQ Template Query ....

@@ -8,6 +8,7 @@ package uk.ac.open.kmi.squire.core4;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.jena.query.Query;
@@ -69,6 +70,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
     @Override
     public void run() {
         try {
+
             // recommend();
             recommendWithToken(this.token);
         } catch (Exception ex) {

@@ -1,0 +1,2710 @@
+
+
+Process Start Time 1494665507341
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.open.ac.uk/query
+endpoint target == http://data.aalto.fi/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://vocab.deri.ie/rooms#Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.geonames.org/ontology#name>  ?buildName ;
+              <http://www.geonames.org/ontology#postalCode>  ?postCode
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    ?ct1 ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              ?dpt1                 ?buildName ;
+              ?dpt2                 ?postCode
+  }
+
+
+qR Arrival Time == 1494665515127
+qR Query Elapsed Time == 7786
+qR score == 0.29999995
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665515858
+qR Query Elapsed Time == 8517
+qR score == 0.3444444
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665516658
+qR Query Elapsed Time == 9317
+qR score == 0.34382713
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665517540
+qR Query Elapsed Time == 10199
+qR score == 0.26666665
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665518321
+qR Query Elapsed Time == 10980
+qR score == 0.33174598
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://purl.org/dc/terms/subject>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665519184
+qR Query Elapsed Time == 11843
+qR score == 0.3444444
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665520111
+qR Query Elapsed Time == 12770
+qR score == 0.38888896
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665521128
+qR Query Elapsed Time == 13787
+qR score == 0.38827157
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665521936
+qR Query Elapsed Time == 14595
+qR score == 0.3111111
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665522904
+qR Query Elapsed Time == 15563
+qR score == 0.37619042
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://purl.org/dc/terms/subject>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665523768
+qR Query Elapsed Time == 16427
+qR score == 0.28456795
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665524722
+qR Query Elapsed Time == 17381
+qR score == 0.3290124
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665525553
+qR Query Elapsed Time == 18212
+qR score == 0.32839513
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665526403
+qR Query Elapsed Time == 19062
+qR score == 0.25123453
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665527338
+qR Query Elapsed Time == 19997
+qR score == 0.31631398
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?buildName ;
+              <http://purl.org/dc/terms/subject>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665528592
+qR Query Elapsed Time == 21251
+qR score == 0.26666665
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665530827
+qR Query Elapsed Time == 23486
+qR score == 0.3111111
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665532056
+qR Query Elapsed Time == 24715
+qR score == 0.31049383
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665532799
+qR Query Elapsed Time == 25458
+qR score == 0.23333335
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665533584
+qR Query Elapsed Time == 26243
+qR score == 0.29841268
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?buildName ;
+              <http://purl.org/dc/terms/subject>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665534423
+qR Query Elapsed Time == 27082
+qR score == 0.28809524
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/dc/terms/subject>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665536011
+qR Query Elapsed Time == 28670
+qR score == 0.33253968
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/dc/terms/subject>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665536895
+qR Query Elapsed Time == 29554
+qR score == 0.3319224
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/dc/terms/subject>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665537759
+qR Query Elapsed Time == 30418
+qR score == 0.25476193
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/dc/terms/subject>  ?buildName ;
+              <http://www.w3.org/2004/02/skos/core#exactMatch>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665538704
+qR Query Elapsed Time == 31363
+qR score == 0.31984127
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/dc/terms/subject>  ?buildName ;
+              <http://purl.org/dc/terms/subject>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665539572
+qR Query Elapsed Time == 32231
+qR score == 0.4361111
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665540483
+qR Query Elapsed Time == 33142
+qR score == 0.48055553
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665541362
+qR Query Elapsed Time == 34021
+qR score == 0.30277777
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665542230
+qR Query Elapsed Time == 34889
+qR score == 0.49404764
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665543145
+qR Query Elapsed Time == 35804
+qR score == 0.48055553
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665543985
+qR Query Elapsed Time == 36644
+qR score == 0.52500004
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665544976
+qR Query Elapsed Time == 37635
+qR score == 0.3472222
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665546145
+qR Query Elapsed Time == 38804
+qR score == 0.538492
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665548468
+qR Query Elapsed Time == 41127
+qR score == 0.4731481
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665549924
+qR Query Elapsed Time == 42583
+qR score == 0.5175926
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665550709
+qR Query Elapsed Time == 43368
+qR score == 0.33981478
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665552016
+qR Query Elapsed Time == 44675
+qR score == 0.53108466
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665553008
+qR Query Elapsed Time == 45667
+qR score == 0.42420638
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665554208
+qR Query Elapsed Time == 46867
+qR score == 0.46865082
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665555281
+qR Query Elapsed Time == 47940
+qR score == 0.29087305
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665556375
+qR Query Elapsed Time == 49034
+qR score == 0.4821428
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665557219
+qR Query Elapsed Time == 49878
+qR score == 0.44351852
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665558182
+qR Query Elapsed Time == 50841
+qR score == 0.48796296
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665559100
+qR Query Elapsed Time == 51759
+qR score == 0.3101852
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665559942
+qR Query Elapsed Time == 52601
+qR score == 0.50145507
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665560868
+qR Query Elapsed Time == 53527
+qR score == 0.48796296
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665561851
+qR Query Elapsed Time == 54510
+qR score == 0.53240746
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665563047
+qR Query Elapsed Time == 55706
+qR score == 0.35462964
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665563926
+qR Query Elapsed Time == 56585
+qR score == 0.54589945
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665564899
+qR Query Elapsed Time == 57558
+qR score == 0.48055553
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665567369
+qR Query Elapsed Time == 60028
+qR score == 0.52500004
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665569253
+qR Query Elapsed Time == 61912
+qR score == 0.3472222
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665570049
+qR Query Elapsed Time == 62708
+qR score == 0.5384921
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665570872
+qR Query Elapsed Time == 63531
+qR score == 0.4316138
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665571789
+qR Query Elapsed Time == 64448
+qR score == 0.47605824
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665572648
+qR Query Elapsed Time == 65307
+qR score == 0.29828048
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665573592
+qR Query Elapsed Time == 66251
+qR score == 0.48955023
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#School> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665574641
+qR Query Elapsed Time == 67300
+qR score == 0.47063494
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665575583
+qR Query Elapsed Time == 68242
+qR score == 0.5150793
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665576552
+qR Query Elapsed Time == 69211
+qR score == 0.3373016
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665577529
+qR Query Elapsed Time == 70188
+qR score == 0.5285714
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665578465
+qR Query Elapsed Time == 71124
+qR score == 0.5150793
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665579535
+qR Query Elapsed Time == 72194
+qR score == 0.5595238
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665580582
+qR Query Elapsed Time == 73241
+qR score == 0.38174605
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665581521
+qR Query Elapsed Time == 74180
+qR score == 0.57301587
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665582456
+qR Query Elapsed Time == 75115
+qR score == 0.507672
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665584666
+qR Query Elapsed Time == 77325
+qR score == 0.5521164
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665586578
+qR Query Elapsed Time == 79237
+qR score == 0.37433863
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665587402
+qR Query Elapsed Time == 80061
+qR score == 0.5656085
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/member>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665588244
+qR Query Elapsed Time == 80903
+qR score == 0.4587301
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665589077
+qR Query Elapsed Time == 81736
+qR score == 0.5031746
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665590182
+qR Query Elapsed Time == 82841
+qR score == 0.32539678
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/member>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665591071
+qR Query Elapsed Time == 83730
+qR score == 0.51666665
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#College> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#part_of>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665591945
+qR Query Elapsed Time == 84604
+qR score == 0.6333333
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665592945
+qR Query Elapsed Time == 85604
+qR score == 0.67777777
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665594281
+qR Query Elapsed Time == 86940
+qR score == 0.6925926
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665595299
+qR Query Elapsed Time == 87958
+qR score == 0.65185183
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665596265
+qR Query Elapsed Time == 88924
+qR score == 0.6444444
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665597284
+qR Query Elapsed Time == 89943
+qR score == 0.65000004
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665598346
+qR Query Elapsed Time == 91005
+qR score == 0.60952383
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665599307
+qR Query Elapsed Time == 91966
+qR score == 0.64074075
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665600423
+qR Query Elapsed Time == 93082
+qR score == 0.68412703
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665602712
+qR Query Elapsed Time == 95371
+qR score == 0.6490741
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665604263
+qR Query Elapsed Time == 96922
+qR score == 0.8191001
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665605085
+qR Query Elapsed Time == 97744
+qR score == 0.67777777
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665605924
+qR Query Elapsed Time == 98583
+qR score == 0.72222227
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665606776
+qR Query Elapsed Time == 99435
+qR score == 0.737037
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665607770
+qR Query Elapsed Time == 100429
+qR score == 0.6962963
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665608729
+qR Query Elapsed Time == 101388
+qR score == 0.68888885
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665609657
+qR Query Elapsed Time == 102316
+qR score == 0.6944445
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665610531
+qR Query Elapsed Time == 103190
+qR score == 0.6539683
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665611533
+qR Query Elapsed Time == 104192
+qR score == 0.6851852
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665612406
+qR Query Elapsed Time == 105065
+qR score == 0.7285714
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665613332
+qR Query Elapsed Time == 105991
+qR score == 0.69351846
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665614478
+qR Query Elapsed Time == 107137
+qR score == 0.8635445
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665615474
+qR Query Elapsed Time == 108133
+qR score == 0.6148148
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665616368
+qR Query Elapsed Time == 109027
+qR score == 0.65925926
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665617467
+qR Query Elapsed Time == 110126
+qR score == 0.6740741
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665619750
+qR Query Elapsed Time == 112409
+qR score == 0.6333333
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665621574
+qR Query Elapsed Time == 114233
+qR score == 0.62592596
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665622487
+qR Query Elapsed Time == 115146
+qR score == 0.63148147
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665623392
+qR Query Elapsed Time == 116051
+qR score == 0.59100527
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665624320
+qR Query Elapsed Time == 116979
+qR score == 0.62222224
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665625607
+qR Query Elapsed Time == 118266
+qR score == 0.66560847
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665626556
+qR Query Elapsed Time == 119215
+qR score == 0.63055557
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665627544
+qR Query Elapsed Time == 120203
+qR score == 0.80058163
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665628682
+qR Query Elapsed Time == 121341
+qR score == 0.6425926
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665629697
+qR Query Elapsed Time == 122356
+qR score == 0.68703705
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665630673
+qR Query Elapsed Time == 123332
+qR score == 0.70185184
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665631741
+qR Query Elapsed Time == 124400
+qR score == 0.6611111
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665632853
+qR Query Elapsed Time == 125512
+qR score == 0.6537037
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665633793
+qR Query Elapsed Time == 126452
+qR score == 0.65925926
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665634805
+qR Query Elapsed Time == 127464
+qR score == 0.61878306
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665636903
+qR Query Elapsed Time == 129562
+qR score == 0.65000004
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665638906
+qR Query Elapsed Time == 131565
+qR score == 0.69338626
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665639908
+qR Query Elapsed Time == 132567
+qR score == 0.65833336
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665640866
+qR Query Elapsed Time == 133525
+qR score == 0.82835937
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665641820
+qR Query Elapsed Time == 134479
+qR score == 0.62777776
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665643137
+qR Query Elapsed Time == 135796
+qR score == 0.6722222
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665644159
+qR Query Elapsed Time == 136818
+qR score == 0.68703705
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665645217
+qR Query Elapsed Time == 137876
+qR score == 0.6462963
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665646268
+qR Query Elapsed Time == 138927
+qR score == 0.6388889
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665647571
+qR Query Elapsed Time == 140230
+qR score == 0.64444447
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665648572
+qR Query Elapsed Time == 141231
+qR score == 0.60396826
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665649722
+qR Query Elapsed Time == 142381
+qR score == 0.6351852
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665650795
+qR Query Elapsed Time == 143454
+qR score == 0.67857146
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665651799
+qR Query Elapsed Time == 144458
+qR score == 0.6435185
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665652860
+qR Query Elapsed Time == 145519
+qR score == 0.8135446
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/owner>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665655348
+qR Query Elapsed Time == 148007
+qR score == 0.4666667
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665656947
+qR Query Elapsed Time == 149606
+qR score == 0.5111111
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665657877
+qR Query Elapsed Time == 150536
+qR score == 0.52592593
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665658832
+qR Query Elapsed Time == 151491
+qR score == 0.48518515
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665659873
+qR Query Elapsed Time == 152532
+qR score == 0.47777772
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665660932
+qR Query Elapsed Time == 153591
+qR score == 0.48333335
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665661957
+qR Query Elapsed Time == 154616
+qR score == 0.44285715
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665663034
+qR Query Elapsed Time == 155693
+qR score == 0.47407413
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665664138
+qR Query Elapsed Time == 156797
+qR score == 0.51746035
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665665218
+qR Query Elapsed Time == 157877
+qR score == 0.48240745
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665666312
+qR Query Elapsed Time == 158971
+qR score == 0.65243345
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665667394
+qR Query Elapsed Time == 160053
+qR score == 0.66507936
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665668546
+qR Query Elapsed Time == 161205
+qR score == 0.70952386
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665669701
+qR Query Elapsed Time == 162360
+qR score == 0.7243386
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665671918
+qR Query Elapsed Time == 164577
+qR score == 0.68359786
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665674204
+qR Query Elapsed Time == 166863
+qR score == 0.67619044
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665675271
+qR Query Elapsed Time == 167930
+qR score == 0.681746
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665676266
+qR Query Elapsed Time == 168925
+qR score == 0.64126986
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665677367
+qR Query Elapsed Time == 170026
+qR score == 0.6724868
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665678552
+qR Query Elapsed Time == 171211
+qR score == 0.715873
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665679689
+qR Query Elapsed Time == 172348
+qR score == 0.68082017
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665681201
+qR Query Elapsed Time == 173860
+qR score == 0.8508461
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://dbpedia.org/ontology/address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665682400
+qR Query Elapsed Time == 175059
+qR score == 0.62407404
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665683612
+qR Query Elapsed Time == 176271
+qR score == 0.66851854
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665684849
+qR Query Elapsed Time == 177508
+qR score == 0.6833334
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665686097
+qR Query Elapsed Time == 178756
+qR score == 0.6425926
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665687340
+qR Query Elapsed Time == 179999
+qR score == 0.6351852
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665688340
+qR Query Elapsed Time == 180999
+qR score == 0.64074075
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665691061
+qR Query Elapsed Time == 183720
+qR score == 0.60026455
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665692804
+qR Query Elapsed Time == 185463
+qR score == 0.63148147
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665693814
+qR Query Elapsed Time == 186473
+qR score == 0.6748678
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665695497
+qR Query Elapsed Time == 188156
+qR score == 0.6398148
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665696670
+qR Query Elapsed Time == 189329
+qR score == 0.80984086
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665697681
+qR Query Elapsed Time == 190340
+qR score == 0.59365076
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665698709
+qR Query Elapsed Time == 191368
+qR score == 0.6380952
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665699774
+qR Query Elapsed Time == 192433
+qR score == 0.65291005
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665700850
+qR Query Elapsed Time == 193509
+qR score == 0.6121693
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665701947
+qR Query Elapsed Time == 194606
+qR score == 0.6047619
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665703108
+qR Query Elapsed Time == 195767
+qR score == 0.61031747
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665704268
+qR Query Elapsed Time == 196927
+qR score == 0.56984127
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665705464
+qR Query Elapsed Time == 198123
+qR score == 0.6010582
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665707817
+qR Query Elapsed Time == 200476
+qR score == 0.64444447
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665709987
+qR Query Elapsed Time == 202646
+qR score == 0.6093915
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665710956
+qR Query Elapsed Time == 203615
+qR score == 0.7794175
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665712481
+qR Query Elapsed Time == 205140
+qR score == 0.6611111
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665713829
+qR Query Elapsed Time == 206488
+qR score == 0.7055556
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665715053
+qR Query Elapsed Time == 207712
+qR score == 0.72037035
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665716347
+qR Query Elapsed Time == 209006
+qR score == 0.6796296
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665717602
+qR Query Elapsed Time == 210261
+qR score == 0.6722222
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665718853
+qR Query Elapsed Time == 211512
+qR score == 0.67777777
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665720007
+qR Query Elapsed Time == 212666
+qR score == 0.6373016
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665721253
+qR Query Elapsed Time == 213912
+qR score == 0.66851854
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665722593
+qR Query Elapsed Time == 215252
+qR score == 0.71190476
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665724009
+qR Query Elapsed Time == 216668
+qR score == 0.6768518
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665726448
+qR Query Elapsed Time == 219107
+qR score == 0.8468779
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#areasize>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665728349
+qR Query Elapsed Time == 221008
+qR score == 0.61565655
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665729414
+qR Query Elapsed Time == 222073
+qR score == 0.660101
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665730572
+qR Query Elapsed Time == 223231
+qR score == 0.6749158
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#country-name>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665731803
+qR Query Elapsed Time == 224462
+qR score == 0.6341751
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#lat>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665732987
+qR Query Elapsed Time == 225646
+qR score == 0.6267677
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://dbpedia.org/ontology/owner>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665734585
+qR Query Elapsed Time == 227244
+qR score == 0.63232327
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://www.w3.org/2003/01/geo/wgs84_pos#long>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665735744
+qR Query Elapsed Time == 228403
+qR score == 0.59184706
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://dbpedia.org/ontology/address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665736834
+qR Query Elapsed Time == 229493
+qR score == 0.623064
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#region>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665737962
+qR Query Elapsed Time == 230621
+qR score == 0.6664502
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#street-address>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665739157
+qR Query Elapsed Time == 231816
+qR score == 0.6313973
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://observedchange.com/tisc/ns#areasize>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665740238
+qR Query Elapsed Time == 232897
+qR score == 0.8014234
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://dbpedia.org/ontology/Building> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?buildName ;
+              <http://www.w3.org/2006/vcard/ns#postal-code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665741437
+qR Query Elapsed Time == 234096
+qR score == 0.48611104
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665743520
+qR Query Elapsed Time == 236179
+qR score == 0.45277774
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665745638
+qR Query Elapsed Time == 238297
+qR score == 0.48672843
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665755125
+qR Query Elapsed Time == 247784
+qR score == 0.53055555
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665756400
+qR Query Elapsed Time == 249059
+qR score == 0.4972222
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665757754
+qR Query Elapsed Time == 250413
+qR score == 0.5311728
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665760462
+qR Query Elapsed Time == 253121
+qR score == 0.46388888
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665762997
+qR Query Elapsed Time == 255656
+qR score == 0.5083333
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665764129
+qR Query Elapsed Time == 256788
+qR score == 0.5138889
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665766022
+qR Query Elapsed Time == 258681
+qR score == 0.48055553
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665767166
+qR Query Elapsed Time == 259825
+qR score == 0.51450616
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?buildName ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665768350
+qR Query Elapsed Time == 261009
+qR score == 0.4361111
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665769624
+qR Query Elapsed Time == 262283
+qR score == 0.48055553
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665770877
+qR Query Elapsed Time == 263536
+qR score == 0.48611104
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665772249
+qR Query Elapsed Time == 264908
+qR score == 0.45277774
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665773358
+qR Query Elapsed Time == 266017
+qR score == 0.48672843
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?buildName ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665774499
+qR Query Elapsed Time == 267158
+qR score == 0.46080244
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665775775
+qR Query Elapsed Time == 268434
+qR score == 0.50524694
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665778365
+qR Query Elapsed Time == 271024
+qR score == 0.51080245
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?buildName ;
+              <http://xmlns.com/foaf/0.1/homepage>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665780340
+qR Query Elapsed Time == 272999
+qR score == 0.4774691
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?buildName ;
+              <http://purl.org/vocab/aiiso/schema#code>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665781456
+qR Query Elapsed Time == 274115
+qR score == 0.5114198
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://purl.org/vocab/aiiso/schema#Department> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?buildName ;
+              <http://observedchange.com/tisc/ns#locatedAt>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665782536
+qR Query Elapsed Time == 275195
+qR score == 0.29999995
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665785107
+qR Query Elapsed Time == 277766
+qR score == 0.3444444
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665790042
+qR Query Elapsed Time == 282701
+qR score == 0.3444444
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665796460
+qR Query Elapsed Time == 289119
+qR score == 0.38888896
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#DatatypeProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665802512
+qR Query Elapsed Time == 295171
+qR score == 0.29999995
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665809066
+qR Query Elapsed Time == 301725
+qR score == 0.3444444
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              a                     ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+qR Arrival Time == 1494665815769
+qR Query Elapsed Time == 308428
+qR score == 0.3444444
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              a                     ?postCode
+  }
+
+
+qR Arrival Time == 1494665821052
+qR Query Elapsed Time == 313711
+qR score == 0.38888896
+SELECT DISTINCT  ?building ?label ?buildName ?postCode
+WHERE
+  { ?building  a                    <http://www.w3.org/2002/07/owl#ObjectProperty> ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?label ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?buildName ;
+              <http://www.w3.org/2000/01/rdf-schema#label>  ?postCode
+  }
+
+
+Process Stop Time == 1494665821053
+Process Elapsed Time == 313712

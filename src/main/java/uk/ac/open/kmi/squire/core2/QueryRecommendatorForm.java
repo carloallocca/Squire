@@ -69,7 +69,7 @@ public class QueryRecommendatorForm {
         }
         //...checking if the input query is satisfiable w.r.t. D1 ...
         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-        if (qs.isSatisfiableWRTResults(query, rdfd1)) {
+        if (qs.isSatisfiable(query, rdfd1)) {
             
             try {
                 QueryRecommendator qR = new QueryRecommendator(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
@@ -114,7 +114,7 @@ public class QueryRecommendatorForm {
         }
         //...checking if the input query is satisfiable w.r.t. D1 ...
         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-        if (qs.isSatisfiableWRTResults(query, rdfd1)) {
+        if (qs.isSatisfiable(query, rdfd1)) {
             
             try {
                 QueryRecommendator qR = new QueryRecommendator(query, rdfd1, rdfd2, resultTypeSimilarityDegree,

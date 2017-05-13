@@ -1,0 +1,32 @@
+
+
+Process Start Time 1494670131425
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://opendatacommunities.org/sparql
+endpoint target == http://data.admin.ch/query/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?s ?id ?label
+WHERE
+  { ?s  a                     <http://opendatacommunities.org/def/local-government/LocalAuthority> ;
+        <http://data.ordnancesurvey.co.uk/ontology/admingeo/gssCode>  ?id ;
+        <http://www.w3.org/2000/01/rdf-schema#label>  ?label
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?s ?id ?label
+WHERE
+  { ?s  ?dpt1  ?ct1 ;
+        ?opt1  ?id ;
+        ?opt2  ?label
+  }
+
+
+Process Stop Time == 1494670228808
+Process Elapsed Time == 97383
