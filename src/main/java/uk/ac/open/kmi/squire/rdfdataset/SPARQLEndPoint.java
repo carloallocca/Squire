@@ -686,6 +686,7 @@ public class SPARQLEndPoint implements IRDFDataset {
         this.rdfVocabulary.add("http://www.w3.org/2002/07/owl#DatatypeProperty ");
         this.rdfVocabulary.add("http://www.w3.org/2002/07/owl#DataRange ");
 
+        
     }
 
     private void computeObjectPropertySetNew() {

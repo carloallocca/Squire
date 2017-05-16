@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -104,8 +106,8 @@ public class QueryResultTypeSimilarity {
 //            return signature;
 //        }
 //        return signature;
-        return computeSPARQLEndPointBasedQVS(qOri, d1);
-       // return computeSPARQLEndPointBasedQVS1(qOri, d1);
+//        return computeSPARQLEndPointBasedQVS(qOri, d1);
+    return computeSPARQLEndPointBasedQVS1(qOri, d1);
 
     }
 
@@ -282,91 +284,161 @@ public class QueryResultTypeSimilarity {
         return signature;
     }
 
+//    private ArrayList<QuerySolution> writeQueryResultsAsJenaQuerySolution(String result, List<Var> projectVars) {
+//        ArrayList<QuerySolution> output = new ArrayList<>();
+//        String[] resBindings = result.split("bindings");
+//
+//        String[] solutionAsStrings = resBindings[1]
+//                .substring(0, resBindings[1].indexOf("]") - 1)
+//                .split("}\\s*}\\s*\\,?");
+//        for (int i = 0; i <= solutionAsStrings.length - 1; i++) {
+//            String[] solValueArray = solutionAsStrings[i].split("}\\s*\\,?");
+//
+//            ArrayList<VarNameVarValuePair> varNameVarValuePairList = new ArrayList<>();
+//
+//            for (String solValueArray1 : solValueArray) {
+//
+//                String[] varNameAndvarValueParts = solValueArray1.split("\"type\"\\s*:\\s*\"uri\"\\s*,\\s*\"value\\s*\"\\s*:");
+//
+//                if (varNameAndvarValueParts.length < 2) {
+//                    log.info("this one 1:: " + solValueArray1);
+//
+//                    varNameAndvarValueParts = solValueArray1.split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"value\\s*\"\\s*:");
+//
+//                }
+//                if (varNameAndvarValueParts.length < 2) {
+//                    log.info("this one 2:: " + solValueArray1);
+//                    varNameAndvarValueParts = solValueArray1
+//                            .split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"\\w*:\\s*\\w*\"\\s*:\\s*\"\\w*\"\\s*,\\s*\"value\\s*\"\\s*:");
+//
+//                }
+//                if (varNameAndvarValueParts.length < 2) {
+//
+//                    log.info("this one 3:: " + solValueArray1);
+//                    varNameAndvarValueParts = solValueArray1
+//                            .split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"\\w*\":\\s*\"(https?|http)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]\"\\s*,\\s*\"value\\s*\"\\s*:");
+//
+//                }
+//                if (varNameAndvarValueParts.length < 2) {
+//                    log.info("this one 4:: " + solValueArray1);
+//
+//                    varNameAndvarValueParts = solValueArray1.split("\"type\"\\s*:\\s*\"bnode\"\\s*,\\s*\"value\\s*\"\\s*:");
+//
+//                }
+//                if (varNameAndvarValueParts.length < 2) {
+//                    log.info("this one 5:: " + solValueArray1);
+//                    varNameAndvarValueParts = solValueArray1
+//                            .split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"\\w*:\\s*\\w*\"\\s*:\\s*\"\\w*-\\w*\"\\s*,\\s*\"value\\s*\"\\s*:");
+//
+//                }
+//
+////                if(varNameAndvarValueParts.length==2){
+////                    log.info("varNameAndvarValueParts ::[0] " +varNameAndvarValueParts[0] );
+////                    log.info("varNameAndvarValueParts ::[1] " +varNameAndvarValueParts[1] );
+////                }
+////                if(varNameAndvarValueParts.length==1){
+////                    log.info("varNameAndvarValueParts ::[0] " +varNameAndvarValueParts[0] );
+////                    
+////                }
+//                //TODO: (DONE) i need to add the code to extract each part of the solution...
+//                String varNamePart = varNameAndvarValueParts[0];//.split(":")[0];
+//                String varValuePart = varNameAndvarValueParts[1];
+//                //log.info("varNamePart " +varNamePart.substring(varNamePart.indexOf("\"")+1, varNamePart.lastIndexOf("\"")));
+//                String extractedVarName = "";
+//                if (varNamePart.contains("[")) {
+//                    String[] varNameNew = varNamePart.split("\\[");
+//                    extractedVarName = varNameNew[1];
+//                } else {
+//                    extractedVarName = varNamePart;
+//                }
+//                String cleanedVarName = StringUtils.substringBetween(extractedVarName, "\"", "\"");
+//                String cleanedVarValue = StringUtils.substringBetween(varValuePart, "\"", "\"");
+//
+//                VarNameVarValuePair newPairItem = new VarNameVarValuePair(cleanedVarName, cleanedVarValue);
+//                varNameVarValuePairList.add(newPairItem);
+//            }
+//            try {
+//                QuerySolutionMap qs = new QuerySolutionMap();
+//                for (VarNameVarValuePair v : varNameVarValuePairList) {
+//                    String cleanedVarName = v.getVarName();
+//                    String cleanedVarValue = v.getVarValue();
+//
+//                    //                   if(isValidateURI(cleanedVarValue)){
+////                        final URI uri = URI.create(cleanedVarValue);
+//                    RDFNode rdfNode = new ResourceImpl(cleanedVarValue);
+//                    qs.add(cleanedVarName, rdfNode);
+////                    }
+//
+//                }
+//                if (varNameVarValuePairList.size() == projectVars.size()) {
+//                    output.add(qs);
+//                }
+//
+//            } catch (Exception e1) {
+//                log.info(e1.getMessage());
+//            }
+//        }
+//        return output;
+//    }
+    
     private ArrayList<QuerySolution> writeQueryResultsAsJenaQuerySolution(String result, List<Var> projectVars) {
+
         ArrayList<QuerySolution> output = new ArrayList<>();
         String[] resBindings = result.split("bindings");
 
-        String[] solutionAsStrings = resBindings[1]
-                .substring(0, resBindings[1].indexOf("]") - 1)
-                .split("}\\s*}\\s*\\,?");
+        //{    "bindings  
+        //1: ": [          ]  }}
+        String[] solutionAsStrings = new String[0];
+
+        String regEx = "\\[\\s*(.*)\\s*\\]";
+        Pattern pattern = Pattern.compile(regEx);
+        Matcher matcher = pattern.matcher(resBindings[1]);
+        if (matcher.find()) {
+            log.info(matcher.group(1));
+            solutionAsStrings = resBindings[1]
+                    .substring(0, resBindings[1].indexOf("]") - 1)
+                    .split("}\\s*}\\s*\\,?");
+        } else {
+            return output;
+        }
+
         for (int i = 0; i <= solutionAsStrings.length - 1; i++) {
             String[] solValueArray = solutionAsStrings[i].split("}\\s*\\,?");
 
             ArrayList<VarNameVarValuePair> varNameVarValuePairList = new ArrayList<>();
 
             for (String solValueArray1 : solValueArray) {
+                log.info("solution:: " + solValueArray1);
+//                String[] varNameAndvarValueParts = solValueArray1.split("\"type\"\\s*:\\s*\"uri\"\\s*,\\s*\"value\\s*\"\\s*:");
 
-                String[] varNameAndvarValueParts = solValueArray1.split("\"type\"\\s*:\\s*\"uri\"\\s*,\\s*\"value\\s*\"\\s*:");
+                String cleanedVarName = "", cleanedVarValue = "";
+                log.info("this one 6:: " + solValueArray1);
 
-                if (varNameAndvarValueParts.length < 2) {
-                    log.info("this one 1:: " + solValueArray1);
+                String regEx1 = "\"(\\w+)\"\\s*:\\s*\\{.*\"value\"\\s*:\\s*\"(.*)\"";
+                Pattern pattern1 = Pattern.compile(regEx1);
+                Matcher matcher1 = pattern1.matcher(solValueArray1);
 
-                    varNameAndvarValueParts = solValueArray1.split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"value\\s*\"\\s*:");
+                while (matcher1.find()) {
+                    log.info("Variable name : {}", matcher1.group(1));
+                    cleanedVarName = matcher1.group(1);
+                    log.info("Variable value : {}", matcher1.group(2));
+                    cleanedVarValue = matcher1.group(2);
+                }
+                log.info("cleanedVarName : " + cleanedVarName);
+                log.info("cleanedVarValue : " + cleanedVarValue);
+                if (!cleanedVarName.isEmpty() && !cleanedVarValue.isEmpty() ) {
+                    VarNameVarValuePair newPairItem = new VarNameVarValuePair(cleanedVarName, cleanedVarValue);
+                    varNameVarValuePairList.add(newPairItem);
 
                 }
-                if (varNameAndvarValueParts.length < 2) {
-                    log.info("this one 2:: " + solValueArray1);
-                    varNameAndvarValueParts = solValueArray1
-                            .split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"\\w*:\\s*\\w*\"\\s*:\\s*\"\\w*\"\\s*,\\s*\"value\\s*\"\\s*:");
-
-                }
-                if (varNameAndvarValueParts.length < 2) {
-
-                    log.info("this one 3:: " + solValueArray1);
-                    varNameAndvarValueParts = solValueArray1
-                            .split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"\\w*\":\\s*\"(https?|http)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]\"\\s*,\\s*\"value\\s*\"\\s*:");
-
-                }
-                if (varNameAndvarValueParts.length < 2) {
-                    log.info("this one 4:: " + solValueArray1);
-
-                    varNameAndvarValueParts = solValueArray1.split("\"type\"\\s*:\\s*\"bnode\"\\s*,\\s*\"value\\s*\"\\s*:");
-
-                }
-                if (varNameAndvarValueParts.length < 2) {
-                    log.info("this one 5:: " + solValueArray1);
-                    varNameAndvarValueParts = solValueArray1
-                            .split("\"type\"\\s*:\\s*\"literal\"\\s*,\\s*\"\\w*:\\s*\\w*\"\\s*:\\s*\"\\w*-\\w*\"\\s*,\\s*\"value\\s*\"\\s*:");
-
-                }
-
-//                if(varNameAndvarValueParts.length==2){
-//                    log.info("varNameAndvarValueParts ::[0] " +varNameAndvarValueParts[0] );
-//                    log.info("varNameAndvarValueParts ::[1] " +varNameAndvarValueParts[1] );
-//                }
-//                if(varNameAndvarValueParts.length==1){
-//                    log.info("varNameAndvarValueParts ::[0] " +varNameAndvarValueParts[0] );
-//                    
-//                }
-                //TODO: (DONE) i need to add the code to extract each part of the solution...
-                String varNamePart = varNameAndvarValueParts[0];//.split(":")[0];
-                String varValuePart = varNameAndvarValueParts[1];
-                //log.info("varNamePart " +varNamePart.substring(varNamePart.indexOf("\"")+1, varNamePart.lastIndexOf("\"")));
-                String extractedVarName = "";
-                if (varNamePart.contains("[")) {
-                    String[] varNameNew = varNamePart.split("\\[");
-                    extractedVarName = varNameNew[1];
-                } else {
-                    extractedVarName = varNamePart;
-                }
-                String cleanedVarName = StringUtils.substringBetween(extractedVarName, "\"", "\"");
-                String cleanedVarValue = StringUtils.substringBetween(varValuePart, "\"", "\"");
-
-                VarNameVarValuePair newPairItem = new VarNameVarValuePair(cleanedVarName, cleanedVarValue);
-                varNameVarValuePairList.add(newPairItem);
             }
             try {
                 QuerySolutionMap qs = new QuerySolutionMap();
                 for (VarNameVarValuePair v : varNameVarValuePairList) {
                     String cleanedVarName = v.getVarName();
                     String cleanedVarValue = v.getVarValue();
-
-                    //                   if(isValidateURI(cleanedVarValue)){
-//                        final URI uri = URI.create(cleanedVarValue);
                     RDFNode rdfNode = new ResourceImpl(cleanedVarValue);
                     qs.add(cleanedVarName, rdfNode);
-//                    }
-
                 }
                 if (varNameVarValuePairList.size() == projectVars.size()) {
                     output.add(qs);
@@ -376,7 +448,7 @@ public class QueryResultTypeSimilarity {
                 log.info(e1.getMessage());
             }
         }
-        return output;
+        return output;        
     }
 
     private void print(List<VarTypeMap> qOri_d1_signature) {

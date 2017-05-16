@@ -67,17 +67,17 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 //    private static final String TEST_RESULT_METRICS = "QueryResultTypeSimilarity/";
 //    private static final String TEST_RESULT_METRICS = "All/";
 
-//    private final static String TEST_ONE = "EducationI/";
-//    private final static String TEST_TWO = "Art/";
-//    private final static String TEST_THREE = "EducationII/";
-//    private final static String TEST_FOUR = "Museum/";
+    private final static String TEST_ONE = "EducationI/";
+    private final static String TEST_TWO = "Art/";
+    private final static String TEST_THREE = "EducationII/";
+    private final static String TEST_FOUR = "Museum/";
     private final static String TEST_FIVE = "GovernmentOpenData/";
 
-//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX;
-//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
-//private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
-//private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
-private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX
+    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
+//private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
 
     private static final String TEST_RESULT_NAME_PREFIX = "testResult";
     private static int testResultIndex = 0;
@@ -341,6 +341,7 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
             for (List<TriplePath> triplePathSubSet : triplePathPowerSetOrdered) {
                 //for (int i=0; i<15; i++) {
                 //    List<TriplePath> triplePathSubSet = triplePathPowerSetOrdered.get(i);
+                log.info("triplePathSubSet ::" +triplePathSubSet.toString());
                 if (!triplePathSubSet.isEmpty()) {
                     SelectBuilder sb = new SelectBuilder();
                     //adding the triple patters
@@ -359,11 +360,23 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
                     // including the fact that satisfiacibile and crete 
                     // a node child from the node parent
                     // Check if it is alredy indexed and therefore generated
+                    log.info("subQuery Remove operation::: " +subQuery.toString());
                     if (!(isQueryIndexed(subQuery))) {
                         //...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
+                        
                         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-                        if (qs.isSatisfiableWRTResultsWithToken(subQuery, rdfd2)) {
-                            log.info("subQuery... " + subQuery);
+                        
+                        boolean b=false;
+                        
+                        try{
+                            b=qs.isSatisfiableWRTResultsWithToken(subQuery, rdfd2);
+                            log.info("isSatisfiableWRTResultsWithToken :: " +b);
+                        }catch(Exception ex){
+                            log.info(ex.getMessage());
+                        }
+                        
+                        if (b) {
+                            log.info("subQuery Remove operation::: " + subQuery);
                             QueryAndContextNode childNode = createNewQueryAndContextNodeForRemovalOp(subQuery, parentQueryAndContextNode);
                             log.info("childNode Solution List... " + childNode.getQueryTempVarSolutionSpace().size());
 
@@ -373,6 +386,7 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
                             //add qWithoutTriple to the index
                             addQueryToIndexIFAbsent(subQuery);
                             //printQuerySolutionSpaceMap(parentQueryAndContextNode);
+                        
                         } else {
                             addQueryToIndexIFAbsent(subQuery);
                         }
@@ -397,7 +411,6 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
             String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
 //                                    String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
             log.info("newTextFile 2 =======" + newTextFile);
-
             try {
                 long qRArrivalTime = System.currentTimeMillis();
                 long queryElapsedTime = qRArrivalTime - startTime;
@@ -435,7 +448,6 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
 //        log.info("this.specializableQueryAndContextNodeList.size() " + this.specializableQueryAndContextNodeList.size());
         while (this.specializableQueryAndContextNodeList.size() > 0) {
 
-
             // 1. Get and Remove the QueryAndContextNode with qRScore max
             QueryAndContextNode parentQueryAndContextNode = getMaxQueryAndContextNode();
             if (parentQueryAndContextNode != null) {
@@ -443,51 +455,21 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
                 this.recommandedQueryList.add(parentQueryAndContextNode);
                 //this.notifyQueryRecommendation(parentQueryAndContextNode.getqR(), parentQueryAndContextNode.getqRScore());
 
-//            // 3. check if we can apply a removal operation;
-//            if (isRProcessable(parentQueryAndContextNode)) {
-//                isRprocessable = true;
-//                Query parentqRCopy = QueryFactory.create(parentQueryAndContextNode.getqR());
-//                Set<TriplePath> triplePathSet = getQueryTriplePathSet(parentqRCopy);
-//
-//                // 4.1 Apply removal operations
-//                for (TriplePath tp : triplePathSet) {
-//                    // 4.1.1. Remove the TriplePath tp from the  parentqRCopy                    
-//                    Query qToProcess = QueryFactory.create(parentqRCopy);
-//
-//                    RemoveTriple instance = new RemoveTriple();
-//                    Query qWithoutTriple = instance.removeTP(qToProcess, tp.asTriple());
-//
-//                    // 4.1.2. Check if it is alredy indexed and therefore generated
-//                    if (!(isQueryIndexed(qWithoutTriple))) {
-//                        //...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
-//                        SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-//                        if (qs.isSatisfiable(qWithoutTriple, rdfd2)) {
-//                            QueryAndContextNode childNode = createNewQueryAndContextNodeForRemovalOp(qWithoutTriple, parentQueryAndContextNode);
-//                            addSpecializableQueryList(childNode);
-//                            //add qWithoutTriple to the index
-//                            addQueryToIndexIFAbsent(qWithoutTriple);
-//                            //printQuerySolutionSpaceMap(parentQueryAndContextNode);
-//                        } else {
-//                            addQueryToIndexIFAbsent(qWithoutTriple);
-//                        }
-//                    }
-//                }
-//            }
+
                 // 4. check if we can apply a instanciation operation;
                 if (isIProcessable(parentQueryAndContextNode)) {
-
                     Query queryChild = QueryFactory.create(parentQueryAndContextNode.getqR());
                     List<QuerySolution> qSolList = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
-
                     log.info("queryChild Instanciation step: " + queryChild.toString());
                     log.info("qSolList size: " + qSolList.size());
-
+                    int solProgressNumber=0;
                     for (QuerySolution sol : qSolList) {
-
-                        for (int i = 0; i < 10; i++) {
-                            // calling repeatedly to increase chances of a clean-up
-                            System.gc();
-                        }
+                        solProgressNumber=solProgressNumber+1;
+                        
+//                        for (int i = 0; i < 10; i++) {
+//                            // calling repeatedly to increase chances of a clean-up
+//                            System.gc();
+//                        }
 
                         Query childQueryCopy = QueryFactory.create(queryChild.toString());
 
@@ -521,8 +503,19 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
                                 if (qs.isSatisfiableWRTResultsWithToken(childQueryCopyInstanciated, rdfd2)) {
                                     QueryAndContextNode childNode
                                             = createNewQueryAndContextNodeForInstanciateOp(childQueryCopyInstanciated, parentQueryAndContextNode, templVarEntityQoQrInstanciatedList);
-                                    addSpecializableQueryList(childNode);
-
+                                    
+                                    
+                                        //======
+                                        // Ho commentato questa riga perche non ha un senso logico. Non c'e' motivo
+                                        // di aggiungere la query instantiata nella lista di query da specializzare. 
+                                        // did it 13/05/2017
+                                    //addSpecializableQueryList(childNode);
+                                    
+                                    // invece, ho aggiunto questa in quanto la query e' pronta per essere raccomandata e non avra piu  :
+                                    this.recommandedQueryList.add(childNode);
+                
+                                    //=====
+                                    
                                     long qRArrivalTime = System.currentTimeMillis();
                                     long queryElapsedTime = qRArrivalTime - startTime;
                                     log.info("qR score ======" + childNode.getqRScore());
@@ -534,34 +527,16 @@ private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_
                                     addQueryToIndexIFAbsent(childQueryCopyInstanciated);
                                     //printQuerySolutionSpaceMap(parentQueryAndContextNode);
 
-                                    /////////////// TESTING PURPOSE
-//                                    String fullPrefix = "";
-//                                    switch (QuerySpecializer4.class_instanciation_number) {
-//                                        case 1:
-//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX;
-//                                            break;
-//                                        case 2:
-//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
-//                                            break;
-//                                        case 3:
-//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
-//                                            break;
-//                                        case 4:
-//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
-//                                            break;
-//                                        case 5:
-//                                            fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
-//                                            break;
-//                                        default:
-//                                            break;
-//                                    }
                                     String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
 //                                    String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
-                                    log.info("newTextFile 2 =======" + newTextFile);
+                                   // log.info("newTextFile 2 =======" + newTextFile);
 
                                     try {
                                         FileWriter fw = new FileWriter(newTextFile, true);
                                         fw.write("\n");
+                                        fw.write("qSolSpace size ==" +qSolList.size());
+                                        fw.write("\n");
+                                        fw.write("solProgressNumber ==" +solProgressNumber);
                                         fw.write("\n");
                                         fw.write("qR Arrival Time == " + Long.toString(qRArrivalTime));
                                         fw.write("\n");

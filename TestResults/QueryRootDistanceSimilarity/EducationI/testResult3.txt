@@ -1,0 +1,68 @@
+
+
+Process Start Time 1494712528508
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.open.ac.uk/query
+endpoint target == https://data.ox.ac.uk/sparql/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?mod ?title ?descr
+WHERE
+  { ?mod  a                     <http://purl.org/vocab/aiiso/schema#Module> ;
+          <http://purl.org/dc/terms/title>  ?title ;
+          <http://purl.org/dc/elements/1.1/description>  ?descr
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title ?descr
+WHERE
+  { ?mod  a                     ?ct1 ;
+          <http://purl.org/dc/terms/title>  ?title ;
+          <http://purl.org/dc/elements/1.1/description>  ?descr
+  }
+
+qSolSpace size ==3
+solProgressNumber ==1
+qR Arrival Time == 1494712529770
+qR Query Elapsed Time == 1262
+qR score == 0.41666663
+SELECT DISTINCT  ?mod ?title ?descr
+WHERE
+  { ?mod  a                     <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
+          <http://purl.org/dc/terms/title>  ?title ;
+          <http://purl.org/dc/elements/1.1/description>  ?descr
+  }
+
+qSolSpace size ==3
+solProgressNumber ==2
+qR Arrival Time == 1494712530368
+qR Query Elapsed Time == 1860
+qR score == 0.45555556
+SELECT DISTINCT  ?mod ?title ?descr
+WHERE
+  { ?mod  a                     <http://ns.ox.ac.uk/namespace/oxpoints/2009/02/owl#Space> ;
+          <http://purl.org/dc/terms/title>  ?title ;
+          <http://purl.org/dc/elements/1.1/description>  ?descr
+  }
+
+qSolSpace size ==3
+solProgressNumber ==3
+qR Arrival Time == 1494712530970
+qR Query Elapsed Time == 2462
+qR score == 0.4722222
+SELECT DISTINCT  ?mod ?title ?descr
+WHERE
+  { ?mod  a                     <http://ns.ox.ac.uk/namespace/oxpoints/2009/02/owl#Room> ;
+          <http://purl.org/dc/terms/title>  ?title ;
+          <http://purl.org/dc/elements/1.1/description>  ?descr
+  }
+
+
+Process Stop Time == 1494712530970
+Process Elapsed Time == 2462

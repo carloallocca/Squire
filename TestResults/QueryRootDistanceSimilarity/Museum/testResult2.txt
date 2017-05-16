@@ -1,6 +1,6 @@
 
 
-Process Start Time 1494666270419
+Process Start Time 1494795119274
 
 
 ============= SPARQL ENDPOINTS =============
@@ -9,28 +9,32 @@ endpoint source == http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/
 endpoint target == http://edan.si.edu/saam/sparql
 
 ============= NEW QUERY SOURCE =============
-SELECT DISTINCT  ?collection ?parentCollection ?parentId ?parentDescr
+SELECT DISTINCT  ?concept ?prefLabel
 WHERE
-  { ?collection  a                  <http://www.w3.org/2004/02/skos/core#OrderedCollection> ;
-              <http://www.w3.org/2004/02/skos/core#member>  ?parentCollection .
-    ?parentCollection
-              <http://purl.org/dc/elements/1.1/identifier>  ?parentId ;
-              <http://vocab.getty.edu/ontology#parentString>  ?parentDescr
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
   }
 
 
 ============= NEW QUERY RECOMMENDATIONS =============
 
 qR score == 0.0
-SELECT DISTINCT  ?collection ?parentCollection ?parentId ?parentDescr
+SELECT DISTINCT  ?concept ?prefLabel
 WHERE
-  { ?collection  a                  ?ct1 ;
-              ?opt2                 ?parentCollection .
-    ?parentCollection
-              ?opt1                 ?parentId ;
-              ?dpt1                 ?parentDescr
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
   }
 
 
-Process Stop Time == 1494667802999
-Process Elapsed Time == 1532580
+qR Arrival Time == 1494795120331
+qR Query Elapsed Time == 1057
+qR score == 1.0
+SELECT DISTINCT  ?concept ?prefLabel
+WHERE
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
+  }
+
+
+Process Stop Time == 1494795120332
+Process Elapsed Time == 1058

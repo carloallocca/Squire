@@ -8,6 +8,7 @@ package org.mksmart.squire.websquire.v1.resources.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import javax.ws.rs.WebApplicationException;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 import org.junit.After;
@@ -52,7 +53,7 @@ public class QueryStringScorePairResourceImplTest {
     }
 
     
-//    @Test
+ //   @Test
     public void testEducationI() {
         String qo1 = "Select distinct ?mod ?title where {?mod a <http://purl.org/vocab/aiiso/schema#Module>.?mod <http://purl.org/dc/terms/title> ?title .}";
         String qo2 = "SELECT DISTINCT ?mod ?title ?code WHERE { "
@@ -104,8 +105,10 @@ public class QueryStringScorePairResourceImplTest {
     }
 
     // the two RDF datasets are very similar to each other...
- //   @Test
+    // http://datos.artium.org:8890/sparql is not up anymore. 
+    @Test
     public void testArt() {
+        
         String qo1 = "SELECT distinct ?physicalThing ?hasType ?descr "
                 + "WHERE { "
                     + "?physicalThing a <http://erlangen-crm.org/current/E18_Physical_Thing> ."
@@ -173,6 +176,13 @@ public class QueryStringScorePairResourceImplTest {
         String qo1 = "SELECT distinct ?thing ?description where {"
                 + "?thing a <http://data.open.ac.uk/podcast/ontology/VideoPodcast>. "
                 + "?thing <http://purl.org/dc/terms/description> ?description .}";
+// Generalised is too generic! Aalto keeps us waiting forever on
+//SELECT DISTINCT  ?dpt1 ?opt1 ?dpt2
+//WHERE
+//  { ?podcast  ?dpt1  ?published ;
+//              ?dpt2  ?download ;
+//              ?opt1  ?this
+//  }
         String 
                 qo2 = "SELECT distinct ?podcast ?download ?published ?this WHERE {"
                 + "?podcast <http://purl.org/dc/terms/published> ?published ."
@@ -201,12 +211,10 @@ public class QueryStringScorePairResourceImplTest {
 
         ArrayList<String> queryQoList = new ArrayList();
         queryQoList.add(qo1);
-        queryQoList.add(qo2);
+  //      queryQoList.add(qo2);
         queryQoList.add(qo3);
         queryQoList.add(qo4);
         queryQoList.add(qo5);
-
-        
 
         String source_endpoint = "http://data.open.ac.uk/query";
         String target_endpoint = "http://data.aalto.fi/sparql";
@@ -233,12 +241,13 @@ public class QueryStringScorePairResourceImplTest {
     }
     
     
-    //@Test
+   // @Test
     public void testMuseum() {
         String qo1 = "SELECT distinct ?place ?pLabel WHERE {"
                 + "?place a <http://www.europeana.eu/schemas/edm/Place>."
                 + "?place <http://www.w3.org/2004/02/skos/core#prefLabel> ?pLabel.}";
-        
+
+// Generalised is too generic! Edan keeps us waiting forever on        
         String qo2 = "SELECT distinct ?collection ?parentCollection ?parentId ?parentDescr WHERE {"
                 + "?collection <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2004/02/skos/core#OrderedCollection> . "
                 + "?collection <http://www.w3.org/2004/02/skos/core#member> ?parentCollection ."
@@ -251,7 +260,7 @@ public class QueryStringScorePairResourceImplTest {
         
         ArrayList<String> queryQoList = new ArrayList();
         queryQoList.add(qo1);
-        queryQoList.add(qo2);
+      //  queryQoList.add(qo2);
         queryQoList.add(qo3);
         
 
@@ -279,7 +288,7 @@ public class QueryStringScorePairResourceImplTest {
         }
     }
     
-    @Test
+  //  @Test
     public void testGovernmentOpenData() {
         String qo1 = "SELECT distinct ?s ?p ?o WHERE {"
                 + "?s a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District>. "
@@ -305,10 +314,10 @@ public class QueryStringScorePairResourceImplTest {
                 + "?service <http://purl.org/dc/terms/identifier> ?identifier}";
         
         ArrayList<String> queryQoList = new ArrayList();
-       queryQoList.add(qo1);
+ //      queryQoList.add(qo1);
         queryQoList.add(qo2);
         
-       queryQoList.add(qo3);    
+    //   queryQoList.add(qo3);    
 // This is what is happening for the query q3         
 //Virtuoso 42000 Error The estimated execution time 1376 (sec) exceeds the limit of 400 (sec).
 //                                SPARQL query:

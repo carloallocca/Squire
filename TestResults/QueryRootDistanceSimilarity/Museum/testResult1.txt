@@ -1,6 +1,6 @@
 
 
-Process Start Time 1494666255195
+Process Start Time 1494795106460
 
 
 ============= SPARQL ENDPOINTS =============
@@ -25,9 +25,10 @@ WHERE
             <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
   }
 
-
-qR Arrival Time == 1494666268209
-qR Query Elapsed Time == 13014
+qSolSpace size ==3
+solProgressNumber ==1
+qR Arrival Time == 1494795117048
+qR Query Elapsed Time == 10588
 qR score == 0.5619047
 SELECT DISTINCT  ?place ?pLabel
 WHERE
@@ -35,9 +36,10 @@ WHERE
             <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
   }
 
-
-qR Arrival Time == 1494666269243
-qR Query Elapsed Time == 14048
+qSolSpace size ==3
+solProgressNumber ==2
+qR Arrival Time == 1494795117966
+qR Query Elapsed Time == 11506
 qR score == 0.44166672
 SELECT DISTINCT  ?place ?pLabel
 WHERE
@@ -45,9 +47,10 @@ WHERE
             <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
   }
 
-
-qR Arrival Time == 1494666270292
-qR Query Elapsed Time == 15097
+qSolSpace size ==3
+solProgressNumber ==3
+qR Arrival Time == 1494795118865
+qR Query Elapsed Time == 12405
 qR score == 0.0
 SELECT DISTINCT  ?place ?pLabel
 WHERE
@@ -56,5 +59,5 @@ WHERE
   }
 
 
-Process Stop Time == 1494666270293
-Process Elapsed Time == 15098
+Process Stop Time == 1494795118866
+Process Elapsed Time == 12406
