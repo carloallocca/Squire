@@ -5,10 +5,6 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,6 +17,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -28,9 +25,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-
 import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
@@ -41,10 +36,14 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import some.tests.ApacheHttpClientExample;
 
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
 import uk.ac.open.kmi.squire.utils.FromStringToArrayList;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  *
@@ -55,13 +54,13 @@ public class SPARQLEndPoint implements IRDFDataset {
     private String endpointURL; // set the path of the RDF dataset. e.g SPARQL endpoint url, or FilePath.
     private String graphName;
 
-    private ArrayList<String> classSet = new ArrayList();
-    private ArrayList<String> objectPropertySet = new ArrayList();
-    private ArrayList<String> datatypePropertySet = new ArrayList();
-    private ArrayList<String> literalSet = new ArrayList();
-    private ArrayList<String> individualSet = new ArrayList();
-    private ArrayList<String> rdfVocabulary = new ArrayList();
-    private ArrayList<String> propertySet = new ArrayList();
+    private List<String> classSet = new ArrayList<>();
+    private List<String> objectPropertySet = new ArrayList<>();
+    private List<String> datatypePropertySet = new ArrayList<>();
+    private List<String> literalSet = new ArrayList<>();
+    private List<String> individualSet = new ArrayList<>();
+    private List<String> rdfVocabulary = new ArrayList<>();
+    private List<String> propertySet = new ArrayList<>();
     private Document signatureDoc;
 
     private final Logger log = LoggerFactory.getLogger(getClass());
@@ -73,8 +72,8 @@ public class SPARQLEndPoint implements IRDFDataset {
     public SPARQLEndPoint(String urlAddress, String gName) throws IOException, LockObtainFailedException {
         this.graphName = gName;
         this.endpointURL = urlAddress;
-        //on 03/04/2017, this is what I have added to make it working again
-        //createSPARQLEndPoint();
+        // on 03/04/2017, this is what I have added to make it working again
+        // createSPARQLEndPoint();
         RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
         this.signatureDoc = instance.getSignature(this.endpointURL, this.graphName);
         if (signatureDoc != null) {
@@ -113,44 +112,41 @@ public class SPARQLEndPoint implements IRDFDataset {
         } catch (Exception ex) {
             if (ex instanceof ClosedByInterruptException) {
                 log.warn(" A task with token  was interrupted."
-                        + " This may have been requested by a client.");
+                         + " This may have been requested by a client.");
             } else {
                 log.error("Caught exception of type " + ex.getClass().getName() + " : " + ex.getMessage()
-                        + " - doing nothing with it.", ex);
+                          + " - doing nothing with it.", ex);
             }
         }
     }
 
-
-
     private void createSPARQLEndPoint() throws IOException, LockObtainFailedException {
-//       Document d = this.signatureDoc;
-//        if (d != null) {
-//            String cSet = d.get("ClassSet");
-//            this.classSet = FromStringToArrayList.transform(cSet);
-//            String oPropSet = d.get("ObjectPropertySet");
-//            this.objectPropertySet = FromStringToArrayList.transform(oPropSet);
-//            String dPropertySet = d.get("DatatypePropertySet");
-//            this.datatypePropertySet = FromStringToArrayList.transform(dPropertySet);
-//            String litSet = d.get("LiteralSet");
-//            this.literalSet = FromStringToArrayList.transform(litSet);
-//            String indSet = d.get("IndividualSet");
-//            this.individualSet = FromStringToArrayList.transform(indSet);
-//            String rdfVoc = d.get("RDFVocabulary");
-//            this.rdfVocabulary = FromStringToArrayList.transform(rdfVoc);
-//            String propSet = d.get("PropertySet");
-//            this.propertySet = FromStringToArrayList.transform(propSet);
-//        }
-//        else{
+        // Document d = this.signatureDoc;
+        // if (d != null) {
+        // String cSet = d.get("ClassSet");
+        // this.classSet = FromStringToArrayList.transform(cSet);
+        // String oPropSet = d.get("ObjectPropertySet");
+        // this.objectPropertySet = FromStringToArrayList.transform(oPropSet);
+        // String dPropertySet = d.get("DatatypePropertySet");
+        // this.datatypePropertySet = FromStringToArrayList.transform(dPropertySet);
+        // String litSet = d.get("LiteralSet");
+        // this.literalSet = FromStringToArrayList.transform(litSet);
+        // String indSet = d.get("IndividualSet");
+        // this.individualSet = FromStringToArrayList.transform(indSet);
+        // String rdfVoc = d.get("RDFVocabulary");
+        // this.rdfVocabulary = FromStringToArrayList.transform(rdfVoc);
+        // String propSet = d.get("PropertySet");
+        // this.propertySet = FromStringToArrayList.transform(propSet);
+        // }
+        // else{
         if (this.signatureDoc == null) {
             computeClassSet();
             computeObjectPropertySet();
             computeDataTypePropertySet();
             computeRDFVocabularySet();
             this.signatureDoc = RDFDatasetIndexer.getInstance().indexSignature(this.endpointURL, graphName,
-                    this.classSet, this.objectPropertySet,
-                    this.datatypePropertySet, this.individualSet, this.literalSet,
-                    this.rdfVocabulary, this.propertySet);
+                this.classSet, this.objectPropertySet, this.datatypePropertySet, this.individualSet,
+                this.literalSet, this.rdfVocabulary, this.propertySet);
 
         }
     }
@@ -164,27 +160,27 @@ public class SPARQLEndPoint implements IRDFDataset {
     }
 
     @Override
-    public void setClassSet(ArrayList<String> classSet) {
+    public void setClassSet(List<String> classSet) {
         this.classSet = classSet;
     }
 
     @Override
-    public void setObjectPropertySet(ArrayList<String> objectPropertySet) {
+    public void setObjectPropertySet(List<String> objectPropertySet) {
         this.objectPropertySet = objectPropertySet;
     }
 
     @Override
-    public void setDatatypePropertySet(ArrayList<String> datatypePropertySet) {
+    public void setDatatypePropertySet(List<String> datatypePropertySet) {
         this.datatypePropertySet = datatypePropertySet;
     }
 
     @Override
-    public void setLiteralSet(ArrayList<String> literalSet) {
+    public void setLiteralSet(List<String> literalSet) {
         this.literalSet = literalSet;
     }
 
     @Override
-    public void setIndividualSet(ArrayList<String> individualSet) {
+    public void setIndividualSet(List<String> individualSet) {
         this.individualSet = individualSet;
     }
 
@@ -193,32 +189,32 @@ public class SPARQLEndPoint implements IRDFDataset {
     }
 
     @Override
-    public void setPropertySet(ArrayList<String> propertySet) {
+    public void setPropertySet(List<String> propertySet) {
         this.propertySet = propertySet;
     }
 
     @Override
-    public ArrayList<String> getIndividualSet() {
+    public List<String> getIndividualSet() {
         return individualSet;
     }
 
     @Override
-    public ArrayList<String> getDatatypePropertySet() {
+    public List<String> getDatatypePropertySet() {
         return datatypePropertySet;
     }
 
     @Override
-    public ArrayList<String> getClassSet() {
+    public List<String> getClassSet() {
         return classSet;
     }
 
     @Override
-    public ArrayList<String> getObjectPropertySet() {
+    public List<String> getObjectPropertySet() {
         return objectPropertySet;
     }
 
     @Override
-    public ArrayList<String> getLiteralSet() {
+    public List<String> getLiteralSet() {
         return literalSet;
     }
 
@@ -247,16 +243,15 @@ public class SPARQLEndPoint implements IRDFDataset {
     @Override
     public boolean isInObjectPropertySet(String opUri) {
         boolean a = objectPropertySet.contains(opUri);
-        log.info("::here 1 " +a);
+        log.info("::here 1 " + a);
         return a;
     }
 
     @Override
     public boolean isInDatatypePropertySet(String dpUri) {
         boolean a = datatypePropertySet.contains(dpUri);
-        log.info("::here 2 " +a);
+        log.info("::here 2 " + a);
         return a;
-
 
     }
 
@@ -266,7 +261,7 @@ public class SPARQLEndPoint implements IRDFDataset {
     }
 
     @Override
-    public ArrayList<String> getRDFVocabulary() {
+    public List<String> getRDFVocabulary() {
         return this.rdfVocabulary;
     }
 
@@ -276,7 +271,7 @@ public class SPARQLEndPoint implements IRDFDataset {
     }
 
     @Override
-    public ArrayList<String> getPropertySet() {
+    public List<String> getPropertySet() {
         return this.propertySet;
     }
 
@@ -301,9 +296,9 @@ public class SPARQLEndPoint implements IRDFDataset {
     public void computeClassSet() {
         try {
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                    + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?class where "
-                    + "{ " + " ?ind a ?class . " + "}";
+                             + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                             + "prefix owl:<http://www.w3.org/2002/07/owl#> "
+                             + " SELECT DISTINCT ?class where " + "{ " + " ?ind a ?class . " + "}";
             String encodedQuery = URLEncoder.encode(qString, "UTF-8");
             String GET_URL = this.endpointURL + "?query=" + encodedQuery;
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -312,10 +307,9 @@ public class SPARQLEndPoint implements IRDFDataset {
             HttpResponse response = httpClient.execute(getRequest);
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+                                           + response.getStatusLine().getStatusCode());
             }
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent())));
+            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
             String output;
             String result = "";
             while ((output = br.readLine()) != null) {
@@ -336,31 +330,31 @@ public class SPARQLEndPoint implements IRDFDataset {
         qS.append("SELECT DISTINCT ?op where { [] ?op ?o ");
         qS.append(" FILTER ( isUri(?o)");
         int count = 0;
-        if(!exclusions.isEmpty()) {
+        if (!exclusions.isEmpty()) {
             qS.append(" && ?op NOT IN (");
-            
-            for(Iterator<Property> it = exclusions.iterator(); it.hasNext();count++) {
-                if(count>0) qS.append(",");
-                qS.append("<"+it.next().getURI()+">");              
+
+            for (Iterator<Property> it = exclusions.iterator(); it.hasNext(); count++) {
+                if (count > 0) qS.append(",");
+                qS.append("<" + it.next().getURI() + ">");
             }
             qS.append(" )");
-                    }
+        }
         qS.append(" ) } LIMIT ");
         qS.append(stepLength);
-      //  if(iteration > 0) {
-      //      qS.append(" OFFSET ");
-      //      qS.append(stepLength*iteration);
-      //  }
+        // if(iteration > 0) {
+        // qS.append(" OFFSET ");
+        // qS.append(stepLength*iteration);
+        // }
         System.out.println(qS.toString());
-     try {   
-                    String encodedQuery = URLEncoder.encode(qS.toString(), "UTF-8");
+        try {
+            String encodedQuery = URLEncoder.encode(qS.toString(), "UTF-8");
             String GET_URL = this.endpointURL + "?query=" + encodedQuery;
 
             // set the connection timeout value to 30 seconds (30000 milliseconds)
             final HttpParams httpParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpParams, 300000000);
             DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
-//            DefaultHttpClient httpClient = new DefaultHttpClient();
+            // DefaultHttpClient httpClient = new DefaultHttpClient();
 
             HttpGet getRequest = new HttpGet(GET_URL);
 
@@ -370,49 +364,47 @@ public class SPARQLEndPoint implements IRDFDataset {
 
                 String reason = response.getStatusLine().getReasonPhrase();
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+                                           + response.getStatusLine().getStatusCode());
 
             }
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent())));
+            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
             String output;
             String result = "";
             while ((output = br.readLine()) != null) {
                 result = result + output;
             }
-            
+
             ArrayList<String> objectPropertyList = parseSparqlResultsJson(result, "op");
             this.objectPropertySet.addAll(objectPropertyList);
-            if(stepLength == objectPropertyList.size()) {
-                for(String op : objectPropertyList)
+            if (stepLength == objectPropertyList.size()) {
+                for (String op : objectPropertyList)
                     exclusions.add(ResourceFactory.createProperty(op));
-            System.out.println(this.objectPropertySet.size() + " object properties indexed so far");
-                computeObjectPropertySet(stepLength, iteration+1, exclusions);
+                System.out.println(this.objectPropertySet.size() + " object properties indexed so far");
+                computeObjectPropertySet(stepLength, iteration + 1, exclusions);
             }
 
-             } catch (ClientProtocolException e) {
+        } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }   
+        }
     }
-    
+
     @Override
     public void computeObjectPropertySet() {
         try {
-            //I need to filter our uri with this namespace: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+            // I need to filter our uri with this namespace: http://www.w3.org/1999/02/22-rdf-syntax-ns#
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                    + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . " + " FILTER (isURI(?o)) "
-                    + "}";
+                             + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                             + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
+                             + " FILTER (isURI(?o)) " + "}";
 
             // just for the opendatacommunity
-//            String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//                    + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
-//                    + "}";
+            // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+            // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+            // + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
+            // + "}";
 
-            
             String encodedQuery = URLEncoder.encode(qString, "UTF-8");
             String GET_URL = this.endpointURL + "?query=" + encodedQuery;
 
@@ -420,7 +412,7 @@ public class SPARQLEndPoint implements IRDFDataset {
             final HttpParams httpParams = new BasicHttpParams();
             HttpConnectionParams.setConnectionTimeout(httpParams, 300000000);
             DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
-//            DefaultHttpClient httpClient = new DefaultHttpClient();
+            // DefaultHttpClient httpClient = new DefaultHttpClient();
 
             HttpGet getRequest = new HttpGet(GET_URL);
 
@@ -430,11 +422,10 @@ public class SPARQLEndPoint implements IRDFDataset {
 
                 String reason = response.getStatusLine().getReasonPhrase();
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+                                           + response.getStatusLine().getStatusCode());
 
             }
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent())));
+            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
             String output;
             String result = "";
             while ((output = br.readLine()) != null) {
@@ -458,15 +449,15 @@ public class SPARQLEndPoint implements IRDFDataset {
 
         try {
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                    + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . " + " FILTER (isLiteral(?o)) "
-                    + "} ";
+                             + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                             + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . "
+                             + " FILTER (isLiteral(?o)) " + "} ";
 
             // just for the opendatacommunity
-//            String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//                    + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . "
-//                    + "} ";
+            // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+            // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+            // + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . "
+            // + "} ";
 
             String encodedQuery = URLEncoder.encode(qString, "UTF-8");
             String GET_URL = this.endpointURL + "?query=" + encodedQuery;
@@ -476,10 +467,9 @@ public class SPARQLEndPoint implements IRDFDataset {
             HttpResponse response = httpClient.execute(getRequest);
             if (response.getStatusLine().getStatusCode() != 200) {
                 throw new RuntimeException("Failed : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+                                           + response.getStatusLine().getStatusCode());
             }
-            BufferedReader br = new BufferedReader(
-                    new InputStreamReader((response.getEntity().getContent())));
+            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
             String output;
             String result = "";
             while ((output = br.readLine()) != null) {
@@ -502,16 +492,15 @@ public class SPARQLEndPoint implements IRDFDataset {
 
         ArrayList<String> output = new ArrayList<>();
         JsonParser jsonParser = new JsonParser();
-        JsonArray results = jsonParser.parse(result)
-                .getAsJsonObject().get("results")
-                .getAsJsonObject().getAsJsonArray("bindings");
+        JsonArray results = jsonParser.parse(result).getAsJsonObject().get("results").getAsJsonObject()
+                .getAsJsonArray("bindings");
         for (JsonElement result1 : results) {
             JsonObject _class = result1.getAsJsonObject().getAsJsonObject(varString);
             String value = _class.get("value").getAsString();
             try {
                 URI valueURI = new URI(value);
                 output.add(value);
-//                System.out.println(valueURI);
+                // System.out.println(valueURI);
             } catch (URISyntaxException ex) {
                 log.error("Bad URI synax for string '{}'", value);
             }
@@ -519,49 +508,45 @@ public class SPARQLEndPoint implements IRDFDataset {
         return output;
     }
 
-    
-    
-    
-    
-//    // the old version, 05 04 2017
-//    @Override
-//    public void computeClassSet() {
-//
-//
-//        // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//        // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//        // + "prefix owl:<http://www.w3.org/2002/07/owl#> "
-//        // + " SELECT DISTINCT ?class where "
-//        // + "{ "
-//        // + " {?class rdf:type owl:Class .} "
-//        // + " UNION "
-//        // + " {?class rdf:type rdfs:Class .} "
-//        // + "} LIMIT 10";
-//        //
-//        String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//                         + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//                         + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?class where "
-//                         + "{ " + " ?ind a ?class . " + "}";
-//        QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
-//            this.graphName);
-//        // QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
-//        ResultSet results = qexec.execSelect();
-//        List<QuerySolution> solList = ResultSetFormatter.toList(results);// .out(, results, q);
-//        for (QuerySolution sol : solList) {
-//            if (sol.get("class").asResource().getURI() != null) {
-//                this.classSet.add(sol.get("class").asResource().getURI());
-//            }
-//        }
-//        System.out.println("[SPARQLEndPoint:computeClassSet] classSet cardinality " + this.classSet.size());
-//
-//    }
+    // // the old version, 05 04 2017
+    // @Override
+    // public void computeClassSet() {
+    //
+    //
+    // // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+    // // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+    // // + "prefix owl:<http://www.w3.org/2002/07/owl#> "
+    // // + " SELECT DISTINCT ?class where "
+    // // + "{ "
+    // // + " {?class rdf:type owl:Class .} "
+    // // + " UNION "
+    // // + " {?class rdf:type rdfs:Class .} "
+    // // + "} LIMIT 10";
+    // //
+    // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+    // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+    // + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?class where "
+    // + "{ " + " ?ind a ?class . " + "}";
+    // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
+    // this.graphName);
+    // // QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
+    // ResultSet results = qexec.execSelect();
+    // List<QuerySolution> solList = ResultSetFormatter.toList(results);// .out(, results, q);
+    // for (QuerySolution sol : solList) {
+    // if (sol.get("class").asResource().getURI() != null) {
+    // this.classSet.add(sol.get("class").asResource().getURI());
+    // }
+    // }
+    // System.out.println("[SPARQLEndPoint:computeClassSet] classSet cardinality " + this.classSet.size());
+    //
+    // }
     @Override
     public void computeIndividualSet() {
         String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?indiv where "
-                + "{ " + " ?indiv rdf:type ?class . " + " {?class rdf:type owl:Class .} "
-                + " UNION " + " {?class rdf:type rdfs:Class .} " + "} LIMIT 10";
+                         + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                         + "prefix owl:<http://www.w3.org/2002/07/owl#> " + " SELECT DISTINCT ?indiv where "
+                         + "{ " + " ?indiv rdf:type ?class . " + " {?class rdf:type owl:Class .} "
+                         + " UNION " + " {?class rdf:type rdfs:Class .} " + "} LIMIT 10";
         // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
         // this.graphName);
         QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
@@ -575,81 +560,82 @@ public class SPARQLEndPoint implements IRDFDataset {
         }
     }
 
-//old version, 05 04 2017    
-//    @Override
-//    public void computeObjectPropertySet() {
-//        String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//                         + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//                         + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . " + " FILTER (isURI(?o)) "
-//                         + "}";
-//
-//        // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
-//        // this.graphName);
-//        QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
-//
-//        ResultSet results = qexec.execSelect();
-//        List<QuerySolution> solList = ResultSetFormatter.toList(results);// .out(, results, q);
-//        for (QuerySolution sol : solList) {
-//            if (sol.get("op").asResource().getURI() != null) {
-//                this.objectPropertySet.add(sol.get("op").asResource().getURI());
-//            }
-//        }
-//        // Convert the set of class into Arraylist List<String> list = new
-//        // ArrayList<String>(listOfTopicAuthors);
-//        System.out.println("[SPARQLEndPoint:computeObjectPropertySetNew] ObjectProperty cardinality "
-//                           + this.objectPropertySet.size());
-//
-//    }
-//old version 05-05-2017    
-//    @Override
-//    public void computeDataTypePropertySet() {
-//
-//        // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//        // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//        // + " SELECT DISTINCT ?dtProp where "
-//        // + "{ "
-//        // + " {?dtProp rdf:type <http://www.w3.org/2002/07/owl#DatatypeProperty> .} "
-//        // + " UNION "
-//        // +
-//        // " {?s ?dtProp ?o . FILTER (isLiteral(?o) &&  !contains(str(?p),\'http://www.w3.org/2000/01/rdf-schema#\'))} "
-//        // + "} LIMIT 10";
-//        // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//        // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//        // + " SELECT DISTINCT ?p where "
-//        // + "{ "
-//        // + " ?s ?p ?o . "
-//        // + "FILTER (isLiteral(?o) &&  "
-//        // + "!contains(str(?p),\'http://www.w3.org/2000/01/rdf-schema#\') && "
-//        // + "!contains(str(?p),\'http://www.w3.org/1999/02/22-rdf-syntax-ns#\') && "
-//        // + "!contains(str(?p),\'http://www.w3.org/2002/07/owl#\')) "
-//        // + "} LIMIT 10";
-//        String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-//                         + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-//                         + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . " + " FILTER (isLiteral(?o)) "
-//                         + "}";
-//
-//        // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
-//        // this.graphName);
-//        QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
-//
-//        ResultSet results = qexec.execSelect();
-//
-//        List<QuerySolution> solList = ResultSetFormatter.toList(results);// .out(, results, q);
-//        for (QuerySolution sol : solList) {
-//            if (sol.get("p").asResource().getURI() != null) {
-//                this.datatypePropertySet.add(sol.get("p").asResource().getURI());
-//            }
-//        }
-//        System.out.println("[SPARQLEndPoint:datatypePropertySet] datatypePropertySet cardinality "
-//                           + this.datatypePropertySet.size());
-//    }
+    // old version, 05 04 2017
+    // @Override
+    // public void computeObjectPropertySet() {
+    // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+    // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+    // + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . " + " FILTER (isURI(?o)) "
+    // + "}";
+    //
+    // // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
+    // // this.graphName);
+    // QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
+    //
+    // ResultSet results = qexec.execSelect();
+    // List<QuerySolution> solList = ResultSetFormatter.toList(results);// .out(, results, q);
+    // for (QuerySolution sol : solList) {
+    // if (sol.get("op").asResource().getURI() != null) {
+    // this.objectPropertySet.add(sol.get("op").asResource().getURI());
+    // }
+    // }
+    // // Convert the set of class into Arraylist List<String> list = new
+    // // ArrayList<String>(listOfTopicAuthors);
+    // System.out.println("[SPARQLEndPoint:computeObjectPropertySetNew] ObjectProperty cardinality "
+    // + this.objectPropertySet.size());
+    //
+    // }
+    // old version 05-05-2017
+    // @Override
+    // public void computeDataTypePropertySet() {
+    //
+    // // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+    // // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+    // // + " SELECT DISTINCT ?dtProp where "
+    // // + "{ "
+    // // + " {?dtProp rdf:type <http://www.w3.org/2002/07/owl#DatatypeProperty> .} "
+    // // + " UNION "
+    // // +
+    // //
+    // " {?s ?dtProp ?o . FILTER (isLiteral(?o) &&  !contains(str(?p),\'http://www.w3.org/2000/01/rdf-schema#\'))} "
+    // // + "} LIMIT 10";
+    // // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+    // // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+    // // + " SELECT DISTINCT ?p where "
+    // // + "{ "
+    // // + " ?s ?p ?o . "
+    // // + "FILTER (isLiteral(?o) &&  "
+    // // + "!contains(str(?p),\'http://www.w3.org/2000/01/rdf-schema#\') && "
+    // // + "!contains(str(?p),\'http://www.w3.org/1999/02/22-rdf-syntax-ns#\') && "
+    // // + "!contains(str(?p),\'http://www.w3.org/2002/07/owl#\')) "
+    // // + "} LIMIT 10";
+    // String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
+    // + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+    // + " SELECT DISTINCT ?p  where " + "{ " + " ?s ?p ?o . " + " FILTER (isLiteral(?o)) "
+    // + "}";
+    //
+    // // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
+    // // this.graphName);
+    // QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
+    //
+    // ResultSet results = qexec.execSelect();
+    //
+    // List<QuerySolution> solList = ResultSetFormatter.toList(results);// .out(, results, q);
+    // for (QuerySolution sol : solList) {
+    // if (sol.get("p").asResource().getURI() != null) {
+    // this.datatypePropertySet.add(sol.get("p").asResource().getURI());
+    // }
+    // }
+    // System.out.println("[SPARQLEndPoint:datatypePropertySet] datatypePropertySet cardinality "
+    // + this.datatypePropertySet.size());
+    // }
     @Override
     public void computeLiteralSet() {
 
         String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                + " SELECT DISTINCT ?lit where " + "{ " + " ?s ?p ?lit . "
-                + " FILTER (isLiteral(?lit) ) " + "} LIMIT 10";
+                         + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                         + " SELECT DISTINCT ?lit where " + "{ " + " ?s ?p ?lit . "
+                         + " FILTER (isLiteral(?lit) ) " + "} LIMIT 10";
 
         // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
         // this.graphName);
@@ -686,7 +672,6 @@ public class SPARQLEndPoint implements IRDFDataset {
         this.rdfVocabulary.add("http://www.w3.org/2002/07/owl#DatatypeProperty ");
         this.rdfVocabulary.add("http://www.w3.org/2002/07/owl#DataRange ");
 
-        
     }
 
     private void computeObjectPropertySetNew() {
@@ -695,10 +680,10 @@ public class SPARQLEndPoint implements IRDFDataset {
         Set<String> qSol = new HashSet();
         while (resultset) {
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                    + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
-                    + " FILTER (isURI(?o)) " + "} ORDER BY ?op limit 50 OFFSET "
-                    + Integer.toString(offset);
+                             + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                             + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
+                             + " FILTER (isURI(?o)) " + "} ORDER BY ?op limit 50 OFFSET "
+                             + Integer.toString(offset);
 
             // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
             // this.graphName);
@@ -720,7 +705,7 @@ public class SPARQLEndPoint implements IRDFDataset {
                 }
                 System.out
                         .println("[SPARQLEndPoint:computeObjectPropertySetNew] objectPropertySet cardinality so far: "
-                                + qSol.size());
+                                 + qSol.size());
                 offset = offset + 50;
             } else {
                 resultset = false;
@@ -729,7 +714,7 @@ public class SPARQLEndPoint implements IRDFDataset {
         // Convert the set of class into Arraylist List<String> list = new
         // ArrayList<String>(listOfTopicAuthors);
         System.out.println("[SPARQLEndPoint:computeObjectPropertySetNew] ObjectProperty cardinality "
-                + qSol.size());
+                           + qSol.size());
         this.objectPropertySet = new ArrayList<String>(qSol);
 
     }
@@ -741,10 +726,10 @@ public class SPARQLEndPoint implements IRDFDataset {
         QueryEngineHTTP qexec = null;
         while (resultset) {
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                    + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
-                    + " FILTER (isURI(?o)) " + "} ORDER BY ?op limit 50 OFFSET "
-                    + Integer.toString(offset);
+                             + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                             + " SELECT DISTINCT ?op where " + "{ " + " ?s ?op ?o . "
+                             + " FILTER (isURI(?o)) " + "} ORDER BY ?op limit 50 OFFSET "
+                             + Integer.toString(offset);
 
             // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
             // this.graphName);
@@ -767,7 +752,7 @@ public class SPARQLEndPoint implements IRDFDataset {
                 }
                 System.out
                         .println("[SPARQLEndPoint:computeObjectPropertySetNew] objectPropertySet cardinality so far: "
-                                + qSol.size());
+                                 + qSol.size());
                 offset = offset + 50;
             } else {
                 resultset = false;
@@ -777,7 +762,7 @@ public class SPARQLEndPoint implements IRDFDataset {
         // Convert the set of class into Arraylist List<String> list = new
         // ArrayList<String>(listOfTopicAuthors);
         System.out.println("[SPARQLEndPoint:computeObjectPropertySetNew] ObjectProperty cardinality "
-                + qSol.size());
+                           + qSol.size());
         this.objectPropertySet = new ArrayList<String>(qSol);
 
     }
@@ -788,10 +773,10 @@ public class SPARQLEndPoint implements IRDFDataset {
         Set<String> qSol = new HashSet();
         while (resultset) {
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                    + " SELECT DISTINCT ?dp  where " + "{ " + " ?s ?dp ?o . "
-                    + " FILTER (isLiteral(?o)) " + "} ORDER BY ?dp limit 50 OFFSET "
-                    + Integer.toString(offset);
+                             + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                             + " SELECT DISTINCT ?dp  where " + "{ " + " ?s ?dp ?o . "
+                             + " FILTER (isLiteral(?o)) " + "} ORDER BY ?dp limit 50 OFFSET "
+                             + Integer.toString(offset);
             // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
             // this.graphName);
             QueryExecution qexec = new QueryEngineHTTP((String) this.endpointURL, qString);
@@ -813,7 +798,7 @@ public class SPARQLEndPoint implements IRDFDataset {
                 }
                 System.out
                         .println("[SPARQLEndPoint:datatypePropertySet] datatypePropertySet cardinality so far: "
-                                + qSol.size());
+                                 + qSol.size());
                 offset = offset + 50;
             } else {
                 resultset = false;
@@ -822,7 +807,7 @@ public class SPARQLEndPoint implements IRDFDataset {
         // Convert the set of class into Arraylist List<String> list = new
         // ArrayList<String>(listOfTopicAuthors);
         System.out.println("[SPARQLEndPoint:datatypePropertySet] datatypePropertySet cardinality "
-                + qSol.size());
+                           + qSol.size());
         this.datatypePropertySet = new ArrayList<String>(qSol);
     }
 
@@ -843,10 +828,10 @@ public class SPARQLEndPoint implements IRDFDataset {
         while (resultset) {
 
             String qString = "prefix rdfs:<http://www.w3.org/2000/01/rdf-schema#> "
-                    + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
-                    + "prefix owl:<http://www.w3.org/2002/07/owl#> "
-                    + " SELECT DISTINCT ?class where " + "{ " + " ?ind rdf:type ?class . "
-                    + "} ORDER BY ?class limit 100 OFFSET " + Integer.toString(offset);
+                             + "prefix rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> "
+                             + "prefix owl:<http://www.w3.org/2002/07/owl#> "
+                             + " SELECT DISTINCT ?class where " + "{ " + " ?ind rdf:type ?class . "
+                             + "} ORDER BY ?class limit 100 OFFSET " + Integer.toString(offset);
 
             // QueryExecution qexec = QueryExecutionFactory.sparqlService((String) this.endpointURL, qString,
             // this.graphName);
@@ -867,7 +852,7 @@ public class SPARQLEndPoint implements IRDFDataset {
                     }
                 }
                 System.out.println("[SPARQLEndPoint:computeClassSetNew] classSet cardinality so far: "
-                        + qSol.size());
+                                   + qSol.size());
                 offset = offset + 100;
             } else {
                 resultset = false;
@@ -897,7 +882,7 @@ public class SPARQLEndPoint implements IRDFDataset {
     }
 
     @Override
-    public void setRDFVocabulary(ArrayList<String> rdfSet) {
+    public void setRDFVocabulary(List<String> rdfSet) {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
         // choose Tools | Templates.
     }

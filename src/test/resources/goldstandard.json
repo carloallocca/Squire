@@ -120,7 +120,7 @@
       ]
    },
    {
-      "description":"Educational data, set 1: Open University and Aalto University",
+      "description":"Educational data, set 2: Open University and Aalto University",
       "source":"http://data.open.ac.uk/query",
       "target":"http://data.aalto.fi/sparql",
       "queries":[
@@ -157,6 +157,37 @@
             "original":"SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://vocab.deri.ie/rooms#Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.geonames.org/ontology#name> ?buildName . ?building <http://www.geonames.org/ontology#postalCode> ?postCode }",
             "expected":[
                "SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://dbpedia.org/ontology/Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.w3.org/2006/vcard/ns#country-name> ?buildName . ?building <http://www.w3.org/2006/vcard/ns#postal-code> ?postCode }"
+            ]
+         }
+      ]
+   },
+   {
+      "description":"Museums: Rijksmuseum and Smithsonian",
+      "source":"http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/",
+      "target":"http://edan.si.edu/saam/sparql/",
+      "queries":[
+         {
+            "id":"q1",
+            "description":"List the URIs and labels of all places",
+            "original":"SELECT DISTINCT ?place ?label WHERE { ?place a <http://www.europeana.eu/schemas/edm/Place> . ?place <http://www.w3.org/2004/02/skos/core#prefLabel> ?label }",
+            "expected":[
+               "SELECT DISTINCT ?place ?label WHERE { ?place a <http://www.cidoc-crm.org/cidoc-crm/E53_Place> . ?place <http://www.w3.org/2000/01/rdf-schema#label> ?label }"
+            ]
+         },
+         {
+            "id":"q2",
+            "description":"List the collections that belong to another collection, and describe the collections they belong to",
+            "original":"SELECT DISTINCT ?collection ?parentCollection ?parentId ?parentDescr WHERE { ?collection a <http://www.w3.org/2004/02/skos/core#OrderedCollection> . ?collection <http://www.w3.org/2004/02/skos/core#member> ?parentCollection . ?parentCollection <http://purl.org/dc/elements/1.1/identifier> ?parentId . ?parentCollection <http://vocab.getty.edu/ontology#parentString> ?parentDescr }",
+            "expected":[
+               "SELECT DISTINCT ?collection ?descr ?collectionMember WHERE { ?collection a <http://www.loc.gov/mads/rdf/v1#MADSCollection> . ?collection <http://www.loc.gov/mads/rdf/v1#hasMADSCollectionMember> ?collectionMember . ?collection <http://www.w3.org/2000/01/rdf-schema#comment> ?descr }"
+            ]
+         },
+         {
+            "id":"q3",
+            "description":"List the URIS and labels of all concepts in the museum thesauri",
+            "original":"SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> . ?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel }",
+            "expected":[
+               "SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> . ?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel . ?concept <http://www.w3.org/2004/02/skos/core#inScheme> ?inScheme }"
             ]
          }
       ]

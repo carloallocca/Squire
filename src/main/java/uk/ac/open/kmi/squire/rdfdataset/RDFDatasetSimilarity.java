@@ -5,19 +5,15 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
-import java.util.ArrayList;
+import java.util.List;
+
 import uk.ac.open.kmi.squire.core4.AbstractQueryRecommendationObservable;
-import uk.ac.open.kmi.squire.core4.IQueryRecommendationObservable;
-import uk.ac.open.kmi.squire.core4.IQueryRecommendationObserver;
-import uk.ac.open.kmi.squire.ontologymatching.JaroWinklerSimilarity;
 
 /**
  *
  * @author carloallocca it is based on the JaroWinklerSimilarity
  */
-public class RDFDatasetSimilarity extends AbstractQueryRecommendationObservable{
-
-
+public class RDFDatasetSimilarity extends AbstractQueryRecommendationObservable {
 
     public RDFDatasetSimilarity(String token) {
         this.token = token;
@@ -29,24 +25,24 @@ public class RDFDatasetSimilarity extends AbstractQueryRecommendationObservable{
 
     public float computeSim(IRDFDataset d1, IRDFDataset d2) {
 
-        ArrayList<String> classSetD1 = d1.getClassSet();
-        ArrayList<String> objectPropertySetD1 = d1.getObjectPropertySet();
-        ArrayList<String> datatypePropertySetD1 = d1.getDatatypePropertySet();
+        List<String> classSetD1 = d1.getClassSet();
+        List<String> objectPropertySetD1 = d1.getObjectPropertySet();
+        List<String> datatypePropertySetD1 = d1.getDatatypePropertySet();
 
-        ArrayList<String> classSetD2 = d2.getClassSet();
-        ArrayList<String> objectPropertySetD2 = d2.getObjectPropertySet();
-        ArrayList<String> datatypePropertySetD2 = d2.getDatatypePropertySet();
+        List<String> classSetD2 = d2.getClassSet();
+        List<String> objectPropertySetD2 = d2.getObjectPropertySet();
+        List<String> datatypePropertySetD2 = d2.getDatatypePropertySet();
 
         float classSim = computeSetSim(classSetD1, classSetD2);
         float objectPropertySetSim = computeSetSim(objectPropertySetD1, objectPropertySetD2);
         float datatypePropertySetSim = computeSetSim(datatypePropertySetD1, datatypePropertySetD2);
 
-//        return ((classSim + objectPropertySetSim + datatypePropertySetSim)/3);
+        // return ((classSim + objectPropertySetSim + datatypePropertySetSim)/3);
         this.notifyDatatsetSimilarity((classSim + objectPropertySetSim + datatypePropertySetSim));
         return ((classSim + objectPropertySetSim + datatypePropertySetSim));
     }
 
-    private float computeSetSim(ArrayList<String> setD1, ArrayList<String> setD2) {
+    private float computeSetSim(List<String> setD1, List<String> setD2) {
         if (setD1 != null && setD2 != null) {
             if (setD1.size() > 0 && setD2.size() > 0) {
                 int d1Size = setD1.size();
@@ -70,7 +66,5 @@ public class RDFDatasetSimilarity extends AbstractQueryRecommendationObservable{
         }
         return (float) 0;
     }
-
-
 
 }

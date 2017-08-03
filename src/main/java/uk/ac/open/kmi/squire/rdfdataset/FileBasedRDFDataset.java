@@ -5,13 +5,14 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.ontology.DatatypeProperty;
@@ -20,9 +21,6 @@ import org.apache.jena.ontology.ObjectProperty;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.util.iterator.ExtendedIterator;
 
@@ -32,15 +30,15 @@ import org.apache.jena.util.iterator.ExtendedIterator;
  */
 public class FileBasedRDFDataset implements IRDFDataset {
 
-    private Object datasetPath; //set the path of the RDF dataset. e.g SPARQL endpoint url, or FilePath. 
+    private Object datasetPath; // set the path of the RDF dataset. e.g SPARQL endpoint url, or FilePath.
 
-    private ArrayList<String> classSet = new ArrayList();
-    private ArrayList<String> objectPropertySet = new ArrayList();
-    private ArrayList<String> datatypePropertySet = new ArrayList();
-    private ArrayList<String> literalSet = new ArrayList();
-    private ArrayList<String> individualSet = new ArrayList();
-    private ArrayList<String> rdfVocabulary = new ArrayList();
-    private ArrayList<String> propertySet = new ArrayList();
+    private List<String> classSet = new ArrayList<>();
+    private List<String> objectPropertySet = new ArrayList<>();
+    private List<String> datatypePropertySet = new ArrayList<>();
+    private List<String> literalSet = new ArrayList<>();
+    private List<String> individualSet = new ArrayList<>();
+    private List<String> rdfVocabulary = new ArrayList<>();
+    private List<String> propertySet = new ArrayList<>();
 
     private OntModel inf = null;
 
@@ -48,41 +46,41 @@ public class FileBasedRDFDataset implements IRDFDataset {
 
         try {
             this.datasetPath = rdfDatasetFilePath;
-            //create a Jena memory based  model
+            // create a Jena memory based model
             this.inf = ModelFactory.createOntologyModel();
             InputStream in = new FileInputStream(rdfDatasetFilePath);
             if (in == null) {
                 throw new IllegalArgumentException("File: " + rdfDatasetFilePath + " not found");
             }
-            //...import the content of the owl file in the Jena model. 
+            // ...import the content of the owl file in the Jena model.
             inf.read(in, "");
 
-            //...compute the set of classes
-            //this.classSet = computeClassSet();
+            // ...compute the set of classes
+            // this.classSet = computeClassSet();
             computeClassSet();
 
-            //...compute the set of individuals
-            //this.individualSet = computeIndividualSet();
+            // ...compute the set of individuals
+            // this.individualSet = computeIndividualSet();
             computeIndividualSet();
 
-            //...compute the set of object Property Set
-            //this.objectPropertySet = computeObjectPropertySet();
+            // ...compute the set of object Property Set
+            // this.objectPropertySet = computeObjectPropertySet();
             computeObjectPropertySet();
 
-            //...compute the set of datatype Property Set
-            //this.datatypePropertySet = computeDataTypePropertySet();
+            // ...compute the set of datatype Property Set
+            // this.datatypePropertySet = computeDataTypePropertySet();
             computeDataTypePropertySet();
 
-            //...compute the set of literals Set
-            //this.literalSet = computeLiteralSet();
+            // ...compute the set of literals Set
+            // this.literalSet = computeLiteralSet();
             computeLiteralSet();
 
-            //...compute the set of rdf Vocabulary terms
-            //this.rdfVocabulary = computeRDFVocabularySet();
+            // ...compute the set of rdf Vocabulary terms
+            // this.rdfVocabulary = computeRDFVocabularySet();
             computeRDFVocabularySet();
 
-            //...compute the set of rdf Vocabulary terms
-            //this.propertySet = computePropertySetSet();
+            // ...compute the set of rdf Vocabulary terms
+            // this.propertySet = computePropertySetSet();
             computePropertySetSet();
 
         } catch (FileNotFoundException ex) {
@@ -91,40 +89,41 @@ public class FileBasedRDFDataset implements IRDFDataset {
 
     }
 
-
-     @Override
-    public ArrayList<String> getIndividualSet() {
+    @Override
+    public List<String> getIndividualSet() {
         return individualSet;
     }
 
     @Override
-    public ArrayList<String> getDatatypePropertySet() {
+    public List<String> getDatatypePropertySet() {
         return datatypePropertySet;
     }
 
     @Override
-    public ArrayList<String> getClassSet() {
+    public List<String> getClassSet() {
         return classSet;
     }
 
     @Override
-    public ArrayList<String> getObjectPropertySet() {
+    public List<String> getObjectPropertySet() {
         return objectPropertySet;
     }
 
     @Override
-    public ArrayList<String> getLiteralSet() {
+    public List<String> getLiteralSet() {
         return literalSet;
     }
 
     @Override
     public Object runSelectQuery() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
     public Object runAskQuery() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
@@ -153,7 +152,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
     }
 
     @Override
-    public ArrayList<String> getRDFVocabulary() {
+    public List<String> getRDFVocabulary() {
         return this.rdfVocabulary;
     }
 
@@ -163,7 +162,7 @@ public class FileBasedRDFDataset implements IRDFDataset {
     }
 
     @Override
-    public ArrayList<String> getPropertySet() {
+    public List<String> getPropertySet() {
         return this.propertySet;
     }
 
@@ -174,15 +173,16 @@ public class FileBasedRDFDataset implements IRDFDataset {
 
     @Override
     public Object getEndPointURL() {
-        return this.datasetPath;//throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return this.datasetPath;// throw new UnsupportedOperationException("Not supported yet."); //To change
+                                // body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void setPath(Object path) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
-    
-    
+
     public void computeClassSet() {
         ExtendedIterator<OntClass> classesIter = this.inf.listClasses();
         for (ExtendedIterator c = classesIter; c.hasNext();) {
@@ -246,91 +246,103 @@ public class FileBasedRDFDataset implements IRDFDataset {
             Node subj = stmt.getSubject();
             Node pred = stmt.getPredicate();
             Node obj = stmt.getObject();
-            if(subj.toString().contains("http://www.w3.org/2002/07/owl#")||
-                    subj.toString().contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#")||
-                    subj.toString().contains("http://www.w3.org/2000/01/rdf-schema#")||
-                    subj.toString().contains("http://www.w3.org/2006/12/owl2-xml#")){
-                    if(!this.rdfVocabulary.contains(subj.toString())){
-                        this.rdfVocabulary.add(subj.toString());
-                    }
-            }            
-            if(pred.toString().contains("http://www.w3.org/2002/07/owl#")||
-                    pred.toString().contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#")||
-                    pred.toString().contains("http://www.w3.org/2000/01/rdf-schema#")||
-                    pred.toString().contains("http://www.w3.org/2006/12/owl2-xml#")){
-                    if(!this.rdfVocabulary.contains(pred.toString())){
-                        this.rdfVocabulary.add(pred.toString());
-                    }
+            if (subj.toString().contains("http://www.w3.org/2002/07/owl#")
+                || subj.toString().contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+                || subj.toString().contains("http://www.w3.org/2000/01/rdf-schema#")
+                || subj.toString().contains("http://www.w3.org/2006/12/owl2-xml#")) {
+                if (!this.rdfVocabulary.contains(subj.toString())) {
+                    this.rdfVocabulary.add(subj.toString());
+                }
             }
-            if(obj.toString().contains("http://www.w3.org/2002/07/owl#")||
-                    obj.toString().contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#")||
-                    obj.toString().contains("http://www.w3.org/2000/01/rdf-schema#")||
-                    obj.toString().contains("http://www.w3.org/2006/12/owl2-xml#")){
-                    if(!this.rdfVocabulary.contains(obj.toString())){
-                        this.rdfVocabulary.add(obj.toString());
-                    }
+            if (pred.toString().contains("http://www.w3.org/2002/07/owl#")
+                || pred.toString().contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+                || pred.toString().contains("http://www.w3.org/2000/01/rdf-schema#")
+                || pred.toString().contains("http://www.w3.org/2006/12/owl2-xml#")) {
+                if (!this.rdfVocabulary.contains(pred.toString())) {
+                    this.rdfVocabulary.add(pred.toString());
+                }
+            }
+            if (obj.toString().contains("http://www.w3.org/2002/07/owl#")
+                || obj.toString().contains("http://www.w3.org/1999/02/22-rdf-syntax-ns#")
+                || obj.toString().contains("http://www.w3.org/2000/01/rdf-schema#")
+                || obj.toString().contains("http://www.w3.org/2006/12/owl2-xml#")) {
+                if (!this.rdfVocabulary.contains(obj.toString())) {
+                    this.rdfVocabulary.add(obj.toString());
+                }
             }
         }
     }
 
     @Override
     public Object getGraph() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
     public void setGraph(Object path) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
-    public void setIndividualSet(ArrayList<String> indSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setIndividualSet(List<String> indSet) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
-    public void setDatatypePropertySet(ArrayList<String> dpSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setDatatypePropertySet(List<String> dpSet) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
-    public void setClassSet(ArrayList<String> classSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setClassSet(List<String> classSet) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
-    public void setObjectPropertySet(ArrayList<String> opSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setObjectPropertySet(List<String> opSet) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
-    public void setLiteralSet(ArrayList<String> litSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setLiteralSet(List<String> litSet) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
-    public void setRDFVocabulary(ArrayList<String> rdfSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setRDFVocabulary(List<String> rdfSet) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
-    public void setPropertySet(ArrayList<String> propSet) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void setPropertySet(List<String> propSet) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
     public boolean isIndexed() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
     public void computePropertySet() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
     @Override
     public void run() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                       // choose Tools | Templates.
     }
 
 }

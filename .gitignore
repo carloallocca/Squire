@@ -1,3 +1,10 @@
+# Mac OS
+.DS_Store
+
+# VCS
+.svn/
+
+# Maven generated
 target/
 pom.xml.tag
 pom.xml.releaseBackup
@@ -7,14 +14,30 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-RDFDatasetIndex/
-.svn/
-nbproject/private/
+
+# NetBeans
 build/
-nbbuild/
 dist/
+nbbuild/
 nbdist/
+nbproject/
 .nb-gradle/
 nb-configuration.xml
 nbactions.xml
-nbproject/
+
+# Eclipse
+.classpath
+.project
+.settings
+
+# Mac OS
+.DS_Store
+
+# Jenv
+.java-version
+
+# Bower
+src/main/webapp/vendor/
+
+# Custom
+RDFDatasetIndex/

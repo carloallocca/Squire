@@ -5,28 +5,21 @@
  */
 package uk.ac.open.kmi.squire.index.II;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.sparql.vocabulary.FOAF;
-import org.apache.jena.vocabulary.RDF;
-import org.apache.lucene.document.Document;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import java.util.List;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
-import uk.ac.open.kmi.squire.loggers.SPARQLEndPointIndexLogger;
 import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
 
 /**
@@ -35,166 +28,69 @@ import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
  */
 public class RDFDatasetIndexerTest {
 
-    public RDFDatasetIndexerTest() {
-    }
+    private Logger log = LoggerFactory.getLogger(getClass());
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
+    // String fileName =
+    // "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
+    // This file contains the endpoints for the gold-standard
+    // String fileName =
+    // "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointTestlist";
+    // String fileName =
+    // "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlistNew";
 
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-    
-    
-    //org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.OFF);
+    String fileName = "endpointlistNew";
 
     /**
      * Test of addEndPointSignature method, of class SPARQLEndPointIndexer1.
      */
     @Test
-    public void testAddRDFDatasetSignature() {
-        FileInputStream fstream = null;
-        
-//        org.apache.log4j.Logger.getRootLogger().setLevel(org.apache.log4j.Level.OFF);
-//        Log.setLog4j("jena-log4j.properties");
-        
-        
-//        String indexDir = "/Users/carloallocca/Desktop/SPARQEndPointIndex";
-        try {
+    public void testAddRDFDatasetSignature() throws Exception {
 
-//            RDFDatasetIndexer indexerInstance = RDFDatasetIndexer.getInstance();
-            //RDFDatasetIndexer indexerInstance = RDFDatasetIndexer.getInstance(indexDir);
-            System.out.println("[RDFDatasetIndexerIITest::testAddEndPointSignature2222]");
-            //String indexDir="/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/Led2Pro/SPARQEndPointIndex";
-            //String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlist";
-            //This file contains the endpoints for the gold-standard
-            String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointlistNew";
-            //String fileName = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/endpointTestlist";
-            
-            
+        URL res = getClass().getResource('/' + fileName);
+        log.debug("Reading endpoint list from location \"{}\"", res);
+        assertNotNull(res);
 
-            
-            // Open the file
-            fstream = new FileInputStream(fileName);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
-            String strLine;
+        InputStream
+        // fstream = new FileInputStream(fileName);
+        fstream = getClass().getResourceAsStream('/' + fileName);
+        List<URL> endpoints = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+        String strLine;
+        while ((strLine = br.readLine()) != null)
+            endpoints.add(new URL(strLine));
+        log.debug("Resource lists {} URLs.", endpoints.size());
+        if (endpoints.isEmpty()) log.error("No endpoints found in list. Test cannot continue.");
+        assertFalse(endpoints.isEmpty());
 
-            try {
-                //Read File Line By Line
-                while ((strLine = br.readLine()) != null) {
-                    SPARQLEndPoint endPoint = new SPARQLEndPoint(strLine, "");
-                    if (!endPoint.isIndexed()) {
-                        SPARQLEndPointIndexLogger.CONSOLE_LOGGER.log(Level.INFO, "the endpoint {0} does not exists ", strLine);
-                        endPoint.computeClassSet();
-                        
-                        System.out.println("classes");
-                        System.out.println(endPoint.getClassSet().toString());
-                        
- 
-//                        endPoint.computeObjectPropertySet(1, 0, new HashSet<Property>());
-                        
-                        endPoint.computeObjectPropertySet();
-                        System.out.println("Obj");
-                        System.out.println(endPoint.getObjectPropertySet().toString());
+        for (URL url : endpoints) {
+            log.info("Inspecting endpoint <{}>", url);
+            SPARQLEndPoint endpoint = new SPARQLEndPoint(url.toString(), "");
+            if (!endpoint.isIndexed()) {
+                log.info(" ... NOT indexed. Will index now.");
+                log.debug("Computing classes...");
+                endpoint.computeClassSet();
+                log.debug("Computing object properties...");
+                endpoint.computeObjectPropertySet();
+                log.debug("Computing datatype properties...");
+                endpoint.computeDataTypePropertySet();
+                log.debug("Computing RDF vocabulary...");
+                endpoint.computeRDFVocabularySet();
 
-                        endPoint.computeDataTypePropertySet();
-                        System.out.println("dt");
-                        System.out.println(endPoint.getDatatypePropertySet().toString());
+                log.debug(" - #classes = {}", endpoint.getClassSet().size());
+                log.debug(" - #OPs = {}", endpoint.getObjectPropertySet().size());
+                log.debug(" - #DPs = {}", endpoint.getDatatypePropertySet().size());
 
-                        endPoint.computeRDFVocabularySet();
-
-                        //index the signature
-                        RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
-                        instance.indexSignature(strLine, "",
-                               endPoint.getClassSet(),
-                               endPoint.getObjectPropertySet(),
-                                endPoint.getDatatypePropertySet(),
-                                endPoint.getIndividualSet(),
-                                endPoint.getLiteralSet(),
-                                endPoint.getRDFVocabulary(),
-                                endPoint.getPropertySet());
-                    } else {
-                        SPARQLEndPointIndexLogger.CONSOLE_LOGGER.log(Level.INFO, "the endpoint {0} already exists", strLine);
-                    }
-
-                }
-            } catch (IOException ex) {
-//                System.out.println("[RDFDatasetIndexerTest::testAddEndPointSignature] TEST:CARLO 1");
-                Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:IOException ", ex);
-            } catch (Exception ex) {
-//                System.out.println("[RDFDatasetIndexerTest::testAddEndPointSignature] TEST:CARLO 2");
-                Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:Exception", ex);
-            }
-            br.close();
-        } catch (FileNotFoundException ex) {
-//            System.out.println("[RDFDatasetIndexerTest::testAddEndPointSignature] TEST:CARLO 3");
-            Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:FileNotFoundException ", ex);
-        } catch (IOException ex) {
-//            System.out.println("[RDFDatasetIndexerTest::testAddEndPointSignature] TEST:CARLO 4");
-            Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:IOException 2", ex);
-        } finally {
-            try {
-//                System.out.println("[RDFDatasetIndexerTest::testAddEndPointSignature] TEST:CARLO 5");
-                if (fstream != null) {
-                    fstream.close();
-                }
-            } catch (IOException ex) {
-//                System.out.println("[RDFDatasetIndexerTest::testAddEndPointSignature] TEST:CARLO 7");
-                Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:IOException 2", ex);
-            }
+                log.debug("Indexing signature...");
+                RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
+                instance.indexSignature(url.toString(), "", endpoint.getClassSet(),
+                    endpoint.getObjectPropertySet(), endpoint.getDatatypePropertySet(),
+                    endpoint.getIndividualSet(), endpoint.getLiteralSet(), endpoint.getRDFVocabulary(),
+                    endpoint.getPropertySet());
+                log.info("<== DONE");
+            } else log.info(" ... already indexed. Skipping.");
         }
 
+        br.close();
     }
 
-//    /**
-//     * Test of addSignature method, of class RDFDatasetIndexerII.
-//     */
-//    @Test
-//    public void testAddRDFDatasetSignatureGet() throws Exception {
-//        System.out.println("addSignature");
-//        String urlAddress = "";
-//        String graphName = "";
-//        ArrayList<String> classSet = null;
-//        ArrayList<String> objectPropertySet = null;
-//        ArrayList<String> datatypePropertySet = null;
-//        ArrayList<String> individualSet = null;
-//        ArrayList<String> literalSet = null;
-//        ArrayList<String> rdfVocabulary = null;
-//        ArrayList<String> propertySet = null;
-//                       //index the signature
-//        RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
-//        
-//        Document d=instance.getSignature("http://data.open.ac.uk/query", "");
-//        String classes=d.get("ClassSet");
-//        
-//        System.out.println("gggggggggggg "+classes);
-//                        
-//         
-//    }
-    
-//
-//    
-//    
-//    
-//    /**
-//     * Test of getSignature method, of class RDFDatasetIndexerII.
-//     */
-//    @Test
-//    public void testGetSPARQLEndPointSignature() throws Exception {
-//        System.out.println("getSignature");
-//        String urlAddress = "";
-//        String graphName = "";
-//        RDFDatasetIndexerII instance = null;
-//        Document expResult = null;
-//        Document result = instance.getSignature(urlAddress, graphName);
-//    }
 }
