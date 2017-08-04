@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.core4.VarNameVarValuePair;
 import uk.ac.open.kmi.squire.rdfdataset.FileBasedRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
 /**
  *

@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
 /**
  *
@@ -64,7 +64,7 @@ public class RDFDatasetIndexerTest {
 
         for (URL url : endpoints) {
             log.info("Inspecting endpoint <{}>", url);
-            SPARQLEndPoint endpoint = new SPARQLEndPoint(url.toString(), "");
+            SparqlIndexedDataset endpoint = new SparqlIndexedDataset(url.toString(), "");
             if (!endpoint.isIndexed()) {
                 log.info(" ... NOT indexed. Will index now.");
                 log.debug("Computing classes...");
@@ -87,7 +87,9 @@ public class RDFDatasetIndexerTest {
                     endpoint.getIndividualSet(), endpoint.getLiteralSet(), endpoint.getRDFVocabulary(),
                     endpoint.getPropertySet());
                 log.info("<== DONE");
-            } else log.info(" ... already indexed. Skipping.");
+            } else log.info(" ... already indexed (classes={};OPs={};DPs={}). Skipping.", endpoint
+                    .getClassSet().size(), endpoint.getObjectPropertySet().size(), endpoint
+                    .getDatatypePropertySet().size());
         }
 
         br.close();

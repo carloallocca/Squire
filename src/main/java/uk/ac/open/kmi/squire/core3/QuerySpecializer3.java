@@ -43,7 +43,7 @@ import uk.ac.open.kmi.squire.operation.RemoveTriple;
 import uk.ac.open.kmi.squire.operation.SPARQLQueryInstantiation;
 import uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
 import uk.ac.open.kmi.squire.treequerypatterns.DataNode;
@@ -326,16 +326,16 @@ public class QuerySpecializer3 implements Callable {
         
         //..set the RDF dataset 1
         IRDFDataset rdfD1 = parentQueryAndContextNode.getRdfD1();
-        if (rdfD1 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
+        if (rdfD1 instanceof SparqlIndexedDataset) {
+            IRDFDataset newRdfD1 = new SparqlIndexedDataset(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD1().getGraph());
             childQueryAndContextNode.setRdfD1(newRdfD1);
         } else { // TO ADD the case of FILEBASED dataset
         }
         //..set the RDF dataset 2
         IRDFDataset rdfD2 = parentQueryAndContextNode.getRdfD2();
-        if (rdfD2 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
+        if (rdfD2 instanceof SparqlIndexedDataset) {
+            IRDFDataset newRdfD2 = new SparqlIndexedDataset(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD2().getGraph());
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace
@@ -500,16 +500,16 @@ public class QuerySpecializer3 implements Callable {
         childQueryAndContextNode.setEntityqR("");
         //..set the RDF dataset 1
         IRDFDataset rdfD1 = parentQueryAndContextNode.getRdfD1();
-        if (rdfD1 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD1 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
+        if (rdfD1 instanceof SparqlIndexedDataset) {
+            IRDFDataset newRdfD1 = new SparqlIndexedDataset(((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD1().getGraph());
             childQueryAndContextNode.setRdfD1(newRdfD1);
         } else { // TO ADD the case of FILEBASED dataset
         }
         //..set the RDF dataset 2
         IRDFDataset rdfD2 = parentQueryAndContextNode.getRdfD2();
-        if (rdfD2 instanceof SPARQLEndPoint) {
-            IRDFDataset newRdfD2 = new SPARQLEndPoint(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
+        if (rdfD2 instanceof SparqlIndexedDataset) {
+            IRDFDataset newRdfD2 = new SparqlIndexedDataset(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
                     (String) parentQueryAndContextNode.getRdfD2().getGraph());
             childQueryAndContextNode.setRdfD2(newRdfD2);
 //            //C. Compute the QueryTempVarSolutionSpace

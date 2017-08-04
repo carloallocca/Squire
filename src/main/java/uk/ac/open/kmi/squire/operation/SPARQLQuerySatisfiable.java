@@ -54,7 +54,7 @@ import uk.ac.open.kmi.squire.core4.IQueryRecommendationObservable;
 import uk.ac.open.kmi.squire.core4.IQueryRecommendationObserver;
 import uk.ac.open.kmi.squire.core4.VarNameVarValuePair;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
 
 /**
@@ -81,7 +81,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
         if (datasetPath == null || datasetPath.isEmpty()) {
             return false;
         } // TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPoint
-        else if (d instanceof SPARQLEndPoint) {
+        else if (d instanceof SparqlIndexedDataset) {
             List<QuerySolution> resList;
 //                QueryExecution qexec = new QueryEngineHTTP((String) d.getEndPointURL(), q);
 //                ResultSet results = qexec.execSelect();

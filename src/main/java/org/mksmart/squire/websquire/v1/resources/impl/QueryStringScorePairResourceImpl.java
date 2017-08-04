@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.jobs.JobManager;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
 /**
  *
@@ -55,8 +55,8 @@ public class QueryStringScorePairResourceImpl implements QueryStringScorePairRes
 
         IRDFDataset d1, d2;
         try {
-            d1 = new SPARQLEndPoint(source_endpoint);
-            d2 = new SPARQLEndPoint(target_endpoint);
+            d1 = new SparqlIndexedDataset(source_endpoint);
+            d2 = new SparqlIndexedDataset(target_endpoint);
         } catch (IOException e) {
             throw new WebApplicationException(INTERNAL_SERVER_ERROR);
         }
