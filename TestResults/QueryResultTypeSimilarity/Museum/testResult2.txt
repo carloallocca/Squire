@@ -1,0 +1,40 @@
+
+
+Process Start Time 1499540315071
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/
+endpoint target == http://edan.si.edu/saam/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?concept ?prefLabel
+WHERE
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 1.0
+SELECT DISTINCT  ?concept ?prefLabel
+WHERE
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
+  }
+
+
+qR Arrival Time == 1499540316242
+qR Query Elapsed Time == 1171
+qR score == 1.0
+SELECT DISTINCT  ?concept ?prefLabel
+WHERE
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
+  }
+
+
+Process Stop Time == 1499540316243
+Process Elapsed Time == 1172

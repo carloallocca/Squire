@@ -1,0 +1,52 @@
+
+
+Process Start Time 1499533371904
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.szepmuveszeti.hu/sparql
+endpoint target == http://datos.artium.org:8890/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?deathEntity ?deathDate
+WHERE
+  { ?deathEntity  a                 <http://erlangen-crm.org/current/E69_Death> ;
+              <http://erlangen-crm.org/current/P4_has_time-span>  ?deathTimeSpan .
+    ?deathTimeSpan
+              <http://erlangen-crm.org/current/P78_is_identified_by>  ?deathTimeSpanID .
+    ?deathTimeSpanID
+              <http://erlangen-crm.org/current/P3_has_note>  ?deathDate
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 1.0
+SELECT DISTINCT  ?deathEntity ?deathDate
+WHERE
+  { ?deathEntity  a                 <http://erlangen-crm.org/current/E69_Death> ;
+              <http://erlangen-crm.org/current/P4_has_time-span>  ?deathTimeSpan .
+    ?deathTimeSpan
+              <http://erlangen-crm.org/current/P78_is_identified_by>  ?deathTimeSpanID .
+    ?deathTimeSpanID
+              <http://erlangen-crm.org/current/P3_has_note>  ?deathDate
+  }
+
+
+qR Arrival Time == 1499533372206
+qR Query Elapsed Time == 302
+qR score == 1.0
+SELECT DISTINCT  ?deathEntity ?deathDate
+WHERE
+  { ?deathEntity  a                 <http://erlangen-crm.org/current/E69_Death> ;
+              <http://erlangen-crm.org/current/P4_has_time-span>  ?deathTimeSpan .
+    ?deathTimeSpan
+              <http://erlangen-crm.org/current/P78_is_identified_by>  ?deathTimeSpanID .
+    ?deathTimeSpanID
+              <http://erlangen-crm.org/current/P3_has_note>  ?deathDate
+  }
+
+
+Process Stop Time == 1499533372207
+Process Elapsed Time == 303

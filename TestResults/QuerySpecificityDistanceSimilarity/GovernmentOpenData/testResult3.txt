@@ -1,0 +1,254 @@
+
+
+Process Start Time 1499531858711
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://opendatacommunities.org/sparql
+endpoint target == http://data.admin.ch/query/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://def.esd.org.uk/Service> ;
+              <http://purl.org/dc/terms/description>  ?description ;
+              <http://purl.org/dc/terms/identifier>  ?identifier
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     ?ct1 ;
+              ?opt1                 ?description ;
+              ?opt2                 ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==1
+qR Arrival Time == 1499532076154
+qR Query Elapsed Time == 217443
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/GovernmentOrganization> ;
+              a                     ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==2
+qR Arrival Time == 1499532076541
+qR Query Elapsed Time == 217830
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/GovernmentOrganization> ;
+              <https://gont.ch/hasEmployment>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==3
+qR Arrival Time == 1499532076896
+qR Query Elapsed Time == 218185
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/GovernmentOrganization> ;
+              <https://gont.ch/subOrganizationOf>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==4
+qR Arrival Time == 1499532077257
+qR Query Elapsed Time == 218546
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/GovernmentOrganization> ;
+              <https://gont.ch/longName>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==5
+qR Arrival Time == 1499532077608
+qR Query Elapsed Time == 218897
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/GovernmentOrganization> ;
+              <http://purl.org/dc/terms/identifier>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==7
+qR Arrival Time == 1499532078122
+qR Query Elapsed Time == 219411
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/Employee> ;
+              a                     ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==8
+qR Arrival Time == 1499532078460
+qR Query Elapsed Time == 219749
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/Employee> ;
+              <http://schema.org/familyName>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==9
+qR Arrival Time == 1499532078840
+qR Query Elapsed Time == 220129
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/Employee> ;
+              <http://www.w3.org/ns/locn#address>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==10
+qR Arrival Time == 1499532079174
+qR Query Elapsed Time == 220463
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/Employee> ;
+              <http://schema.org/givenName>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==11
+qR Arrival Time == 1499532079511
+qR Query Elapsed Time == 220800
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://www.w3.org/ns/locn#Address> ;
+              a                     ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==12
+qR Arrival Time == 1499532079877
+qR Query Elapsed Time == 221166
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://www.w3.org/ns/locn#Address> ;
+              <http://www.w3.org/ns/locn#postName>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==13
+qR Arrival Time == 1499532080228
+qR Query Elapsed Time == 221517
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://www.w3.org/ns/locn#Address> ;
+              <http://www.w3.org/ns/locn#postCode>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==14
+qR Arrival Time == 1499532080619
+qR Query Elapsed Time == 221908
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://www.w3.org/ns/locn#Address> ;
+              <http://www.w3.org/ns/locn#thoroughfare>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==15
+qR Arrival Time == 1499532080953
+qR Query Elapsed Time == 222242
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://www.w3.org/ns/locn#Address> ;
+              <http://www.w3.org/ns/locn#locatorDesignator>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==16
+qR Arrival Time == 1499532081298
+qR Query Elapsed Time == 222587
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <http://www.w3.org/ns/locn#Address> ;
+              <http://www.w3.org/ns/locn#poBox>  ?identifier
+  }
+
+qSolSpace size ==715
+solProgressNumber ==17
+qR Arrival Time == 1499532081659
+qR Query Elapsed Time == 222948
+qR score == -0.5
+SELECT DISTINCT  ?service ?description ?identifier
+WHERE
+  { ?service  a                     <https://gont.ch/Employment> ;
+              a                     ?identifier
+  }
+
+
+
+[QueryRecommendatorForm4]: 
+java.lang.RuntimeException: Failed : HTTP error code : 503
+	at uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable.isSatisfiableWRTResultsWithToken(SPARQLQuerySatisfiable.java:167)
+	at uk.ac.open.kmi.squire.core4.QuerySpecializer4.specialize(QuerySpecializer4.java:504)
+	at uk.ac.open.kmi.squire.core4.QueryRecommendator4.buildRecommendation(QueryRecommendator4.java:119)
+	at uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4.recommendWithToken(QueryRecommendatorForm4.java:156)
+	at uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4.run(QueryRecommendatorForm4.java:75)
+	at org.mksmart.squire.websquire.v1.resources.impl.QueryStringScorePairResourceImplTest.testGovernmentOpenData(QueryStringScorePairResourceImplTest.java:363)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.junit.internal.runners.TestMethodRunner.executeMethodBody(TestMethodRunner.java:99)
+	at org.junit.internal.runners.TestMethodRunner.runUnprotected(TestMethodRunner.java:81)
+	at org.junit.internal.runners.BeforeAndAfterRunner.runProtected(BeforeAndAfterRunner.java:34)
+	at org.junit.internal.runners.TestMethodRunner.runMethod(TestMethodRunner.java:75)
+	at org.junit.internal.runners.TestMethodRunner.run(TestMethodRunner.java:45)
+	at org.junit.internal.runners.TestClassMethodsRunner.invokeTestMethod(TestClassMethodsRunner.java:66)
+	at org.junit.internal.runners.TestClassMethodsRunner.run(TestClassMethodsRunner.java:35)
+	at org.junit.internal.runners.TestClassRunner$1.runUnprotected(TestClassRunner.java:42)
+	at org.junit.internal.runners.BeforeAndAfterRunner.runProtected(BeforeAndAfterRunner.java:34)
+	at org.junit.internal.runners.TestClassRunner.run(TestClassRunner.java:52)
+	at org.apache.maven.surefire.junit4.JUnit4TestSet.execute(JUnit4TestSet.java:53)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.executeTestSet(JUnit4Provider.java:123)
+	at org.apache.maven.surefire.junit4.JUnit4Provider.invoke(JUnit4Provider.java:104)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:497)
+	at org.apache.maven.surefire.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:164)
+	at org.apache.maven.surefire.booter.ProviderFactory$ProviderProxy.invoke(ProviderFactory.java:110)
+	at org.apache.maven.surefire.booter.SurefireStarter.invokeProvider(SurefireStarter.java:175)
+	at org.apache.maven.surefire.booter.SurefireStarter.runSuitesInProcessWhenForked(SurefireStarter.java:107)
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:68)
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 880.085 sec
+
+Results :
+
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
+
+------------------------------------------------------------------------
+BUILD SUCCESS
+------------------------------------------------------------------------
+Total time: 14:42.030s
+Finished at: Sat Jul 08 17:42:21 BST 2017
+Final Memory: 12M/302M
+------------------------------------------------------------------------

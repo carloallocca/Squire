@@ -1,0 +1,63 @@
+
+
+Process Start Time 1499531159681
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/
+endpoint target == http://edan.si.edu/saam/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?place ?pLabel
+WHERE
+  { ?place  a                     <http://www.europeana.eu/schemas/edm/Place> ;
+            <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 5.9604645E-8
+SELECT DISTINCT  ?place ?pLabel
+WHERE
+  { ?place  a                     ?ct1 ;
+            <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
+  }
+
+qSolSpace size ==3
+solProgressNumber ==1
+qR Arrival Time == 1499531169642
+qR Query Elapsed Time == 9961
+qR score == 5.9604645E-8
+SELECT DISTINCT  ?place ?pLabel
+WHERE
+  { ?place  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+            <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
+  }
+
+qSolSpace size ==3
+solProgressNumber ==2
+qR Arrival Time == 1499531170499
+qR Query Elapsed Time == 10818
+qR score == 5.9604645E-8
+SELECT DISTINCT  ?place ?pLabel
+WHERE
+  { ?place  a                     <http://www.cidoc-crm.org/cidoc-crm/E55_Type> ;
+            <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
+  }
+
+qSolSpace size ==3
+solProgressNumber ==3
+qR Arrival Time == 1499531171394
+qR Query Elapsed Time == 11713
+qR score == 5.9604645E-8
+SELECT DISTINCT  ?place ?pLabel
+WHERE
+  { ?place  a                     <http://www.cidoc-crm.org/cidoc-crm/E74_Group> ;
+            <http://www.w3.org/2004/02/skos/core#prefLabel>  ?pLabel
+  }
+
+
+Process Stop Time == 1499531171395
+Process Elapsed Time == 11714

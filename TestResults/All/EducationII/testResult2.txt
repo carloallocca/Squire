@@ -1,0 +1,191 @@
+
+
+Process Start Time 1499545186356
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.open.ac.uk/query
+endpoint target == http://data.aalto.fi/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/givenName>  ?z
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 1.0833334
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        ?dpt1                 ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==1
+qR Arrival Time == 1499545187574
+qR Query Elapsed Time == 1218
+qR score == 0.53703713
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        a                     ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==2
+qR Arrival Time == 1499545189462
+qR Query Elapsed Time == 3106
+qR score == 0.53703713
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/name>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==3
+qR Arrival Time == 1499545189888
+qR Query Elapsed Time == 3532
+qR score == 0.4953704
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://www.w3.org/ns/org#memberOf>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==4
+qR Arrival Time == 1499545190317
+qR Query Elapsed Time == 3961
+qR score == 0.5648148
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/workInfoHomepage>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==5
+qR Arrival Time == 1499545190771
+qR Query Elapsed Time == 4415
+qR score == 0.76851857
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/familyName>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==6
+qR Arrival Time == 1499545191206
+qR Query Elapsed Time == 4850
+qR score == 0.57407415
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://schema.org/jobtitle>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==7
+qR Arrival Time == 1499545191636
+qR Query Elapsed Time == 5280
+qR score == 0.7870371
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/firstName>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==8
+qR Arrival Time == 1499545192059
+qR Query Elapsed Time == 5703
+qR score == 0.53703713
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/plan>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==9
+qR Arrival Time == 1499545192506
+qR Query Elapsed Time == 6150
+qR score == 0.57671964
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/topic_interest>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==10
+qR Arrival Time == 1499545192985
+qR Query Elapsed Time == 6629
+qR score == 0.50132275
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/skypeID>  ?z
+  }
+
+qSolSpace size ==11
+solProgressNumber ==11
+qR Arrival Time == 1499545195774
+qR Query Elapsed Time == 9418
+qR score == 0.4953704
+SELECT DISTINCT  ?x
+WHERE
+  { ?x  <http://xmlns.com/foaf/0.1/familyName>  ?y ;
+        <http://xmlns.com/foaf/0.1/jabberID>  ?z
+  }
+
+
+Process Stop Time == 1499545195775
+Process Elapsed Time == 9419
+
+
+Process Start Time 1499548930325
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/
+endpoint target == http://edan.si.edu/saam/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?concept ?prefLabel
+WHERE
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 2.0
+SELECT DISTINCT  ?concept ?prefLabel
+WHERE
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
+  }
+
+
+qR Arrival Time == 1499548931206
+qR Query Elapsed Time == 881
+qR score == 1.0
+SELECT DISTINCT  ?concept ?prefLabel
+WHERE
+  { ?concept  a                     <http://www.w3.org/2004/02/skos/core#Concept> ;
+              <http://www.w3.org/2004/02/skos/core#prefLabel>  ?prefLabel
+  }
+
+
+Process Stop Time == 1499548931206
+Process Elapsed Time == 881

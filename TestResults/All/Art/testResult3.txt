@@ -1,0 +1,40 @@
+
+
+Process Start Time 1499544922215
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.szepmuveszeti.hu/sparql
+endpoint target == http://datos.artium.org:8890/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?deathEntity ?deathTimeSpan
+WHERE
+  { ?deathEntity  a                 <http://erlangen-crm.org/current/E69_Death> ;
+              <http://erlangen-crm.org/current/P4_has_time-span>  ?deathTimeSpan
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 2.0
+SELECT DISTINCT  ?deathEntity ?deathTimeSpan
+WHERE
+  { ?deathEntity  a                 <http://erlangen-crm.org/current/E69_Death> ;
+              <http://erlangen-crm.org/current/P4_has_time-span>  ?deathTimeSpan
+  }
+
+
+qR Arrival Time == 1499544922486
+qR Query Elapsed Time == 271
+qR score == 1.0
+SELECT DISTINCT  ?deathEntity ?deathTimeSpan
+WHERE
+  { ?deathEntity  a                 <http://erlangen-crm.org/current/E69_Death> ;
+              <http://erlangen-crm.org/current/P4_has_time-span>  ?deathTimeSpan
+  }
+
+
+Process Stop Time == 1499544922486
+Process Elapsed Time == 271

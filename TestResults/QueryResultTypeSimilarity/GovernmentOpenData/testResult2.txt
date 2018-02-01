@@ -1,0 +1,215 @@
+
+
+Process Start Time 1499541893215
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://opendatacommunities.org/sparql
+endpoint target == http://data.admin.ch/query/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  a                     <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority> ;
+             <http://www.w3.org/2004/02/skos/core#prefLabel>  ?label ;
+             <http://www.w3.org/2004/02/skos/core#notation>  ?notation
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  a                     ?ct1 ;
+             ?opt1                 ?label ;
+             ?opt2                 ?notation
+  }
+
+qSolSpace size ==715
+solProgressNumber ==1
+qR Arrival Time == 1499542131717
+qR Query Elapsed Time == 238502
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  a                     ?label ;
+             a                     <https://gont.ch/GovernmentOrganization>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==2
+qR Arrival Time == 1499542132110
+qR Query Elapsed Time == 238895
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <https://gont.ch/hasEmployment>  ?label ;
+             a                     <https://gont.ch/GovernmentOrganization>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==3
+qR Arrival Time == 1499542132510
+qR Query Elapsed Time == 239295
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <https://gont.ch/subOrganizationOf>  ?label ;
+             a                     <https://gont.ch/GovernmentOrganization>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==4
+qR Arrival Time == 1499542132864
+qR Query Elapsed Time == 239649
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <https://gont.ch/longName>  ?label ;
+             a                     <https://gont.ch/GovernmentOrganization>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==5
+qR Arrival Time == 1499542133222
+qR Query Elapsed Time == 240007
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://purl.org/dc/terms/identifier>  ?label ;
+             a                     <https://gont.ch/GovernmentOrganization>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==7
+qR Arrival Time == 1499542133726
+qR Query Elapsed Time == 240511
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  a                     ?label ;
+             a                     <https://gont.ch/Employee>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==8
+qR Arrival Time == 1499542134127
+qR Query Elapsed Time == 240912
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://schema.org/familyName>  ?label ;
+             a                     <https://gont.ch/Employee>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==9
+qR Arrival Time == 1499542134580
+qR Query Elapsed Time == 241365
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://www.w3.org/ns/locn#address>  ?label ;
+             a                     <https://gont.ch/Employee>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==10
+qR Arrival Time == 1499542134980
+qR Query Elapsed Time == 241765
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://schema.org/givenName>  ?label ;
+             a                     <https://gont.ch/Employee>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==11
+qR Arrival Time == 1499542135412
+qR Query Elapsed Time == 242197
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  a                     ?label ;
+             a                     <http://www.w3.org/ns/locn#Address>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==12
+qR Arrival Time == 1499542135860
+qR Query Elapsed Time == 242645
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://www.w3.org/ns/locn#postName>  ?label ;
+             a                     <http://www.w3.org/ns/locn#Address>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==13
+qR Arrival Time == 1499542136206
+qR Query Elapsed Time == 242991
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://www.w3.org/ns/locn#postCode>  ?label ;
+             a                     <http://www.w3.org/ns/locn#Address>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==14
+qR Arrival Time == 1499542136579
+qR Query Elapsed Time == 243364
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://www.w3.org/ns/locn#thoroughfare>  ?label ;
+             a                     <http://www.w3.org/ns/locn#Address>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==15
+qR Arrival Time == 1499542137003
+qR Query Elapsed Time == 243788
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://www.w3.org/ns/locn#locatorDesignator>  ?label ;
+             a                     <http://www.w3.org/ns/locn#Address>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==16
+qR Arrival Time == 1499542137451
+qR Query Elapsed Time == 244236
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <http://www.w3.org/ns/locn#poBox>  ?label ;
+             a                     <http://www.w3.org/ns/locn#Address>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==17
+qR Arrival Time == 1499542137849
+qR Query Elapsed Time == 244634
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  a                     ?label ;
+             a                     <https://gont.ch/Employment>
+  }
+
+qSolSpace size ==715
+solProgressNumber ==18
+qR Arrival Time == 1499542138227
+qR Query Elapsed Time == 245012
+qR score == 1.0
+SELECT DISTINCT  ?school ?label ?notation
+WHERE
+  { ?school  <https://gont.ch/occupiedBy>  ?label ;
+             a                     <https://gont.ch/Employment>
+  }

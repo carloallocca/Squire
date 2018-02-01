@@ -1,0 +1,43 @@
+
+
+Process Start Time 1499544923144
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.szepmuveszeti.hu/sparql
+endpoint target == http://datos.artium.org:8890/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?topic ?authoritativeLabel ?hasVariant
+WHERE
+  { ?topic  a                     <http://www.loc.gov/mads/rdf/v1#Topic> ;
+            <http://www.loc.gov/mads/rdf/v1#authoritativeLabel>  ?authoritativeLabel ;
+            <http://www.loc.gov/mads/rdf/v1#hasVariant>  ?hasVariant
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 2.0
+SELECT DISTINCT  ?topic ?authoritativeLabel ?hasVariant
+WHERE
+  { ?topic  a                     <http://www.loc.gov/mads/rdf/v1#Topic> ;
+            <http://www.loc.gov/mads/rdf/v1#authoritativeLabel>  ?authoritativeLabel ;
+            <http://www.loc.gov/mads/rdf/v1#hasVariant>  ?hasVariant
+  }
+
+
+qR Arrival Time == 1499544923395
+qR Query Elapsed Time == 251
+qR score == 1.0
+SELECT DISTINCT  ?topic ?authoritativeLabel ?hasVariant
+WHERE
+  { ?topic  a                     <http://www.loc.gov/mads/rdf/v1#Topic> ;
+            <http://www.loc.gov/mads/rdf/v1#authoritativeLabel>  ?authoritativeLabel ;
+            <http://www.loc.gov/mads/rdf/v1#hasVariant>  ?hasVariant
+  }
+
+
+Process Stop Time == 1499544923395
+Process Elapsed Time == 251

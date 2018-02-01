@@ -1,0 +1,63 @@
+
+
+Process Start Time 1499533369607
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.szepmuveszeti.hu/sparql
+endpoint target == http://datos.artium.org:8890/sparql
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?creation ?partecipant
+WHERE
+  { ?creation  a                    <http://erlangen-crm.org/current/E65_Creation> ;
+              <http://erlangen-crm.org/current/P11_had_participant>  ?partecipant
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 1.0
+SELECT DISTINCT  ?creation ?partecipant
+WHERE
+  { ?creation  a                    <http://erlangen-crm.org/current/E65_Creation> ;
+              ?opt1                 ?partecipant
+  }
+
+qSolSpace size ==3
+solProgressNumber ==1
+qR Arrival Time == 1499533370676
+qR Query Elapsed Time == 1069
+qR score == 0.0
+SELECT DISTINCT  ?creation ?partecipant
+WHERE
+  { ?creation  a                    <http://erlangen-crm.org/current/E65_Creation> ;
+              a                     ?partecipant
+  }
+
+qSolSpace size ==3
+solProgressNumber ==2
+qR Arrival Time == 1499533370977
+qR Query Elapsed Time == 1370
+qR score == 0.0
+SELECT DISTINCT  ?creation ?partecipant
+WHERE
+  { ?creation  a                    <http://erlangen-crm.org/current/E65_Creation> ;
+              <http://erlangen-crm.org/current/P14_carried_out_by>  ?partecipant
+  }
+
+qSolSpace size ==3
+solProgressNumber ==3
+qR Arrival Time == 1499533371273
+qR Query Elapsed Time == 1666
+qR score == 0.0
+SELECT DISTINCT  ?creation ?partecipant
+WHERE
+  { ?creation  a                    <http://erlangen-crm.org/current/E65_Creation> ;
+              <http://erlangen-crm.org/current/P4_has_time-span>  ?partecipant
+  }
+
+
+Process Stop Time == 1499533371274
+Process Elapsed Time == 1667

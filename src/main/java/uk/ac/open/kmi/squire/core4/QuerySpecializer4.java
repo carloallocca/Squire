@@ -62,10 +62,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
     private static final String TEST_RESULT_DIR_PREFIX = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/TestResults/";
 //    private static final String TEST_RESULT_METRICS = "QueryRootDistanceSimilarity/";
 
-    private static final String TEST_RESULT_METRICS = "QueryRootDistanceSimilarity/";
-//    private static final String TEST_RESULT_METRICS = "QuerySpecificityDistanceSimilarity/";
+//    private static final String TEST_RESULT_METRICS = "QueryRootDistanceSimilarity/";
+//      private static final String TEST_RESULT_METRICS = "QuerySpecificityDistanceSimilarity/";
 //    private static final String TEST_RESULT_METRICS = "QueryResultTypeSimilarity/";
-//    private static final String TEST_RESULT_METRICS = "All/";
+    private static final String TEST_RESULT_METRICS = "All/";
 
     private final static String TEST_ONE = "EducationI/";
     private final static String TEST_TWO = "Art/";
@@ -73,11 +73,11 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
     private final static String TEST_FOUR = "Museum/";
     private final static String TEST_FIVE = "GovernmentOpenData/";
 
-//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX
-    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
-//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE + TEST_RESULT_NAME_PREFIX;
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO + TEST_RESULT_NAME_PREFIX;
+    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
 //    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR + TEST_RESULT_NAME_PREFIX;
-//private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
+//    private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE + TEST_RESULT_NAME_PREFIX;
 
     private static final String TEST_RESULT_NAME_PREFIX = "testResult";
     private static int testResultIndex = 0;
@@ -155,7 +155,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         this.datatypePropertyVarTable = dpVM;
         this.rdfVocVarTable = rdfVM;
 
-        this.resultSizeSimilarityDegree = resultTypeSimilarityDegree;
+        this.resultTypeSimilarityDegree = resultTypeSimilarityDegree;
         this.queryRootDistanceDegree = queryRootDistanceDegree;
         this.resultSizeSimilarityDegree = resultSizeSimilarityDegree;
         this.querySpecificityDistanceDegree = querySpecificityDistanceDegree;
@@ -181,11 +181,12 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         // 4)...QueryResultSizeSimilarity        
         float queryResultSizeSimilarity = 0;
 
-        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim));
-
-//        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim) 
-//                                    + (resultTypeSimilarityDegree * resultTypeSim) 
-//                                    + (querySpecificityDistanceDegree * (qSpecificitySim)));
+//        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim));
+//        float recommentedQueryScore = (querySpecificityDistanceDegree * qSpecificitySim);
+//          float recommentedQueryScore = (resultTypeSimilarityDegree * resultTypeSim);
+        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim)
+                + (resultTypeSimilarityDegree * resultTypeSim)
+                + (querySpecificityDistanceDegree * (qSpecificitySim)));
 //        
 //        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDist) + (resultTypeSimilarityDegree * resulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistVar + qSpecDistTP)));
         //float recommentedQueryScore = resulttypeSim + qSpecDistVar+qSpecDistTP;//This is working as it should but it does not consider the similarity distance between the replased entities
@@ -341,7 +342,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
             for (List<TriplePath> triplePathSubSet : triplePathPowerSetOrdered) {
                 //for (int i=0; i<15; i++) {
                 //    List<TriplePath> triplePathSubSet = triplePathPowerSetOrdered.get(i);
-                log.info("triplePathSubSet ::" +triplePathSubSet.toString());
+                log.info("triplePathSubSet ::" + triplePathSubSet.toString());
                 if (!triplePathSubSet.isEmpty()) {
                     SelectBuilder sb = new SelectBuilder();
                     //adding the triple patters
@@ -360,21 +361,21 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                     // including the fact that satisfiacibile and crete 
                     // a node child from the node parent
                     // Check if it is alredy indexed and therefore generated
-                    log.info("subQuery Remove operation::: " +subQuery.toString());
+                    log.info("subQuery Remove operation::: " + subQuery.toString());
                     if (!(isQueryIndexed(subQuery))) {
                         //...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
-                        
+
                         SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-                        
-                        boolean b=false;
-                        
-                        try{
-                            b=qs.isSatisfiableWRTResultsWithToken(subQuery, rdfd2);
-                            log.info("isSatisfiableWRTResultsWithToken :: " +b);
-                        }catch(Exception ex){
+
+                        boolean b = false;
+
+                        try {
+                            b = qs.isSatisfiableWRTResultsWithToken(subQuery, rdfd2);
+                            log.info("isSatisfiableWRTResultsWithToken :: " + b);
+                        } catch (Exception ex) {
                             log.info(ex.getMessage());
                         }
-                        
+
                         if (b) {
                             log.info("subQuery Remove operation::: " + subQuery);
                             QueryAndContextNode childNode = createNewQueryAndContextNodeForRemovalOp(subQuery, parentQueryAndContextNode);
@@ -386,7 +387,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                             //add qWithoutTriple to the index
                             addQueryToIndexIFAbsent(subQuery);
                             //printQuerySolutionSpaceMap(parentQueryAndContextNode);
-                        
+
                         } else {
                             addQueryToIndexIFAbsent(subQuery);
                         }
@@ -455,22 +456,20 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                 this.recommandedQueryList.add(parentQueryAndContextNode);
                 //this.notifyQueryRecommendation(parentQueryAndContextNode.getqR(), parentQueryAndContextNode.getqRScore());
 
-
                 // 4. check if we can apply a instanciation operation;
                 if (isIProcessable(parentQueryAndContextNode)) {
                     Query queryChild = QueryFactory.create(parentQueryAndContextNode.getqR());
                     List<QuerySolution> qSolList = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
                     log.info("queryChild Instanciation step: " + queryChild.toString());
                     log.info("qSolList size: " + qSolList.size());
-                    int solProgressNumber=0;
+                    int solProgressNumber = 0;
                     for (QuerySolution sol : qSolList) {
-                        solProgressNumber=solProgressNumber+1;
-                        
+                        solProgressNumber = solProgressNumber + 1;
+
 //                        for (int i = 0; i < 10; i++) {
 //                            // calling repeatedly to increase chances of a clean-up
 //                            System.gc();
 //                        }
-
                         Query childQueryCopy = QueryFactory.create(queryChild.toString());
 
                         //[ REPLACED ] Query childQueryCopyInstanciated= applyInstanciationOP(childQueryCopy, sol);
@@ -503,19 +502,16 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
                                 if (qs.isSatisfiableWRTResultsWithToken(childQueryCopyInstanciated, rdfd2)) {
                                     QueryAndContextNode childNode
                                             = createNewQueryAndContextNodeForInstanciateOp(childQueryCopyInstanciated, parentQueryAndContextNode, templVarEntityQoQrInstanciatedList);
-                                    
-                                    
-                                        //======
-                                        // Ho commentato questa riga perche non ha un senso logico. Non c'e' motivo
-                                        // di aggiungere la query instantiata nella lista di query da specializzare. 
-                                        // did it 13/05/2017
+
+                                    //======
+                                    // Ho commentato questa riga perche non ha un senso logico. Non c'e' motivo
+                                    // di aggiungere la query instantiata nella lista di query da specializzare. 
+                                    // did it 13/05/2017
                                     //addSpecializableQueryList(childNode);
-                                    
                                     // invece, ho aggiunto questa in quanto la query e' pronta per essere raccomandata e non avra piu  :
                                     this.recommandedQueryList.add(childNode);
-                
+
                                     //=====
-                                    
                                     long qRArrivalTime = System.currentTimeMillis();
                                     long queryElapsedTime = qRArrivalTime - startTime;
                                     log.info("qR score ======" + childNode.getqRScore());
@@ -529,14 +525,14 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
                                     String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
 //                                    String newTextFile = TEST_RESULT_DIR_PREFIX + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
-                                   // log.info("newTextFile 2 =======" + newTextFile);
+                                    // log.info("newTextFile 2 =======" + newTextFile);
 
                                     try {
                                         FileWriter fw = new FileWriter(newTextFile, true);
                                         fw.write("\n");
-                                        fw.write("qSolSpace size ==" +qSolList.size());
+                                        fw.write("qSolSpace size ==" + qSolList.size());
                                         fw.write("\n");
-                                        fw.write("solProgressNumber ==" +solProgressNumber);
+                                        fw.write("solProgressNumber ==" + solProgressNumber);
                                         fw.write("\n");
                                         fw.write("qR Arrival Time == " + Long.toString(qRArrivalTime));
                                         fw.write("\n");
@@ -709,7 +705,13 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
         // float recommentedQueryScore = ((queryRootDistanceDegree * newQueryRootDist) + (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree * (qSpecDistVar+qSpecDistTP)));
         //float recommentedQueryScore = newQueryRootDist + newResulttypeSim +  (qSpecDistVar/qSpecDistSimTriplePattern);
 
-        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim));
+//        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim));
+//        float recommentedQueryScore = (querySpecificityDistanceDegree * qSpecificitySim);
+//        float recommentedQueryScore = (resultTypeSimilarityDegree * newResulttypeSim);
+
+        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim)
+                + (resultTypeSimilarityDegree * newResulttypeSim)
+                + (querySpecificityDistanceDegree * (qSpecificitySim)));
 
 //        float recommentedQueryScore = (newResulttypeSim +  (qSpecDistSimVar+qSpecDistSimTriplePattern));
 //       
@@ -848,9 +850,16 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 //                                        (  newResulttypeSim) + 
 //                                        (  (qSpecDistVar/qSpecDistSimTriplePattern)));
 //    log.info("qSpecDistSimVar/qSpecDistSimTriplePattern " + (qSpecDistSimVar+qSpecDistSimTriplePattern));
-        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim));
+        //float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim));
+        //float recommentedQueryScore = (querySpecificityDistanceDegree * qSpecificitySim);
+        //float recommentedQueryScore = (resultTypeSimilarityDegree * resultTypeSim);
 
-//
+        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim)
+                + (resultTypeSimilarityDegree * resultTypeSim)
+                + (querySpecificityDistanceDegree * (qSpecificitySim)));
+
+        
+        
 //        float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim) 
 //                                    + (resultTypeSimilarityDegree * resultTypeSim) 
 //                                    + (querySpecificityDistanceDegree * (qSpecificitySim)));

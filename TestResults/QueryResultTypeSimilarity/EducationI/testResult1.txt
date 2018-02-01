@@ -1,0 +1,217 @@
+
+
+Process Start Time 1499532967655
+
+
+============= SPARQL ENDPOINTS =============
+
+endpoint source == http://data.open.ac.uk/query
+endpoint target == https://data.ox.ac.uk/sparql/
+
+============= NEW QUERY SOURCE =============
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://purl.org/vocab/aiiso/schema#Module> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+
+============= NEW QUERY RECOMMENDATIONS =============
+
+qR score == 1.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     ?ct1 ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==1
+qR Arrival Time == 1499532972133
+qR Query Elapsed Time == 4478
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://purl.org/dc/terms/LicenseDocument> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==2
+qR Arrival Time == 1499532973448
+qR Query Elapsed Time == 5793
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://creativecommons.org/ns#License> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==3
+qR Arrival Time == 1499532974734
+qR Query Elapsed Time == 7079
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://ns.ox.ac.uk/namespace/oxpoints/2009/02/owl#Site> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==4
+qR Arrival Time == 1499532975965
+qR Query Elapsed Time == 8310
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://www.w3.org/2003/01/geo/wgs84_pos#SpatialThing> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==5
+qR Arrival Time == 1499532977063
+qR Query Elapsed Time == 9408
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://rdfs.org/ns/void#Dataset> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==6
+qR Arrival Time == 1499532978699
+qR Query Elapsed Time == 11044
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://www.w3.org/ns/dcat#Dataset> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==7
+qR Arrival Time == 1499532980259
+qR Query Elapsed Time == 12604
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://www.w3.org/2002/07/owl#Ontology> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==8
+qR Arrival Time == 1499532981142
+qR Query Elapsed Time == 13487
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://www.w3.org/ns/dcat#Catalog> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==9
+qR Arrival Time == 1499532983085
+qR Query Elapsed Time == 15430
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://ns.ox.ac.uk/namespace/oxpoints/2009/02/owl#Room> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==10
+qR Arrival Time == 1499532985059
+qR Query Elapsed Time == 17404
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://ns.ox.ac.uk/namespace/oxpoints/2009/02/owl#Building> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==11
+qR Arrival Time == 1499532987012
+qR Query Elapsed Time == 19357
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://xcri.org/profiles/1.2/course> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==12
+qR Arrival Time == 1499532988654
+qR Query Elapsed Time == 20999
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://xcri.org/profiles/1.2/presentation> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==13
+qR Arrival Time == 1499532990248
+qR Query Elapsed Time == 22593
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://xmlns.com/foaf/0.1/Document> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==14
+qR Arrival Time == 1499532991876
+qR Query Elapsed Time == 24221
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://xcri.org/profiles/1.2/catalog> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==15
+qR Arrival Time == 1499532993357
+qR Query Elapsed Time == 25702
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://ns.ox.ac.uk/namespace/oxpoints/2009/02/owl#Space> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==16
+qR Arrival Time == 1499532995084
+qR Query Elapsed Time == 27429
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://www.w3.org/ns/adms#SemanticAsset> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+qSolSpace size ==17
+solProgressNumber ==17
+qR Arrival Time == 1499532996183
+qR Query Elapsed Time == 28528
+qR score == 0.0
+SELECT DISTINCT  ?mod ?title
+WHERE
+  { ?mod  a                     <http://www.w3.org/2002/07/owl#Thing> ;
+          <http://purl.org/dc/terms/title>  ?title
+  }
+
+
+Process Stop Time == 1499532996183
+Process Elapsed Time == 28528

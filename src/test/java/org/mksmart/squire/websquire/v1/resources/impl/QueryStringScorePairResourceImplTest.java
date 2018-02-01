@@ -53,7 +53,7 @@ public class QueryStringScorePairResourceImplTest {
     }
 
     
- //   @Test
+//    @Test
     public void testEducationI() {
         String qo1 = "Select distinct ?mod ?title where {?mod a <http://purl.org/vocab/aiiso/schema#Module>.?mod <http://purl.org/dc/terms/title> ?title .}";
         String qo2 = "SELECT DISTINCT ?mod ?title ?code WHERE { "
@@ -106,7 +106,7 @@ public class QueryStringScorePairResourceImplTest {
 
     // the two RDF datasets are very similar to each other...
     // http://datos.artium.org:8890/sparql is not up anymore. 
-    @Test
+    //@Test
     public void testArt() {
         
         String qo1 = "SELECT distinct ?physicalThing ?hasType ?descr "
@@ -210,11 +210,11 @@ public class QueryStringScorePairResourceImplTest {
                 + "?x <http://xmlns.com/foaf/0.1/givenName> ?z .}";
 
         ArrayList<String> queryQoList = new ArrayList();
-        queryQoList.add(qo1);
+   //     queryQoList.add(qo1);
   //      queryQoList.add(qo2);
-        queryQoList.add(qo3);
         queryQoList.add(qo4);
         queryQoList.add(qo5);
+        queryQoList.add(qo3);
 
         String source_endpoint = "http://data.open.ac.uk/query";
         String target_endpoint = "http://data.aalto.fi/sparql";
@@ -241,7 +241,7 @@ public class QueryStringScorePairResourceImplTest {
     }
     
     
-   // @Test
+    @Test
     public void testMuseum() {
         String qo1 = "SELECT distinct ?place ?pLabel WHERE {"
                 + "?place a <http://www.europeana.eu/schemas/edm/Place>."
@@ -288,7 +288,7 @@ public class QueryStringScorePairResourceImplTest {
         }
     }
     
-  //  @Test
+    //  @Test
     public void testGovernmentOpenData() {
         String qo1 = "SELECT distinct ?s ?p ?o WHERE {"
                 + "?s a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District>. "
