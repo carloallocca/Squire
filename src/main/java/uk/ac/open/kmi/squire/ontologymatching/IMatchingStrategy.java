@@ -5,18 +5,16 @@
  */
 package uk.ac.open.kmi.squire.ontologymatching;
 
-
-
 /**
  *
  * @author callocca
  */
 public interface IMatchingStrategy {
-    
-//    public Object computeMatching();
-//    public Object computeClassMatching();
-//    public Object computeObjectPropertyMatching();
-//    public Object computeDatatypePropertyMatching();    
-      public float computeMatchingScore(String s1, String s2);
+
+	// public Object computeMatching();
+	// public Object computeClassMatching();
+	// public Object computeObjectPropertyMatching();
+	// public Object computeDatatypePropertyMatching();
+	public float computeMatchingScore(String s1, String s2);
 
 }

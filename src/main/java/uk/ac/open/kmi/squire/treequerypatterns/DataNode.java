@@ -6,6 +6,8 @@
 package uk.ac.open.kmi.squire.treequerypatterns;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.jena.query.Query;
 
 /**
@@ -13,83 +15,71 @@ import org.apache.jena.query.Query;
  * @author carloallocca
  */
 public class DataNode {
-    Query qO;
-    Query qR;
-    String entityqO;
-    String entityqR;
-    ArrayList<String> operationList;//=new ArrayList();
-    String op; //It can be either R (for Removal) or I (Instanciation). 
-    float nodeCost;
 
+	Query qO, qR;
+	String entityqO;
+	String entityqR;
+	List<String> operationList;// =new ArrayList();
+	String op; // It can be either R (for Removal) or I (Instanciation).
+	float nodeCost;
 
-  public DataNode(Query qO, Query qR, String entityqO, String entityqR, ArrayList<String> operationList,String op, float nodeCost){
-    this.qO= qO; 
-    this.qR=qR;
-    this.entityqO=entityqO;
-    this.entityqR=entityqR;
-    this.operationList= operationList;
-    this.op=op;
-    this.nodeCost=nodeCost;
-  }
+	public DataNode(Query qO, Query qR, String entityqO, String entityqR, List<String> operationList, String op,
+			float nodeCost) {
+		this.qO = qO;
+		this.qR = qR;
+		this.entityqO = entityqO;
+		this.entityqR = entityqR;
+		this.operationList = operationList;
+		this.op = op;
+		this.nodeCost = nodeCost;
+	}
 
-  
-    public void setqO(Query qO) {
-        this.qO = qO;
-    }
+	public String getEntityqO() {
+		return entityqO;
+	}
 
-    public void setqR(Query qR) {
-        this.qR = qR;
-    }
+	public String getEntityqR() {
+		return entityqR;
+	}
 
-    public void setEntityqO(String entityqO) {
-        this.entityqO = entityqO;
-    }
+	public float getNodeCost() {
+		return nodeCost;
+	}
 
-    public void setEntityqR(String entityqR) {
-        this.entityqR = entityqR;
-    }
+	public List<String> getOperationList() {
+		return operationList;
+	}
 
-    public void setOperationList(ArrayList<String> operationList) {
-        this.operationList = operationList;
-    }
+	public Query getqO() {
+		return qO;
+	}
 
-    public void setNodeCost(float nodeCost) {
-        this.nodeCost = nodeCost;
-    }
-  
-  
-  
-  
+	public Query getqR() {
+		return qR;
+	}
 
-    public Query getqO() {
-        return qO;
-    }
+	public void setEntityqO(String entityqO) {
+		this.entityqO = entityqO;
+	}
 
-    public Query getqR() {
-        return qR;
-    }
+	public void setEntityqR(String entityqR) {
+		this.entityqR = entityqR;
+	}
 
-    public String getEntityqO() {
-        return entityqO;
-    }
+	public void setNodeCost(float nodeCost) {
+		this.nodeCost = nodeCost;
+	}
 
-    public String getEntityqR() {
-        return entityqR;
-    }
+	public void setOperationList(ArrayList<String> operationList) {
+		this.operationList = operationList;
+	}
 
-    public ArrayList<String> getOperationList() {
-        return operationList;
-    }
+	public void setqO(Query qO) {
+		this.qO = qO;
+	}
 
-    public float getNodeCost() {
-        return nodeCost;
-    }
+	public void setqR(Query qR) {
+		this.qR = qR;
+	}
 
-  
-  
-  
-    
 }
-
-
- 

@@ -5,18 +5,22 @@
  */
 package uk.ac.open.kmi.squire.core;
 
-import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import java.util.List;
+
 import org.apache.jena.query.Query;
+
+import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
  *
  * @author callocca
  */
 public interface IQueryRecommendation {
-    
-    public List<Query> queryRecommendation();
-    public List<Query> queryRecommendation(String querySPARQL);
-    public List<Query> queryRecommendation(String querySPARQL, IRDFDataset d1, IRDFDataset d2);
-    
+
+	public List<Query> queryRecommendation();
+
+	public List<Query> queryRecommendation(String querySPARQL);
+
+	public List<Query> queryRecommendation(String querySPARQL, IRDFDataset d1, IRDFDataset d2);
+
 }

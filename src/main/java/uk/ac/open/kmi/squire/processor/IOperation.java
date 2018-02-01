@@ -10,11 +10,11 @@ package uk.ac.open.kmi.squire.processor;
  * @author carloallocca
  */
 public interface IOperation {
-    
-    /**
-     *
-     * @return 
-     */
-    public Object apply();
-    
+
+	/**
+	 *
+	 * @return
+	 */
+	public Object apply();
+
 }

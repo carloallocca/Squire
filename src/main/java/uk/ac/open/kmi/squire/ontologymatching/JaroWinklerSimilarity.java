@@ -9,15 +9,15 @@ import org.apache.lucene.search.spell.JaroWinklerDistance;
 
 /**
  *
- * @author carloallocca
- * This is has been used to compute the instantiation matching in our entire process.
+ * @author carloallocca This is has been used to compute the instantiation
+ *         matching in our entire process.
  */
 public class JaroWinklerSimilarity implements IMatchingStrategy {
 
-    @Override
-    public float computeMatchingScore(String s1, String s2) {        
-        JaroWinklerDistance d= new JaroWinklerDistance();
-        return d.getDistance(s1, s2);
-    }
-    
+	@Override
+	public float computeMatchingScore(String s1, String s2) {
+		JaroWinklerDistance d = new JaroWinklerDistance();
+		return d.getDistance(s1, s2);
+	}
+
 }

@@ -10,5 +10,5 @@ package uk.ac.open.kmi.squire.operation;
  * @author callocca
  */
 public interface ISPARQLQuery {
-    
+
 }

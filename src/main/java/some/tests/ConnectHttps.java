@@ -5,32 +5,26 @@
  */
 package some.tests;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 
 /**
  *
  * @author carloallocca
- * http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
+ *         http://www.rgagnon.com/javadetails/java-fix-certificate-problem-in-HTTPS.html
  */
 public class ConnectHttps {
-    
-    public static void main(String[] args) throws Exception {
 
-    String myQuery = "^IXIC";
-    String query="SELECT ?s ?p ?o WHERE { ?s ?p ?o} LIMIT 10";
-          
-    
-//
-//        URI uri = new URI( String.format( 
-//                           query, 
-//                           URLEncoder.encode( myQuery , "UTF8" ) ) );
+	public static void main(String[] args) throws Exception {
 
-        System.out.println( URLEncoder.encode(query, "UTF-8"));
-    }
-    
+		String myQuery = "^IXIC";
+		String query = "SELECT ?s ?p ?o WHERE { ?s ?p ?o} LIMIT 10";
+
+		//
+		// URI uri = new URI( String.format(
+		// query,
+		// URLEncoder.encode( myQuery , "UTF8" ) ) );
+
+		System.out.println(URLEncoder.encode(query, "UTF-8"));
+	}
+
 }

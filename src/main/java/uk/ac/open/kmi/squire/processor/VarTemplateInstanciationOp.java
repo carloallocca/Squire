@@ -12,23 +12,23 @@ import org.apache.jena.sparql.core.Var;
  *
  * @author carloallocca
  */
-public class VarTemplateInstanciationOp implements IOperation{
+public class VarTemplateInstanciationOp implements IOperation {
 
-    private final Query q; 
-    private final String entity;
-    private final Var varTemplate;
-    
-    
-    public VarTemplateInstanciationOp(Query q, Var varTemplate, String entity){
-        this.q=q;
-        this.varTemplate=varTemplate;
-        this.entity=entity;
-    }
-    
-    @Override
-    public Object apply() {
-        System.out.println(" Substitute the varTemplate" +this.varTemplate+ " with the entity " +this.entity+ " in the query Q=" +this.q.toString());
-        return null; // return this.q modified
-    }
-    
+	private final Query q;
+	private final String entity;
+	private final Var varTemplate;
+
+	public VarTemplateInstanciationOp(Query q, Var varTemplate, String entity) {
+		this.q = q;
+		this.varTemplate = varTemplate;
+		this.entity = entity;
+	}
+
+	@Override
+	public Object apply() {
+		System.out.println(" Substitute the varTemplate" + this.varTemplate + " with the entity " + this.entity
+				+ " in the query Q=" + this.q.toString());
+		return null; // return this.q modified
+	}
+
 }
