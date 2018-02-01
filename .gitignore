@@ -24,6 +24,9 @@ pom.xml.next
 release.properties
 target/
 
+# Bower
+src/main/webapp/vendor/
+
 
 ######################
 # Development env.
@@ -42,6 +45,9 @@ nbproject/
 nbbuild/
 nbdist/
 nbproject/
+
+# Jenv
+.java-version
 
 
 ######################

@@ -30,7 +30,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import uk.ac.open.kmi.squire.rdfdataset.FileBasedRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQClassVisitor;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQDatatypePropertyVisitor;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQObjectPropertyVisitor;
@@ -110,7 +110,7 @@ public class QueryResultSizeDistance {
     private int computeQueryResultSetCardinality(Query qOri, IRDFDataset d1) {
         if (d1 instanceof FileBasedRDFDataset) {
             return computeFileBasedQueryResultSetCardinality(qOri, d1);
-        } else if (d1 instanceof SPARQLEndPoint) {
+        } else if (d1 instanceof SparqlIndexedDataset) {
             return computeSPARQLEndPointQueryResultSetCardinality(qOri, d1);
         }
         return 0;
@@ -196,7 +196,7 @@ public class QueryResultSizeDistance {
         int class_ext = 0;
         if (d1 instanceof FileBasedRDFDataset) {
             class_ext = computeFileBasedClassExtCardinality(classe, d1);
-        } else if (d1 instanceof SPARQLEndPoint) {
+        } else if (d1 instanceof SparqlIndexedDataset) {
             class_ext = computeSPARQLEndPointBasedClassExtCardinality(classe, d1);
         }
         return class_ext;
@@ -291,7 +291,7 @@ public class QueryResultSizeDistance {
         int objprop_ext = 0;
         if (d1 instanceof FileBasedRDFDataset) {
             objprop_ext = computeFileBasedObjectPropertyExtCardinality(prop, d1);
-        } else if (d1 instanceof SPARQLEndPoint) {
+        } else if (d1 instanceof SparqlIndexedDataset) {
             objprop_ext = computeSPARQLEndPointBasedObjectPropertExtCardinality(prop, d1);
         }
         return objprop_ext;
@@ -409,7 +409,7 @@ public class QueryResultSizeDistance {
         int dtprop_ext = 0;
         if (d1 instanceof FileBasedRDFDataset) {
             dtprop_ext = computeFileBasedDatatypePropertyExtCardinality(prop, d1);
-        } else if (d1 instanceof SPARQLEndPoint) {
+        } else if (d1 instanceof SparqlIndexedDataset) {
             dtprop_ext = computeSPARQLEndPointBasedDatatypePropertExtCardinality(prop, d1);
         }
         return dtprop_ext;

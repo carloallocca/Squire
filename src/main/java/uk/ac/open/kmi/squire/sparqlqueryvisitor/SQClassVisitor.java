@@ -5,15 +5,13 @@
  */
 package uk.ac.open.kmi.squire.sparqlqueryvisitor;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
+
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.sparql.core.TriplePath;
-import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.ElementAssign;
 import org.apache.jena.sparql.syntax.ElementBind;
 import org.apache.jena.sparql.syntax.ElementData;
@@ -31,6 +29,7 @@ import org.apache.jena.sparql.syntax.ElementSubQuery;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import org.apache.jena.sparql.syntax.ElementUnion;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
+
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
@@ -40,7 +39,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 public class SQClassVisitor extends ElementVisitorBase {
 
     private IRDFDataset d;
-    private ArrayList<String> datasetClassSet;
+    private List<String> datasetClassSet;
 
     private Set<String> queryClassSet = new HashSet<String>();
 

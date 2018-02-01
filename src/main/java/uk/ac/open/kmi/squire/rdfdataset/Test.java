@@ -34,8 +34,8 @@ public class Test {
         // datatypePropertySet cardinality 82                
         String urlAddress4 = "http://www.europeandataportal.eu/sparql";
 
-        SPARQLEndPoint d1 = new SPARQLEndPoint(urlAddress3, "");
-        SPARQLEndPoint d2 = new SPARQLEndPoint(urlAddress4, "");
+        SparqlIndexedDataset d1 = new SparqlIndexedDataset(urlAddress3, "");
+        SparqlIndexedDataset d2 = new SparqlIndexedDataset(urlAddress4, "");
 
         RDFDatasetSimilarity simD = new RDFDatasetSimilarity();
 

@@ -18,7 +18,7 @@ import org.mksmart.squire.websquire.v1.resources.QueryStringScorePair;
 import uk.ac.open.kmi.squire.core.QueryScorePair;
 import uk.ac.open.kmi.squire.core2.QueryRecommendatorForm;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
 /**
  *
@@ -77,8 +77,8 @@ public class QueryRecommendatorForm3Test {
             float resultSizeSimilarityDegree = 3;
             float querySpecificityDistanceDegree = 1;
 
-            IRDFDataset d1 = new SPARQLEndPoint(urlAddress1, "");
-            IRDFDataset d2 = new SPARQLEndPoint(urlAddress2, "");
+            IRDFDataset d1 = new SparqlIndexedDataset(urlAddress1, "");
+            IRDFDataset d2 = new SparqlIndexedDataset(urlAddress2, "");
 
             QueryRecommendatorForm3 instance = new QueryRecommendatorForm3(qString, d1, d2,
                     resultTypeSimilarityDegree,

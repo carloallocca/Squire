@@ -22,7 +22,7 @@ import uk.ac.open.kmi.squire.core4.IQueryRecommendationObserver;
 import uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4;
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SPARQLEndPoint;
+import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
 /**
  *
@@ -127,7 +127,7 @@ public class JobManager implements IQueryRecommendationObserver {
 
         }
         try {
-            IRDFDataset d1 = new SPARQLEndPoint(endPointURI, graphName);
+            IRDFDataset d1 = new SparqlIndexedDataset(endPointURI, graphName);
             if (!d1.isIndexed()) {
 //                RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 
