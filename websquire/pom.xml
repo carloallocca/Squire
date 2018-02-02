@@ -19,7 +19,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.3</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -38,14 +38,15 @@
 
 	<dependencies>
 
-		<!-- Project tax -->	
+		<!-- Project tax -->
 		<dependency>
 			<groupId>org.mksmart.squire</groupId>
 			<artifactId>squire</artifactId>
 			<version>1.1-SNAPSHOT</version>
 		</dependency>
-	
+		
 		<!-- Web tax -->
+
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server-linking</artifactId>
@@ -58,6 +59,7 @@
 		</dependency>
 
 		<!-- Debug tax -->
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
