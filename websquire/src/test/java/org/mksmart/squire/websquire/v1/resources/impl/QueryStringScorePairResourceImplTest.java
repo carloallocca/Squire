@@ -111,7 +111,7 @@ public class QueryStringScorePairResourceImplTest {
 				+ "?topic <http://www.loc.gov/mads/rdf/v1#authoritativeLabel> ?authoritativeLabel . "
 				+ "?topic <http://www.loc.gov/mads/rdf/v1#hasVariant> ?hasVariant}";
 
-		ArrayList<String> queryQoList = new ArrayList();
+		List<String> queryQoList = new ArrayList<>();
 		queryQoList.add(qo1);
 		queryQoList.add(qo2);
 		queryQoList.add(qo3);
@@ -175,7 +175,7 @@ public class QueryStringScorePairResourceImplTest {
 		String qo5 = "select distinct ?x where {" + "?x <http://xmlns.com/foaf/0.1/familyName> ?y ."
 				+ "?x <http://xmlns.com/foaf/0.1/givenName> ?z .}";
 
-		ArrayList<String> queryQoList = new ArrayList();
+		List<String> queryQoList = new ArrayList<>();
 		// queryQoList.add(qo1);
 		// queryQoList.add(qo2);
 		queryQoList.add(qo4);
@@ -222,7 +222,7 @@ public class QueryStringScorePairResourceImplTest {
 				+ "?concept a <http://www.w3.org/2004/02/skos/core#Concept> ."
 				+ "?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel . }";
 
-		ArrayList<String> queryQoList = new ArrayList();
+		List<String> queryQoList = new ArrayList<>();
 		queryQoList.add(qo1);
 		// queryQoList.add(qo2);
 		queryQoList.add(qo3);
@@ -275,7 +275,7 @@ public class QueryStringScorePairResourceImplTest {
 				+ "?service <http://purl.org/dc/terms/description> ?description . "
 				+ "?service <http://purl.org/dc/terms/identifier> ?identifier}";
 
-		ArrayList<String> queryQoList = new ArrayList();
+		List<String> queryQoList = new ArrayList<>();
 		// queryQoList.add(qo1);
 		queryQoList.add(qo2);
 

@@ -6,7 +6,7 @@
 package uk.ac.open.kmi.squire.treequerypatterns;
 
 import java.util.ArrayList;
-import java.util.List;
+
 import uk.ac.open.kmi.squire.core.SQueryRecommendationWorker;
 import uk.ac.open.kmi.squire.rdfdataset.AbstractedRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;

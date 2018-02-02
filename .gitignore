@@ -34,7 +34,9 @@ src/main/webapp/vendor/
 
 # Eclipse #
 .classpath
+.metadata/
 .project
+.recommenders/
 .settings/
 
 # NetBeans #
@@ -63,4 +65,3 @@ nbproject/
 ######################
 
 RDFDatasetIndex/
-/.metadata/
