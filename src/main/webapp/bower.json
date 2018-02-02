@@ -1,7 +1,0 @@
-{
-    "name": "sqrt",
-    "dependencies": {
-        "bootstrap" : "3.*" ,
-        "jquery"    : "1.11.*"
-    }
-}
