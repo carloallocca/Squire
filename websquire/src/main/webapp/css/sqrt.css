@@ -1,0 +1,17 @@
+/* Bootstrap overrides */
+label { margin: 10px 5px }
+
+.container { max-width:660px }
+.nav-tabs li { float:right }
+.nav-tabs li a { outline:none }
+
+.provide-rdf { margin:10px 0; min-height:48px }
+.sqrt_res { display:none; margin:10px 0; position:relative }
+.sqrt_res .sqrt_run { float:right; padding:5px; visibility:hidden }
+.sqrt_res small { color:#666 }
+.sqrt_res:hover .sqrt_run { visibility:visible }
+
+.squire_weight { display:inline-block; margin:0 3px }
+.squire_weight input { max-width:150px }
+.squire_weight label { float:right; margin:0 3px }
+.squire_weight span { font-size:0.85em }
