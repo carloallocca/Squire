@@ -60,7 +60,7 @@ public class RDFDatasetIndexer {
 	private RDFDatasetIndexer() {
 		File file = new File("RDFDatasetIndex");
 		this.datasetIndexDir = file.getAbsoluteFile().getAbsolutePath();
-		log.info("Using index at directory {}", datasetIndexDir);
+		log.debug("Using index at directory {}", datasetIndexDir);
 		createIndex();
 	}
 

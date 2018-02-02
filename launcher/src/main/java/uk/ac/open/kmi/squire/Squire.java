@@ -103,7 +103,7 @@ public class Squire {
 
 	public static void main(String[] args) {
 		new Cli(args).parse();
-		log.info("task {}", task);
+		log.debug("Task: {}", task);
 		if ("index".equals(task)) {
 			log.info("Trying to index {} SPARQL endpoints", targetEndpoints.length);
 			new IndexingTask(new HashSet<>(Arrays.asList(targetEndpoints))).run();
