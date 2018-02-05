@@ -1,7 +1,7 @@
 package uk.ac.open.kmi.squire.rdfdataset;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 
@@ -10,117 +10,129 @@ import java.util.List;
  */
 public abstract class AbstractRdfDataset implements IRDFDataset {
 
-    protected List<String> classSet = new ArrayList<>();
-    protected List<String> datatypePropertySet = new ArrayList<>();
-    protected List<String> individualSet = new ArrayList<>();
-    protected List<String> literalSet = new ArrayList<>();
-    protected List<String> objectPropertySet = new ArrayList<>();
-    protected List<String> propertySet = new ArrayList<>();
-    protected List<String> rdfVocabulary = new ArrayList<>();
+	protected Set<String> classSet = new HashSet<>();
+	protected Set<String> datatypePropertySet = new HashSet<>();
+	protected Set<String> individualSet = new HashSet<>();
+	protected Set<String> literalSet = new HashSet<>();
+	protected Set<String> objectPropertySet = new HashSet<>();
+	protected Set<String> rdfVocabulary = new HashSet<>();
 
-    @Override
-    public List<String> getClassSet() {
-        return classSet;
-    }
+	@Override
+	public void clear() {
+		this.classSet.clear();
+		this.objectPropertySet.clear();
+		this.datatypePropertySet.clear();
+		this.individualSet.clear();
+		this.literalSet.clear();
+		this.rdfVocabulary.clear();
+	}
 
-    @Override
-    public List<String> getDatatypePropertySet() {
-        return datatypePropertySet;
-    }
+	@Override
+	public Set<String> getClassSet() {
+		return classSet;
+	}
 
-    @Override
-    public List<String> getIndividualSet() {
-        return individualSet;
-    }
+	@Override
+	public Set<String> getDatatypePropertySet() {
+		return datatypePropertySet;
+	}
 
-    @Override
-    public List<String> getLiteralSet() {
-        return literalSet;
-    }
+	@Override
+	public Set<String> getIndividualSet() {
+		return individualSet;
+	}
 
-    @Override
-    public List<String> getObjectPropertySet() {
-        return objectPropertySet;
-    }
+	@Override
+	public Set<String> getLiteralSet() {
+		return literalSet;
+	}
 
-    @Override
-    public List<String> getPropertySet() {
-        return propertySet;
-    }
+	@Override
+	public Set<String> getObjectPropertySet() {
+		return objectPropertySet;
+	}
 
-    @Override
-    public List<String> getRDFVocabulary() {
-        return rdfVocabulary;
-    }
+	/**
+	 * Can be overridden if necessary. For example, implementations may fall back to
+	 * this general property set if they are unable to distinguish datatype and
+	 * object properties by usage.
+	 */
+	@Override
+	public Set<String> getPropertySet() {
+		Set<String> result = new HashSet<>(getDatatypePropertySet());
+		result.addAll(getDatatypePropertySet());
+		result.addAll(getObjectPropertySet());
+		return result;
+	}
 
-    @Override
-    public boolean isInClassSet(String classUri) {
-        return classSet.contains(classUri);
-    }
+	@Override
+	public Set<String> getRDFVocabulary() {
+		return rdfVocabulary;
+	}
 
-    @Override
-    public boolean isInDatatypePropertySet(String dpUri) {
-        return datatypePropertySet.contains(dpUri);
-    }
+	@Override
+	public boolean isInClassSet(String classUri) {
+		return classSet.contains(classUri);
+	}
 
-    @Override
-    public boolean isInIndividualSet(String indUri) {
-        return individualSet.contains(indUri);
-    }
+	@Override
+	public boolean isInDatatypePropertySet(String dpUri) {
+		return datatypePropertySet.contains(dpUri);
+	}
 
-    @Override
-    public boolean isInLiteralSet(String lit) {
-        return literalSet.contains(lit);
-    }
+	@Override
+	public boolean isInIndividualSet(String indUri) {
+		return individualSet.contains(indUri);
+	}
 
-    @Override
-    public boolean isInObjectPropertySet(String opUri) {
-        return objectPropertySet.contains(opUri);
-    }
+	@Override
+	public boolean isInLiteralSet(String lit) {
+		return literalSet.contains(lit);
+	}
 
-    @Override
-    public boolean isInPropertySet(String propertyUri) {
-        return propertySet.contains(propertyUri);
-    }
+	@Override
+	public boolean isInObjectPropertySet(String opUri) {
+		return objectPropertySet.contains(opUri);
+	}
 
-    @Override
-    public boolean isInRDFVocabulary(String rdfEntity) {
-        return rdfVocabulary.contains(rdfEntity);
-    }
+	@Override
+	public boolean isInPropertySet(String propertyUri) {
+		return datatypePropertySet.contains(propertyUri) || objectPropertySet.contains(propertyUri);
+	}
 
-    @Override
-    public void setClassSet(List<String> classSet) {
-        this.classSet = classSet;
-    }
+	@Override
+	public boolean isInRDFVocabulary(String rdfEntity) {
+		return rdfVocabulary.contains(rdfEntity);
+	}
 
-    @Override
-    public void setDatatypePropertySet(List<String> datatypePropertySet) {
-        this.datatypePropertySet = datatypePropertySet;
-    }
+	@Override
+	public void setClassSet(Set<String> classSet) {
+		this.classSet = classSet;
+	}
 
-    @Override
-    public void setIndividualSet(List<String> individualSet) {
-        this.individualSet = individualSet;
-    }
+	@Override
+	public void setDatatypePropertySet(Set<String> datatypePropertySet) {
+		this.datatypePropertySet = datatypePropertySet;
+	}
 
-    @Override
-    public void setLiteralSet(List<String> literalSet) {
-        this.literalSet = literalSet;
-    }
+	@Override
+	public void setIndividualSet(Set<String> individualSet) {
+		this.individualSet = individualSet;
+	}
 
-    @Override
-    public void setObjectPropertySet(List<String> objectPropertySet) {
-        this.objectPropertySet = objectPropertySet;
-    }
+	@Override
+	public void setLiteralSet(Set<String> literalSet) {
+		this.literalSet = literalSet;
+	}
 
-    @Override
-    public void setPropertySet(List<String> propertySet) {
-        this.propertySet = propertySet;
-    }
+	@Override
+	public void setObjectPropertySet(Set<String> objectPropertySet) {
+		this.objectPropertySet = objectPropertySet;
+	}
 
-    @Override
-    public void setRDFVocabulary(List<String> rdfSet) {
-        this.rdfVocabulary = rdfSet;
-    }
+	@Override
+	public void setRDFVocabulary(Set<String> rdfSet) {
+		this.rdfVocabulary = rdfSet;
+	}
 
 }

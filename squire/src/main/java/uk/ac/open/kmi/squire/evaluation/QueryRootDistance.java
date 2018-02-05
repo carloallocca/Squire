@@ -5,42 +5,35 @@
  */
 package uk.ac.open.kmi.squire.evaluation;
 
-import java.util.List;
-import org.apache.jena.query.Query;
-import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.treequerypatterns.DataNode;
-import uk.ac.open.kmi.squire.treequerypatterns.TreeNode;
-
 /**
  *
  * @author carloallocca
  */
 public class QueryRootDistance {
 
-    
-//    public QueryRootDistance() {
-//        super();
-//    }
-//
-//    public float computeQRD(TreeNode tn) {
-//        return ((DataNode) tn.getData()).getNodeCost();
-//    }
+	// public QueryRootDistance() {
+	// super();
+	// }
+	//
+	// public float computeQRD(TreeNode tn) {
+	// return ((DataNode) tn.getData()).getNodeCost();
+	// }
 
-//    public float computeQRD(Query qOri, List<String> opPath, Query qRec, ) {
-//
-//        float distance = 0;
-//        for (String op : opPath) {
-//            if (op.equals("R")) {
-//                distance = distance + computeRemovalOperationCost(qOri, qRec);
-//            } else {
-//                distance = distance + computeInstantiationOperationCost(qOri, op, qRec);
-//            }
-//        }
-//        return 0;
-//    }
-//    private float computeRemovalOperationCost(Query qO, Query qR) {
-//        QueryGPESim queryGPEsim = new QueryGPESim();
-//        return queryGPEsim.computeQRTSim(qO, qR);
-//    }
+	// public float computeQRD(Query qOri, List<String> opPath, Query qRec, ) {
+	//
+	// float distance = 0;
+	// for (String op : opPath) {
+	// if (op.equals("R")) {
+	// distance = distance + computeRemovalOperationCost(qOri, qRec);
+	// } else {
+	// distance = distance + computeInstantiationOperationCost(qOri, op, qRec);
+	// }
+	// }
+	// return 0;
+	// }
+	// private float computeRemovalOperationCost(Query qO, Query qR) {
+	// QueryGPESim queryGPEsim = new QueryGPESim();
+	// return queryGPEsim.computeQRTSim(qO, qR);
+	// }
 
 }

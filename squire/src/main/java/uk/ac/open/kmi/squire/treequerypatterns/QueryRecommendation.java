@@ -6,6 +6,7 @@
 package uk.ac.open.kmi.squire.treequerypatterns;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -991,8 +992,8 @@ public class QueryRecommendation<T> {
 
 	}
 
-	private void specialize(TreeNode<T> parentNode, List<String> parentPL, List<String> parentCL, List<String> parentIL,
-			List<String> parentLitL) {
+	private void specialize(TreeNode<T> parentNode, Collection<String> parentPL, Collection<String> parentCL,
+			Collection<String> parentIL, Collection<String> parentLitL) {
 		if (parentNode == null) {
 			throw new IllegalStateException("[QueryRecommendation::specialize()]A ParentNode is null!!");
 		}
@@ -2623,8 +2624,8 @@ public class QueryRecommendation<T> {
 	}
 
 	// Working to include also remove operation
-	private void specialize3(TreeNode<T> parentNode, List<String> parentPL, List<String> parentCL,
-			List<String> parentIL, List<String> parentLitL) {
+	private void specialize3(TreeNode<T> parentNode, Collection<String> parentPL, Collection<String> parentCL,
+			Collection<String> parentIL, Collection<String> parentLitL) {
 		if (parentNode == null) {
 			throw new IllegalStateException("[QueryRecommendation::specialize3()]A ParentNode is null!!");
 		}
@@ -3932,10 +3933,10 @@ public class QueryRecommendation<T> {
 		// As we have the issue of indexing long String when merging dpPropertySet and
 		// opPropertySet, I do not
 		// index and I do their merging here
-		ArrayList<String> propertySet = new ArrayList<String>();
-		propertySet.addAll(rdfd2.getDatatypePropertySet());
-		propertySet.addAll(rdfd2.getObjectPropertySet());
-		rdfd2.setPropertySet(propertySet);
+		// ArrayList<String> propertySet = new ArrayList<String>();
+		// propertySet.addAll(rdfd2.getDatatypePropertySet());
+		// propertySet.addAll(rdfd2.getObjectPropertySet());
+		// rdfd2.setPropertySet(propertySet);
 
 		// try {
 		// FromArrayStringToFile.save("/Users/carloallocca/Desktop/propertyList.txt",

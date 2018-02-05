@@ -30,10 +30,11 @@ public class Squire {
 
 		public Cli(String[] args) {
 			this.args = args;
+			options.addOption("f", "force", false, "Force reindexing (for 'index' task).");
+			options.addOption("h", "help", false, "Show this help.");
 			options.addOption("q", "query", true, "Initial SPARQL query (required for 'recommend').");
 			options.addOption("s", "source", true,
 					"SPARQL endpoint where the query is satisfiable (required for 'recommend')..");
-			options.addOption("h", "help", false, "Show this help.");
 			options.addOption("t", "target", true,
 					"Target SPARQl endpoint to send the reformulated query (required for 'recommend')..");
 		}
@@ -72,6 +73,7 @@ public class Squire {
 							help(1);
 						}
 						task = "index";
+						forceIndexing = cmd.hasOption('f');
 						targetEndpoints = new String[args.length - 1];
 						for (int i = 1; i < args.length; i++)
 							targetEndpoints[i - 1] = args[i];
@@ -99,6 +101,8 @@ public class Squire {
 
 	private static String task = null;
 
+	private static boolean forceIndexing = false;
+
 	private static String[] targetEndpoints = new String[0];
 
 	public static void main(String[] args) {
@@ -106,7 +110,7 @@ public class Squire {
 		log.debug("Task: {}", task);
 		if ("index".equals(task)) {
 			log.info("Trying to index {} SPARQL endpoints", targetEndpoints.length);
-			new IndexingTask(new HashSet<>(Arrays.asList(targetEndpoints))).run();
+			new IndexingTask(new HashSet<>(Arrays.asList(targetEndpoints)), forceIndexing).run();
 		} else if ("recommend".equals(task)) {
 			log.error("Sorry, not implemented yet through command-line.");
 			System.exit(-1);

@@ -11,16 +11,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
+import uk.ac.open.kmi.squire.rdfdataset.BootedException;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
 public class IndexingTask {
 
 	private Set<String> endpoints;
 
+	private boolean force = false;
+
 	private Logger log = LoggerFactory.getLogger(getClass());
 
-	public IndexingTask(Set<String> endpoints) {
+	public IndexingTask(Set<String> endpoints, boolean force) {
 		this.endpoints = endpoints;
+		this.force = force;
+	}
+
+	public IndexingTask(Set<String> endpoints) {
+		this(endpoints, false);
 	}
 
 	public void run() {
@@ -38,37 +46,49 @@ public class IndexingTask {
 		}
 		for (String url : endpoints) {
 			log.info("Inspecting endpoint <{}>", url);
-			SparqlIndexedDataset endpoint;
+			SparqlIndexedDataset indexed;
 			try {
-				endpoint = new SparqlIndexedDataset(url);
+				indexed = new SparqlIndexedDataset(url);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			if (endpoint.isIndexed()) {
-				log.info(" ... already indexed (classes={};OPs={};DPs={}). Skipping.", endpoint.getClassSet().size(),
-						endpoint.getObjectPropertySet().size(), endpoint.getDatatypePropertySet().size());
-				continue;
+			if (indexed.isIndexed()) {
+				log.info(" ... already indexed (classes={};OPs={};DPs={};Ps={}).", indexed.getClassSet().size(),
+						indexed.getObjectPropertySet().size(), indexed.getDatatypePropertySet().size(),
+						indexed.getPropertySet().size());
+				if (force) {
+					log.info("Re-indexing forced by user.");
+					indexed.clear();
+				} else {
+					log.info("Skipping.");
+					continue;
+				}
+			} else log.info(" ... NOT indexed. Will index now.");
+			log.info("Computing classes...");
+			indexed.computeClassSet();
+			try {
+				log.info("Computing object properties...");
+				indexed.computeObjectPropertySet();
+				log.info("Computing datatype properties...");
+				indexed.computeDataTypePropertySet();
+			} catch (BootedException ex) {
+				log.warn("Kicked out during property partitioning."
+						+ " Falling back to undistinguished property computation.");
+				indexed.computePropertySet();
 			}
+			log.info("Computing RDF vocabulary...");
+			indexed.computeRDFVocabularySet();
 
-			log.info(" ... NOT indexed. Will index now.");
-			log.debug("Computing classes...");
-			endpoint.computeClassSet();
-			log.debug("Computing object properties...");
-			endpoint.computeObjectPropertySet();
-			log.debug("Computing datatype properties...");
-			endpoint.computeDataTypePropertySet();
-			log.debug("Computing RDF vocabulary...");
-			endpoint.computeRDFVocabularySet();
-
-			log.debug(" - #classes = {}", endpoint.getClassSet().size());
-			log.debug(" - #OPs = {}", endpoint.getObjectPropertySet().size());
-			log.debug(" - #DPs = {}", endpoint.getDatatypePropertySet().size());
+			log.debug(" - #classes = {}", indexed.getClassSet().size());
+			log.debug(" - #OPs = {}", indexed.getObjectPropertySet().size());
+			log.debug(" - #DPs = {}", indexed.getDatatypePropertySet().size());
+			log.debug(" - #Ps = {}", indexed.getPropertySet().size());
 
 			log.debug("Indexing signature...");
 			RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
-			instance.indexSignature(url.toString(), "", endpoint.getClassSet(), endpoint.getObjectPropertySet(),
-					endpoint.getDatatypePropertySet(), endpoint.getIndividualSet(), endpoint.getLiteralSet(),
-					endpoint.getRDFVocabulary(), endpoint.getPropertySet());
+			instance.indexSignature(url.toString(), "", indexed.getClassSet(), indexed.getObjectPropertySet(),
+					indexed.getDatatypePropertySet(), indexed.getIndividualSet(), indexed.getLiteralSet(),
+					indexed.getRDFVocabulary(), indexed.getPropertySet());
 			log.info("<== DONE");
 
 		}

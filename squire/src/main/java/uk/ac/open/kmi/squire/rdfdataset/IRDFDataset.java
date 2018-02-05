@@ -5,7 +5,7 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -13,74 +13,74 @@ import java.util.List;
  */
 public interface IRDFDataset extends Runnable {
 
-    public void computeClassSet();
+	public void clear();
 
-    public void computeDataTypePropertySet();
+	public void computeClassSet();
 
-    public void computeIndividualSet();
+	public void computeDataTypePropertySet() throws BootedException;
 
-    public void computeLiteralSet();
+	public void computeIndividualSet();
 
-    public void computeObjectPropertySet();
+	public void computeLiteralSet();
 
-    public void computePropertySet();
+	public void computeObjectPropertySet() throws BootedException;
 
-    public void computeRDFVocabularySet();
+	public void computePropertySet();
 
-    public List<String> getClassSet();
+	public void computeRDFVocabularySet();
 
-    public List<String> getDatatypePropertySet();
+	public Set<String> getClassSet();
 
-    public Object getEndPointURL();
+	public Set<String> getDatatypePropertySet();
 
-    public Object getGraph();
+	public Object getEndPointURL();
 
-    public List<String> getIndividualSet();
+	public Object getGraph();
 
-    public List<String> getLiteralSet();
+	public Set<String> getIndividualSet();
 
-    public List<String> getObjectPropertySet();
+	public Set<String> getLiteralSet();
 
-    public List<String> getPropertySet();
+	public Set<String> getObjectPropertySet();
 
-    public List<String> getRDFVocabulary();
+	public Set<String> getPropertySet();
 
-    public boolean isInClassSet(String classUri);
+	public Set<String> getRDFVocabulary();
 
-    public boolean isInDatatypePropertySet(String dpUri);
+	public boolean isInClassSet(String classUri);
 
-    public boolean isIndexed();
+	public boolean isInDatatypePropertySet(String dpUri);
 
-    public boolean isInIndividualSet(String indUri);
+	public boolean isIndexed();
 
-    public boolean isInLiteralSet(String lit);
+	public boolean isInIndividualSet(String indUri);
 
-    public boolean isInObjectPropertySet(String opUri);
+	public boolean isInLiteralSet(String lit);
 
-    public boolean isInPropertySet(String propertyUri);
+	public boolean isInObjectPropertySet(String opUri);
 
-    public boolean isInRDFVocabulary(String rdfEntity);
+	public boolean isInPropertySet(String propertyUri);
 
-    public Object runAskQuery();
+	public boolean isInRDFVocabulary(String rdfEntity);
 
-    public Object runSelectQuery();
+	public Object runAskQuery();
 
-    public void setClassSet(List<String> classSet);
+	public Object runSelectQuery();
 
-    public void setDatatypePropertySet(List<String> dpSet);
+	public void setClassSet(Set<String> classSet);
 
-    public void setGraph(Object path);
+	public void setDatatypePropertySet(Set<String> dpSet);
 
-    public void setIndividualSet(List<String> indSet);
+	public void setGraph(Object path);
 
-    public void setLiteralSet(List<String> litSet);
+	public void setIndividualSet(Set<String> indSet);
 
-    public void setObjectPropertySet(List<String> opSet);
+	public void setLiteralSet(Set<String> litSet);
 
-    public void setPath(Object path);
+	public void setObjectPropertySet(Set<String> opSet);
 
-    public void setPropertySet(List<String> propSet);
+	public void setPath(Object path);
 
-    public void setRDFVocabulary(List<String> rdfSet);
+	public void setRDFVocabulary(Set<String> rdfSet);
 
 }

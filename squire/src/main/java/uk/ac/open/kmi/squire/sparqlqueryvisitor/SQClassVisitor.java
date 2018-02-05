@@ -5,8 +5,8 @@
  */
 package uk.ac.open.kmi.squire.sparqlqueryvisitor;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
@@ -38,124 +38,126 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  */
 public class SQClassVisitor extends ElementVisitorBase {
 
-    private IRDFDataset d;
-    private List<String> datasetClassSet;
+	private IRDFDataset d;
+	private Collection<String> datasetClassSet;
 
-    private Set<String> queryClassSet = new HashSet<String>();
+	private Set<String> queryClassSet = new HashSet<String>();
 
-    public SQClassVisitor(IRDFDataset d1) {
-        if (d1 == null) {
-            throw new IllegalStateException("[SQClassVisitor]The IRDFDataset d1 is null!!");
-        }
-        this.d = d1;
-        this.datasetClassSet = d1.getClassSet();
-    }
+	public SQClassVisitor(IRDFDataset d1) {
+		if (d1 == null) {
+			throw new IllegalStateException("[SQClassVisitor]The IRDFDataset d1 is null!!");
+		}
+		this.d = d1;
+		this.datasetClassSet = d1.getClassSet();
+	}
 
-    @Override
-    public void visit(ElementPathBlock el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementPathBlock el)] ");
-        if (el == null) {
-            throw new IllegalStateException("[SQClassVisitor::visit(ElementPathBlock el)] The ElementPathBlock is null!!");
-        }
-        ListIterator<TriplePath> it = el.getPattern().iterator();
-        while (it.hasNext()) {
-            final TriplePath tp = it.next();
-            //System.out.println("The triple ==> " + tp.toString());
-            Node subject = tp.getSubject();
-            // SUBJECT            
-            if (subject.isURI()) {
-                if (this.datasetClassSet.contains(subject.getURI())) {
-                    this.queryClassSet.add(subject.getURI());
-                }
-            }
-            // OBJECT
-            Node object = tp.getObject();
-            if (object.isURI()) {
-                if (this.datasetClassSet.contains(object.getURI())) {
-                    this.queryClassSet.add(object.getURI());
-                }
-            }
-        }
-    }
+	@Override
+	public void visit(ElementPathBlock el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementPathBlock el)] ");
+		if (el == null) {
+			throw new IllegalStateException(
+					"[SQClassVisitor::visit(ElementPathBlock el)] The ElementPathBlock is null!!");
+		}
+		ListIterator<TriplePath> it = el.getPattern().iterator();
+		while (it.hasNext()) {
+			final TriplePath tp = it.next();
+			// System.out.println("The triple ==> " + tp.toString());
+			Node subject = tp.getSubject();
+			// SUBJECT
+			if (subject.isURI()) {
+				if (this.datasetClassSet.contains(subject.getURI())) {
+					this.queryClassSet.add(subject.getURI());
+				}
+			}
+			// OBJECT
+			Node object = tp.getObject();
+			if (object.isURI()) {
+				if (this.datasetClassSet.contains(object.getURI())) {
+					this.queryClassSet.add(object.getURI());
+				}
+			}
+		}
+	}
 
-    @Override
-    public void visit(ElementAssign el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementAssign el))] ");
+	@Override
+	public void visit(ElementAssign el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementAssign el))] ");
 
-    }
+	}
 
-    @Override
-    public void visit(ElementBind el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementBind el)] ");
+	@Override
+	public void visit(ElementBind el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementBind el)] ");
 
-    }
+	}
 
-    @Override
-    public void visit(ElementSubQuery el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementSubQuery el)] ");
-    }
+	@Override
+	public void visit(ElementSubQuery el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementSubQuery el)] ");
+	}
 
-    public Set<String> getQueryClassSet() {
-        return queryClassSet;
-    }
+	public Set<String> getQueryClassSet() {
+		return queryClassSet;
+	}
 
-    @Override
-    public void visit(ElementService el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementService el)] ");
-    }
+	@Override
+	public void visit(ElementService el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementService el)] ");
+	}
 
-    @Override
-    public void visit(ElementMinus el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementMinus el)] ");
-    }
+	@Override
+	public void visit(ElementMinus el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementMinus el)] ");
+	}
 
-    @Override
-    public void visit(ElementNotExists el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementNotExists el)] ");
-    }
+	@Override
+	public void visit(ElementNotExists el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementNotExists el)] ");
+	}
 
-    @Override
-    public void visit(ElementExists el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementExists el)] ");
-    }
+	@Override
+	public void visit(ElementExists el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementExists el)] ");
+	}
 
-    @Override
-    public void visit(ElementNamedGraph el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementNamedGraph el)] ");
-    }
+	@Override
+	public void visit(ElementNamedGraph el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementNamedGraph el)] ");
+	}
 
-    @Override
-    public void visit(ElementGroup el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementGroup el)] ");
-    }
+	@Override
+	public void visit(ElementGroup el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementGroup el)] ");
+	}
 
-    @Override
-    public void visit(ElementOptional el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementOptional el)] ");
-    }
+	@Override
+	public void visit(ElementOptional el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementOptional el)] ");
+	}
 
-    @Override
-    public void visit(ElementDataset el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementDataset el)] ");
-    }
+	@Override
+	public void visit(ElementDataset el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementDataset el)] ");
+	}
 
-    @Override
-    public void visit(ElementUnion el) {
-    }
+	@Override
+	public void visit(ElementUnion el) {
+	}
 
-    @Override
-    public void visit(ElementData el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementData el)] ");
-    }
+	@Override
+	public void visit(ElementData el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementData el)] ");
+	}
 
-    @Override
-    public void visit(ElementFilter el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementFilter el)] ");
-    }
+	@Override
+	public void visit(ElementFilter el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementFilter el)] ");
+	}
 
-    @Override
-    public void visit(ElementTriplesBlock el) {
-//        System.out.println("[SQInstantiationVisitor::visit(ElementTriplesBlock el)] ");
-    }
+	@Override
+	public void visit(ElementTriplesBlock el) {
+		// System.out.println("[SQInstantiationVisitor::visit(ElementTriplesBlock el)]
+		// ");
+	}
 
 }

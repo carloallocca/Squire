@@ -65,8 +65,8 @@ public class QueryRecommendatorFormTest {
 			float resultSizeSimilarityDegree = 3;
 			float querySpecificityDistanceDegree = 1;
 
-			IRDFDataset d1 = new SparqlIndexedDataset(urlAddress1, "");
-			IRDFDataset d2 = new SparqlIndexedDataset(urlAddress2, "");
+			IRDFDataset d1 = new SparqlIndexedDataset(urlAddress1);
+			IRDFDataset d2 = new SparqlIndexedDataset(urlAddress2);
 
 			QueryRecommendatorForm instance = new QueryRecommendatorForm(qString, d1, d2, resultTypeSimilarityDegree,
 					queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree);

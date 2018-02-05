@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -24,7 +22,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TermQuery;
@@ -34,6 +32,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockObtainFailedException;
 import org.apache.lucene.util.Version;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -46,151 +45,51 @@ public class RDFDatasetIndexer {
 	private static RDFDatasetIndexer me;
 
 	public static RDFDatasetIndexer getInstance() {
-		if (me == null)
-			me = new RDFDatasetIndexer();
+		if (me == null) me = new RDFDatasetIndexer();
 		return me;
 	}
 
-	private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	private final Version version = Version.LUCENE_5_4_0;
+	private final Version version = Version.LUCENE_5_5_5;
 
 	private String datasetIndexDir;
 
 	private RDFDatasetIndexer() {
+		log.debug("Setting up new Lucene {} indexer", this.version);
 		File file = new File("RDFDatasetIndex");
 		this.datasetIndexDir = file.getAbsoluteFile().getAbsolutePath();
 		log.debug("Using index at directory {}", datasetIndexDir);
 		createIndex();
 	}
 
-	private boolean alreadyExists(String urlAddress, String graphName) {
-		try {
-			if (null != graphName && !graphName.isEmpty()) {
-				Path path = Paths.get(this.datasetIndexDir);
-				Directory index1 = FSDirectory.open(path);
-				IndexReader reader = DirectoryReader.open(index1);
-				IndexSearcher searcher = new IndexSearcher(reader);
-				BooleanQuery query = new BooleanQuery();
-				query.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
-				query.add(new TermQuery(new Term("GraphName", graphName)), BooleanClause.Occur.MUST);
-				TopDocs results = searcher.search(query, 1);
-				return results.totalHits > 0;
-			} else {
-				Path path = Paths.get(this.datasetIndexDir);
-				Directory index1 = FSDirectory.open(path);
-				IndexReader reader = DirectoryReader.open(index1);
-				IndexSearcher searcher = new IndexSearcher(reader);
-				BooleanQuery query = new BooleanQuery();
-				query.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
-				TopDocs results = searcher.search(query, 1);
-				return results.totalHits > 0;
-			}
-		} catch (IOException ex) {
-			Logger.getLogger(RDFDatasetIndexer.class.getName()).log(Level.SEVERE, null, ex);
-		}
-		return false;
-	}
-
-	private void createIndex() {
-		// Analyzer analyzer = new StopAnalyzer();
-		Analyzer analyzer = new StandardAnalyzer();
-		Directory index = null;
-		try {
-			Path path = Paths.get(this.datasetIndexDir);
-			index = FSDirectory.open(path); // getDirectory(this.datasetIndexDir);
-			// IndexWriterConfig config = new
-			// IndexWriterConfig(analyzer);//.setOpenMode(OpenMode.CREATE_OR_APPEND);
-			IndexWriterConfig config = new IndexWriterConfig(null);// .setOpenMode(OpenMode.CREATE_OR_APPEND);
-			/*
-			 * IndexWriterConfig.OpenMode.CREATE_OR_APPEND if used IndexWriter will create a
-			 * new index if there is not already an index at the provided path and otherwise
-			 * open the existing index.
-			 */
-			config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-			IndexWriter indexWriter = new IndexWriter(index, config);
-			indexWriter.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	// public SPARQLEndPoint getSignature(String urlAddress, String graphName){
 	public Document getSignature(String urlAddress, String graphName) {
-		// SPARQLEndPoint output= new SPARQLEndPoint(urlAddress, graphName);
+		Builder queryBuilder = new Builder();
 		try {
-			if (null != graphName && !graphName.isEmpty()) {
-
-				// if(this.alreadyExists(urlAddress, graphName)){
-				// log.info("sparql endpoint:" +urlAddress);
-				// }
-				//
-
-				Path path = Paths.get(this.datasetIndexDir);
-				Directory index1 = FSDirectory.open(path);
-				IndexReader reader = DirectoryReader.open(index1);
-				IndexSearcher searcher = new IndexSearcher(reader);
-				// ..prepare the query
-				BooleanQuery query = new BooleanQuery();
-				query.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
-				query.add(new TermQuery(new Term("GraphName", graphName)), BooleanClause.Occur.MUST);
-				// ..find the docs by executing the query
-				int hitsPerPage = 1;
-				TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
-				searcher.search(query, collector);
-				ScoreDoc[] hits = collector.topDocs().scoreDocs;
-				if (hits.length > 0) {
-					// ..retrieve the related doc
-					int docId = hits[0].doc;
-					Document d = searcher.doc(docId);
-					return d;
-				} else {
-					return null;
-				}
-			} else {
-				Path path = Paths.get(this.datasetIndexDir);
-				Directory index1 = FSDirectory.open(path);
-				IndexReader reader = DirectoryReader.open(index1);
-				IndexSearcher searcher = new IndexSearcher(reader);
-				// ..prepare the query
-				BooleanQuery query = new BooleanQuery();
-				query.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
-				// ..find the docs by executing the query
-				int hitsPerPage = 1;
-				TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage);
-				searcher.search(query, collector);
-				ScoreDoc[] hits = collector.topDocs().scoreDocs;
-				if (hits.length > 0) {
-					// ..retrieve the related doc
-					int docId = hits[0].doc;
-					Document d = searcher.doc(docId);
-					return d;
-				} else {
-					return null;
-				}
-			}
+			IndexReader reader = DirectoryReader.open(getIndex());
+			IndexSearcher searcher = new IndexSearcher(reader);
+			queryBuilder.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
+			if (null != graphName && !graphName.isEmpty())
+				queryBuilder.add(new TermQuery(new Term("GraphName", graphName)), BooleanClause.Occur.MUST);
+			TopScoreDocCollector collector = TopScoreDocCollector.create(1);
+			searcher.search(queryBuilder.build(), collector);
+			ScoreDoc[] hits = collector.topDocs().scoreDocs;
+			if (hits.length > 0) return searcher.doc(hits[0].doc);
 		} catch (IOException ex) {
-			Logger.getLogger(RDFDatasetIndexer.class.getName()).log(Level.SEVERE, null, ex);
+			log.error("Exception occurred while trying to access index.", ex);
 		}
 		return null;
 	}
 
-	// Add a new SPARQL EndPoint to the index
 	public Document indexSignature(String urlAddress, String graphName, Collection<String> classSet,
 			Collection<String> objectPropertySet, Collection<String> datatypePropertySet,
-			Collection<String> individualSet, Collection<String> literalSet, Collection<String> rdfVocabulary,
-			Collection<String> propertySet) {
+			Collection<String> individualSet, Collection<String> literalSet, Collection<String> rdfVocabulary) {
 
 		// Analyzer analyzer = new WhitespaceAnalyzer();
 		Analyzer analyzer = new StandardAnalyzer();
-		Directory index = null;
 
 		try {
 			if (!(alreadyExists(urlAddress, graphName))) {
-
-				Path path = Paths.get(this.datasetIndexDir);
-				index = FSDirectory.open(path); // getDirectory(this.datasetIndexDir);
 				IndexWriterConfig config = new IndexWriterConfig(analyzer);// .setOpenMode(OpenMode.CREATE_OR_APPEND);
 				/*
 				 * IndexWriterConfig.OpenMode.CREATE_OR_APPEND if used IndexWriter will create a
@@ -198,7 +97,7 @@ public class RDFDatasetIndexer {
 				 * open the existing index.
 				 */
 				config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-				IndexWriter indexWriter = new IndexWriter(index, config);
+				IndexWriter indexWriter = new IndexWriter(getIndex(), config);
 
 				Document doc = new Document();
 				// index the SPARQL endpoint
@@ -223,27 +122,15 @@ public class RDFDatasetIndexer {
 				// StringField propSet = new StringField("PropertySet", propertySet.toString(),
 				// Field.Store.NO);
 
-				Field url = new Field("URL", urlAddress, Field.Store.YES, Field.Index.NOT_ANALYZED);
-				Field gName = new Field("GraphName", graphName, Field.Store.YES, Field.Index.NOT_ANALYZED);
-				Field cSet = new Field("ClassSet", classSet.toString(), Field.Store.YES, Field.Index.NO);
-				Field oPropSet = new Field("ObjectPropertySet", objectPropertySet.toString(), Field.Store.YES,
-						Field.Index.NO);
-				Field dPropertySet = new Field("DatatypePropertySet", datatypePropertySet.toString(), Field.Store.YES,
-						Field.Index.NO);
-				Field litSet = new Field("LiteralSet", literalSet.toString(), Field.Store.YES, Field.Index.NO);
-				Field indSet = new Field("IndividualSet", individualSet.toString(), Field.Store.YES, Field.Index.NO);
-				Field rdfVoc = new Field("RDFVocabulary", rdfVocabulary.toString(), Field.Store.YES, Field.Index.NO);
-				Field propSet = new Field("PropertySet", propertySet.toString(), Field.Store.YES, Field.Index.NO);
-
-				doc.add(url);
-				doc.add(gName);
-				doc.add(cSet);
-				doc.add(oPropSet);
-				doc.add(dPropertySet);
-				doc.add(litSet);
-				doc.add(indSet);
-				doc.add(rdfVoc);
-				doc.add(propSet);
+				doc.add(new Field("URL", urlAddress, Field.Store.YES, Field.Index.NOT_ANALYZED));
+				doc.add(new Field("GraphName", graphName, Field.Store.YES, Field.Index.NOT_ANALYZED));
+				doc.add(new Field("ClassSet", classSet.toString(), Field.Store.YES, Field.Index.NO));
+				doc.add(new Field("ObjectPropertySet", objectPropertySet.toString(), Field.Store.YES, Field.Index.NO));
+				doc.add(new Field("DatatypePropertySet", datatypePropertySet.toString(), Field.Store.YES,
+						Field.Index.NO));
+				doc.add(new Field("LiteralSet", literalSet.toString(), Field.Store.YES, Field.Index.NO));
+				doc.add(new Field("IndividualSet", individualSet.toString(), Field.Store.YES, Field.Index.NO));
+				doc.add(new Field("RDFVocabulary", rdfVocabulary.toString(), Field.Store.YES, Field.Index.NO));
 
 				indexWriter.addDocument(doc);
 				// indexWriter.optimize();
@@ -270,6 +157,64 @@ public class RDFDatasetIndexer {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	// Add a new SPARQL EndPoint to the index
+	public Document indexSignature(String urlAddress, String graphName, Collection<String> classSet,
+			Collection<String> objectPropertySet, Collection<String> datatypePropertySet,
+			Collection<String> individualSet, Collection<String> literalSet, Collection<String> rdfVocabulary,
+			Collection<String> propertySet) {
+		Document res = indexSignature(urlAddress, graphName, classSet, objectPropertySet, datatypePropertySet,
+				individualSet, literalSet, rdfVocabulary);
+		if (res != null) res.add(new Field("PropertySet", propertySet.toString(), Field.Store.YES, Field.Index.NO));
+		return res;
+	}
+
+	private boolean alreadyExists(String urlAddress, String graphName) {
+		Builder queryBuilder = new Builder();
+		TopDocs results;
+		try {
+			IndexReader reader = DirectoryReader.open(getIndex());
+			IndexSearcher searcher = new IndexSearcher(reader);
+			// Prepare the query
+			queryBuilder.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
+			if (null != graphName && !graphName.isEmpty())
+				queryBuilder.add(new TermQuery(new Term("GraphName", graphName)), BooleanClause.Occur.MUST);
+			results = searcher.search(queryBuilder.build(), 1);
+		} catch (IOException ex) {
+			log.error("Exception occurred while trying to access index.", ex);
+			return false;
+		}
+		return results.totalHits > 0;
+	}
+
+	private void createIndex() {
+		// Analyzer analyzer = new StopAnalyzer();
+		Analyzer analyzer = new StandardAnalyzer();
+		Directory index = null;
+		try {
+			Path path = Paths.get(this.datasetIndexDir);
+			index = FSDirectory.open(path); // getDirectory(this.datasetIndexDir);
+			// IndexWriterConfig config = new
+			// IndexWriterConfig(analyzer);//.setOpenMode(OpenMode.CREATE_OR_APPEND);
+			IndexWriterConfig config = new IndexWriterConfig(null);// .setOpenMode(OpenMode.CREATE_OR_APPEND);
+			/*
+			 * IndexWriterConfig.OpenMode.CREATE_OR_APPEND if used IndexWriter will create a
+			 * new index if there is not already an index at the provided path and otherwise
+			 * open the existing index.
+			 */
+			config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
+			IndexWriter indexWriter = new IndexWriter(index, config);
+			indexWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private Directory getIndex() throws IOException {
+		Path path = Paths.get(this.datasetIndexDir);
+		return FSDirectory.open(path);
 	}
 
 }
