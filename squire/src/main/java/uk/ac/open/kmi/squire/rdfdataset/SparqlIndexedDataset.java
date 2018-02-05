@@ -220,7 +220,14 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 
 	@Override
 	public Set<String> getPropertySet() {
+		if (this.propertySet.isEmpty()) return super.getPropertySet();
 		return this.propertySet;
+	}
+
+	@Override
+	public boolean isInPropertySet(String propertyUri) {
+		if (this.propertySet.contains(propertyUri)) return true;
+		return super.isInPropertySet(propertyUri);
 	}
 
 	@Override
