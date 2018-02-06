@@ -53,6 +53,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 
 	private String endpointURL; // set the path of the RDF dataset. e.g SPARQL endpoint url, or FilePath.
 	private String graphName;
+	private boolean replacing = false;
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -64,17 +65,36 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	protected Set<String> propertySet = new HashSet<>();
 
 	public SparqlIndexedDataset(String urlAddress) throws IOException, LockObtainFailedException {
-		this(urlAddress, "");
+		this(urlAddress, "", false);
 	}
 
-	public SparqlIndexedDataset(String urlAddress, String gName) throws IOException, LockObtainFailedException {
-		this.graphName = gName;
+	public SparqlIndexedDataset(String urlAddress, boolean replacing) throws IOException, LockObtainFailedException {
+		this(urlAddress, "", replacing);
+	}
+
+	public SparqlIndexedDataset(String urlAddress, String graphName) throws IOException, LockObtainFailedException {
+		this(urlAddress, graphName, false);
+	}
+
+	public SparqlIndexedDataset(String urlAddress, String graphName, boolean replacing)
+			throws IOException, LockObtainFailedException {
+		this.graphName = graphName;
 		this.endpointURL = urlAddress;
+		this.replacing = replacing;
 		// on 03/04/2017, this is what I have added to make it working again
 		// createSPARQLEndPoint();
 		RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 		this.signatureDoc = instance.getSignature(this.endpointURL, this.graphName);
 		load();
+	}
+
+	@Override
+	public void clear() {
+		/*
+		 * This variant also clears its separate property set.
+		 */
+		super.clear();
+		this.propertySet.clear();
 	}
 
 	@Override
@@ -183,7 +203,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 */
 		// No exclusions, creates excessively long queries
 		try {
-			iterativeComputation(qS.toString(), getPropertySet(), 50, 0, null);
+			iterativeComputation(qS.toString(), this.propertySet, 50, 0, null);
 		} catch (BootedException e) {
 			log.error("We were kicked out immediately while trying to compute properties."
 					+ " Have no fallback strategy for that.");
@@ -225,16 +245,14 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	}
 
 	@Override
-	public boolean isInPropertySet(String propertyUri) {
-		if (this.propertySet.contains(propertyUri)) return true;
-		return super.isInPropertySet(propertyUri);
+	public boolean isIndexed() {
+		return this.signatureDoc != null;
 	}
 
 	@Override
-	public boolean isIndexed() {
-		RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
-		Document d = instance.getSignature(this.endpointURL, this.graphName);
-		return d != null;
+	public boolean isInPropertySet(String propertyUri) {
+		if (this.propertySet.contains(propertyUri)) return true;
+		return super.isInPropertySet(propertyUri);
 	}
 
 	@Override
@@ -242,7 +260,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		System.out.println("[SPARQLEndPoint:run()] run is in execution....");
 		try {
 			if (!isIndexed()) {
-				createSPARQLEndPoint();
+				createSPARQLEndPoint(this.replacing);
 			}
 		} catch (Exception ex) {
 			if (ex instanceof ClosedByInterruptException) {
@@ -252,16 +270,6 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 						+ " - doing nothing with it.", ex);
 			}
 		}
-	}
-
-	@Override
-	public Object runAskQuery() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public Object runSelectQuery() {
-		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	public void setEndpointURL(String endpointURL) {
@@ -283,7 +291,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		// choose Tools | Templates.
 	}
 
-	private void createSPARQLEndPoint() throws IOException, LockObtainFailedException {
+	private void createSPARQLEndPoint(boolean overwrite) throws IOException, LockObtainFailedException {
 		// Document d = this.signatureDoc;
 		// if (d != null) {
 		// String cSet = d.get("ClassSet");
@@ -310,28 +318,29 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			} catch (BootedException e) {
 				computePropertySet();
 			}
-
 			computeRDFVocabularySet();
-			this.signatureDoc = RDFDatasetIndexer.getInstance().indexSignature(this.endpointURL, graphName,
-					this.classSet, this.objectPropertySet, this.datatypePropertySet, this.individualSet,
-					this.literalSet, this.rdfVocabulary);
-
+			// XXX Ugly call.
+			this.signatureDoc = RDFDatasetIndexer.getInstance().indexSignature(this.endpointURL, graphName, this,
+					overwrite);
 		}
 	}
 
-	private ArrayList<String> parseSparqlResultsJson(String result, String varString) {
+	private Set<String> loadSingle(String field) {
+		String val = signatureDoc.get(field);
+		return val == null ? new HashSet<>() : StringUtils.commaSeparated2List(val);
+	}
 
-		ArrayList<String> output = new ArrayList<>();
+	private List<String> parseSparqlResultsJson(String result, String varString) {
+		List<String> output = new ArrayList<>();
 		JsonParser jsonParser = new JsonParser();
 		JsonArray results = jsonParser.parse(result).getAsJsonObject().get("results").getAsJsonObject()
 				.getAsJsonArray("bindings");
 		for (JsonElement result1 : results) {
-			JsonObject _class = result1.getAsJsonObject().getAsJsonObject(varString);
-			String value = _class.get("value").getAsString();
+			JsonObject jClazz = result1.getAsJsonObject().getAsJsonObject(varString);
+			String value = jClazz.get("value").getAsString();
 			try {
-				URI valueURI = new URI(value);
+				new URI(value); // To test the syntax
 				output.add(value);
-				// System.out.println(valueURI);
 			} catch (URISyntaxException ex) {
 				log.error("Bad URI synax for string '{}'", value);
 			}
@@ -348,7 +357,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	 * @param exclusions
 	 *            if NULL, the method will do pure pagination
 	 */
-	protected void iterativeComputation(final String partialQuery, final Set<String> resourceSet, int stepLength,
+	protected void iterativeComputation(final String partialQuery, final Set<String> tgtResourceSet, int stepLength,
 			int iteration, Set<Property> exclusions) throws BootedException {
 		long before = System.currentTimeMillis();
 		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
@@ -413,19 +422,19 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			 * wrong with the order in which results are given, therefore one should sort
 			 * but it's costly).
 			 */
-			if (itemList.isEmpty() || resourceSet.containsAll(itemList)) {
+			if (itemList.isEmpty() || tgtResourceSet.containsAll(itemList)) {
 				if (!itemList.isEmpty())
 					log.debug("All {} RDF resources already present, closing loop.", itemList.size());
-				log.info("DONE. {} total resources indexed.", resourceSet.size());
+				log.info("DONE. {} total resources indexed.", tgtResourceSet.size());
 			} else {
-				resourceSet.addAll(itemList);
-				log.info(" ... {} resources indexed so far (last {} in {} ms)", resourceSet.size(), itemList.size(),
+				tgtResourceSet.addAll(itemList);
+				log.info(" ... {} resources indexed so far (last {} in {} ms)", tgtResourceSet.size(), itemList.size(),
 						(System.currentTimeMillis() - before));
 				if (stepLength == itemList.size()) {
 					if (exclusions != null) for (String op : itemList)
 						exclusions.add(ResourceFactory.createProperty(op));
-					iterativeComputation(partialQuery, resourceSet, stepLength, iteration + 1, exclusions);
-				} else log.info("DONE. {} total resources indexed for this category.", resourceSet.size());
+					iterativeComputation(partialQuery, tgtResourceSet, stepLength, iteration + 1, exclusions);
+				} else log.info("DONE. {} total resources indexed for this category.", tgtResourceSet.size());
 			}
 
 		} catch (ClientProtocolException e) {
@@ -437,18 +446,13 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 
 	protected void load() {
 		if (signatureDoc != null) {
-			String cSet = signatureDoc.get("ClassSet");
-			this.classSet = StringUtils.commaSeparated2List(cSet);
-			String oPropSet = signatureDoc.get("ObjectPropertySet");
-			this.objectPropertySet = StringUtils.commaSeparated2List(oPropSet);
-			String dPropertySet = signatureDoc.get("DatatypePropertySet");
-			this.datatypePropertySet = StringUtils.commaSeparated2List(dPropertySet);
-			String litSet = signatureDoc.get("LiteralSet");
-			this.literalSet = StringUtils.commaSeparated2List(litSet);
-			String indSet = signatureDoc.get("IndividualSet");
-			this.individualSet = StringUtils.commaSeparated2List(indSet);
-			String rdfVoc = signatureDoc.get("RDFVocabulary");
-			this.rdfVocabulary = StringUtils.commaSeparated2List(rdfVoc);
+			this.classSet = loadSingle("ClassSet");
+			this.objectPropertySet = loadSingle("ObjectPropertySet");
+			this.datatypePropertySet = loadSingle("DatatypePropertySet");
+			this.literalSet = loadSingle("LiteralSet");
+			this.individualSet = loadSingle("IndividualSet");
+			this.rdfVocabulary = loadSingle("RDFVocabulary");
+			this.propertySet = loadSingle("PropertySet");
 		}
 	}
 

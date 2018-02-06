@@ -39,8 +39,10 @@ public class StringUtils {
 			String[] sSplit = s.substring(1, s.length() - 1).split(",");
 			// Shit needs trimming...
 			Set<String> cleaned = new HashSet<>();
-			for (int i = 0; i < sSplit.length; i++)
-				cleaned.add(sSplit[i].trim());
+			for (int i = 0; i < sSplit.length; i++) {
+				String sc = sSplit[i].trim();
+				if (!sc.isEmpty()) cleaned.add(sc);
+			}
 			return cleaned;
 			// Would use if I could trust it was clean:
 			// return new HashSet<>(Arrays.asList(sSplit));

@@ -85,9 +85,7 @@ public class RDFDatasetIndexerTest {
 
 				log.debug("Indexing signature...");
 				RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
-				instance.indexSignature(url.toString(), "", endpoint.getClassSet(), endpoint.getObjectPropertySet(),
-						endpoint.getDatatypePropertySet(), endpoint.getIndividualSet(), endpoint.getLiteralSet(),
-						endpoint.getRDFVocabulary(), endpoint.getPropertySet());
+				instance.indexSignature(url.toString(), "", endpoint, endpoint.getPropertySet(), false);
 				log.info("<== DONE");
 			} else log.info(" ... already indexed (classes={};OPs={};DPs={}). Skipping.", endpoint.getClassSet().size(),
 					endpoint.getObjectPropertySet().size(), endpoint.getDatatypePropertySet().size());

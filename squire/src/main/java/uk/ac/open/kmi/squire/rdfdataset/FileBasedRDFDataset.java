@@ -7,6 +7,7 @@ package uk.ac.open.kmi.squire.rdfdataset;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.jena.graph.Node;
@@ -28,115 +29,83 @@ import org.slf4j.LoggerFactory;
  */
 public class FileBasedRDFDataset extends AbstractRdfDataset {
 
-	private Object datasetPath; // set the path of the RDF dataset. e.g SPARQL endpoint url, or FilePath.
+	/**
+	 * set the path of the RDF dataset. e.g SPARQL endpoint url, or FilePath.
+	 */
+	private Object datasetPath;
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private OntModel inf = null;
 
 	public FileBasedRDFDataset(String rdfDatasetFilePath) {
-
+		InputStream in = null;
 		try {
+			in = new FileInputStream(rdfDatasetFilePath);
 			this.datasetPath = rdfDatasetFilePath;
-			// create a Jena memory based model
 			this.inf = ModelFactory.createOntologyModel();
-			InputStream in = new FileInputStream(rdfDatasetFilePath);
-			if (in == null) {
-				throw new IllegalArgumentException("File: " + rdfDatasetFilePath + " not found");
-			}
 			// ...import the content of the owl file in the Jena model.
 			inf.read(in, "");
 
-			// ...compute the set of classes
-			// this.classSet = computeClassSet();
+			// Do computations
 			computeClassSet();
-
-			// ...compute the set of individuals
-			// this.individualSet = computeIndividualSet();
-			computeIndividualSet();
-
-			// ...compute the set of object Property Set
-			// this.objectPropertySet = computeObjectPropertySet();
 			computeObjectPropertySet();
-
-			// ...compute the set of datatype Property Set
-			// this.datatypePropertySet = computeDataTypePropertySet();
 			computeDataTypePropertySet();
-
-			// ...compute the set of literals Set
-			// this.literalSet = computeLiteralSet();
+			computeIndividualSet();
 			computeLiteralSet();
-
-			// ...compute the set of rdf Vocabulary terms
-			// this.rdfVocabulary = computeRDFVocabularySet();
+			computePropertySet();
 			computeRDFVocabularySet();
-
-			// ...compute the set of rdf Vocabulary terms
-			// this.propertySet = computePropertySetSet();
-			computePropertySetSet();
-
-		} catch (FileNotFoundException ex) {
-			log.error("", ex);
-		}
-
-	}
-
-	public void computeClassSet() {
-		ExtendedIterator<OntClass> classesIter = this.inf.listClasses();
-		for (ExtendedIterator c = classesIter; c.hasNext();) {
-			OntClass classe = (OntClass) c.next();
-			this.classSet.add(classe.getURI());
-		}
-
-	}
-
-	public void computeDataTypePropertySet() {
-		ExtendedIterator<DatatypeProperty> datatypePropertyIter = this.inf.listDatatypeProperties();
-		for (ExtendedIterator datatypeP = datatypePropertyIter; datatypeP.hasNext();) {
-			DatatypeProperty datatypeProperty = (DatatypeProperty) datatypePropertyIter.next();
-			this.datatypePropertySet.add(datatypeProperty.getURI());
-		}
-	}
-
-	public void computeIndividualSet() {
-		ExtendedIterator<Individual> individualIter = this.inf.listIndividuals();
-		for (ExtendedIterator ind = individualIter; ind.hasNext();) {
-			Individual individuo = (Individual) ind.next();
-			this.individualSet.add(individuo.getURI());
-		}
-	}
-
-	public void computeLiteralSet() {
-		StmtIterator it = this.inf.listStatements();
-		while (it.hasNext()) {
-			Triple stmt = it.next().asTriple();
-			Node subj = stmt.getSubject();
-			Node obj = stmt.getObject();
-
-			if (subj.isLiteral()) {
-				this.literalSet.add(subj.getLiteralLexicalForm());
-
+		} catch (FileNotFoundException e) {
+			log.error("File not found: {}", rdfDatasetFilePath);
+		} finally {
+			try {
+				if (in != null) in.close();
+			} catch (IOException e) {
+				log.error("Failed to close stream after reading. Reason follows.", e);
 			}
-			if (obj.isLiteral()) {
-				this.literalSet.add(obj.getLiteralLexicalForm());
-
-			}
-		}
-	}
-
-	public void computeObjectPropertySet() {
-		ExtendedIterator<ObjectProperty> objPropertyIter = this.inf.listObjectProperties();
-		for (ExtendedIterator objP = objPropertyIter; objP.hasNext();) {
-			ObjectProperty objProperty = (ObjectProperty) objPropertyIter.next();
-			this.objectPropertySet.add(objProperty.getURI());
 		}
 	}
 
 	@Override
-	public void computePropertySet() {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
+	public void computeClassSet() {
+		for (ExtendedIterator<OntClass> it = this.inf.listClasses(); it.hasNext();)
+			this.classSet.add(it.next().getURI());
 	}
 
+	@Override
+	public void computeDataTypePropertySet() {
+		for (ExtendedIterator<DatatypeProperty> it = this.inf.listDatatypeProperties(); it.hasNext();)
+			this.datatypePropertySet.add(it.next().getURI());
+	}
+
+	@Override
+	public void computeIndividualSet() {
+		for (ExtendedIterator<Individual> it = this.inf.listIndividuals(); it.hasNext();)
+			this.individualSet.add(it.next().getURI());
+	}
+
+	@Override
+	public void computeLiteralSet() {
+		for (StmtIterator it = this.inf.listStatements(); it.hasNext();) {
+			Triple stmt = it.next().asTriple();
+			// Subjects cannot be literals
+			Node obj = stmt.getObject();
+			if (obj.isLiteral()) this.literalSet.add(obj.getLiteralLexicalForm());
+		}
+	}
+
+	@Override
+	public void computeObjectPropertySet() {
+		for (ExtendedIterator<ObjectProperty> it = this.inf.listObjectProperties(); it.hasNext();)
+			this.objectPropertySet.add(it.next().getURI());
+	}
+
+	@Override
+	public void computePropertySet() {
+		log.warn("Got request to compute general property set. This is unsupported"
+				+ " as right now it is the sum of data properties and object proeprties.");
+	}
+
+	@Override
 	public void computeRDFVocabularySet() {
 		StmtIterator it = this.inf.listStatements();
 		while (it.hasNext()) {
@@ -173,55 +142,32 @@ public class FileBasedRDFDataset extends AbstractRdfDataset {
 
 	@Override
 	public Object getEndPointURL() {
-		return this.datasetPath;// throw new UnsupportedOperationException("Not supported yet."); //To change
-								// body of generated methods, choose Tools | Templates.
+		return this.datasetPath;
 	}
 
 	@Override
 	public Object getGraph() {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public boolean isIndexed() {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public void run() {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
-	}
-
-	@Override
-	public Object runAskQuery() {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
-	}
-
-	@Override
-	public Object runSelectQuery() {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
+		throw new UnsupportedOperationException("This class is not associated to a process.");
 	}
 
 	@Override
 	public void setGraph(Object path) {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public void setPath(Object path) {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
-																		// choose Tools | Templates.
-	}
-
-	private void computePropertySetSet() {
-		log.warn("Got request to compute general property set. This is unsupported"
-				+ " as right now it is the sum of data proeprties and object proeprties.");
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 }

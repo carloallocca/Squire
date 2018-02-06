@@ -48,7 +48,7 @@ public class IndexingTask {
 			log.info("Inspecting endpoint <{}>", url);
 			SparqlIndexedDataset indexed;
 			try {
-				indexed = new SparqlIndexedDataset(url);
+				indexed = new SparqlIndexedDataset(url, force);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -86,9 +86,7 @@ public class IndexingTask {
 
 			log.debug("Indexing signature...");
 			RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
-			instance.indexSignature(url.toString(), "", indexed.getClassSet(), indexed.getObjectPropertySet(),
-					indexed.getDatatypePropertySet(), indexed.getIndividualSet(), indexed.getLiteralSet(),
-					indexed.getRDFVocabulary(), indexed.getPropertySet());
+			instance.indexSignature(url.toString(), "", indexed, indexed.getPropertySet(), force);
 			log.info("<== DONE");
 
 		}

@@ -59,7 +59,7 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 	 */
 	@Override
 	public Set<String> getPropertySet() {
-		Set<String> result = new HashSet<>(getDatatypePropertySet());
+		Set<String> result = new HashSet<>();
 		result.addAll(getDatatypePropertySet());
 		result.addAll(getObjectPropertySet());
 		return result;

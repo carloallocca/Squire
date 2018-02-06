@@ -35,6 +35,8 @@ import org.apache.lucene.util.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+
 /**
  *
  * @author carloallocca
@@ -69,11 +71,15 @@ public class RDFDatasetIndexer {
 			IndexReader reader = DirectoryReader.open(getIndex());
 			IndexSearcher searcher = new IndexSearcher(reader);
 			queryBuilder.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
-			if (null != graphName && !graphName.isEmpty())
+			log.debug("Searching in index: URL={}", urlAddress);
+			if (null != graphName && !graphName.isEmpty()) {
+				log.debug(" ... and GraphName={}", graphName);
 				queryBuilder.add(new TermQuery(new Term("GraphName", graphName)), BooleanClause.Occur.MUST);
+			}
 			TopScoreDocCollector collector = TopScoreDocCollector.create(1);
 			searcher.search(queryBuilder.build(), collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
+			log.debug("Got {} hit{}", hits.length, hits.length > 1 ? "s" : "");
 			if (hits.length > 0) return searcher.doc(hits[0].doc);
 		} catch (IOException ex) {
 			log.error("Exception occurred while trying to access index.", ex);
@@ -81,15 +87,14 @@ public class RDFDatasetIndexer {
 		return null;
 	}
 
-	public Document indexSignature(String urlAddress, String graphName, Collection<String> classSet,
-			Collection<String> objectPropertySet, Collection<String> datatypePropertySet,
-			Collection<String> individualSet, Collection<String> literalSet, Collection<String> rdfVocabulary) {
+	public Document indexSignature(String urlAddress, String graphName, IRDFDataset indexand,
+			Collection<String> propertySet, boolean overwrite) {
 
 		// Analyzer analyzer = new WhitespaceAnalyzer();
 		Analyzer analyzer = new StandardAnalyzer();
 
 		try {
-			if (!(alreadyExists(urlAddress, graphName))) {
+			if (!(alreadyExists(urlAddress, graphName)) || overwrite) {
 				IndexWriterConfig config = new IndexWriterConfig(analyzer);// .setOpenMode(OpenMode.CREATE_OR_APPEND);
 				/*
 				 * IndexWriterConfig.OpenMode.CREATE_OR_APPEND if used IndexWriter will create a
@@ -124,13 +129,25 @@ public class RDFDatasetIndexer {
 
 				doc.add(new Field("URL", urlAddress, Field.Store.YES, Field.Index.NOT_ANALYZED));
 				doc.add(new Field("GraphName", graphName, Field.Store.YES, Field.Index.NOT_ANALYZED));
-				doc.add(new Field("ClassSet", classSet.toString(), Field.Store.YES, Field.Index.NO));
-				doc.add(new Field("ObjectPropertySet", objectPropertySet.toString(), Field.Store.YES, Field.Index.NO));
-				doc.add(new Field("DatatypePropertySet", datatypePropertySet.toString(), Field.Store.YES,
+				doc.add(new Field("ClassSet", indexand.getClassSet().toString(), Field.Store.YES, Field.Index.NO));
+				doc.add(new Field("ObjectPropertySet", indexand.getObjectPropertySet().toString(), Field.Store.YES,
 						Field.Index.NO));
-				doc.add(new Field("LiteralSet", literalSet.toString(), Field.Store.YES, Field.Index.NO));
-				doc.add(new Field("IndividualSet", individualSet.toString(), Field.Store.YES, Field.Index.NO));
-				doc.add(new Field("RDFVocabulary", rdfVocabulary.toString(), Field.Store.YES, Field.Index.NO));
+				doc.add(new Field("DatatypePropertySet", indexand.getDatatypePropertySet().toString(), Field.Store.YES,
+						Field.Index.NO));
+				doc.add(new Field("LiteralSet", indexand.getLiteralSet().toString(), Field.Store.YES, Field.Index.NO));
+				doc.add(new Field("IndividualSet", indexand.getIndividualSet().toString(), Field.Store.YES,
+						Field.Index.NO));
+				doc.add(new Field("RDFVocabulary", indexand.getRDFVocabulary().toString(), Field.Store.YES,
+						Field.Index.NO));
+				if (propertySet != null && !propertySet.isEmpty())
+					doc.add(new Field("PropertySet", propertySet.toString(), Field.Store.YES, Field.Index.NO));
+
+				// Remove the old one(s)
+				Builder queryBuilder = new Builder();
+				queryBuilder.add(new TermQuery(new Term("URL", urlAddress)), BooleanClause.Occur.MUST);
+				// queryBuilder.add(new TermQuery(new Term("GraphName", graphName)),
+				// BooleanClause.Occur.MUST);
+				indexWriter.deleteDocuments(queryBuilder.build());
 
 				indexWriter.addDocument(doc);
 				// indexWriter.optimize();
@@ -152,7 +169,7 @@ public class RDFDatasetIndexer {
 		} catch (LockObtainFailedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -160,14 +177,8 @@ public class RDFDatasetIndexer {
 	}
 
 	// Add a new SPARQL EndPoint to the index
-	public Document indexSignature(String urlAddress, String graphName, Collection<String> classSet,
-			Collection<String> objectPropertySet, Collection<String> datatypePropertySet,
-			Collection<String> individualSet, Collection<String> literalSet, Collection<String> rdfVocabulary,
-			Collection<String> propertySet) {
-		Document res = indexSignature(urlAddress, graphName, classSet, objectPropertySet, datatypePropertySet,
-				individualSet, literalSet, rdfVocabulary);
-		if (res != null) res.add(new Field("PropertySet", propertySet.toString(), Field.Store.YES, Field.Index.NO));
-		return res;
+	public Document indexSignature(String urlAddress, String graphName, IRDFDataset indexand, boolean overwrite) {
+		return indexSignature(urlAddress, graphName, indexand, null, overwrite);
 	}
 
 	private boolean alreadyExists(String urlAddress, String graphName) {
@@ -213,8 +224,7 @@ public class RDFDatasetIndexer {
 	}
 
 	private Directory getIndex() throws IOException {
-		Path path = Paths.get(this.datasetIndexDir);
-		return FSDirectory.open(path);
+		return FSDirectory.open(Paths.get(this.datasetIndexDir));
 	}
 
 }

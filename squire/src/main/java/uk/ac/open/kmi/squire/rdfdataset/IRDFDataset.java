@@ -63,10 +63,6 @@ public interface IRDFDataset extends Runnable {
 
 	public boolean isInRDFVocabulary(String rdfEntity);
 
-	public Object runAskQuery();
-
-	public Object runSelectQuery();
-
 	public void setClassSet(Set<String> classSet);
 
 	public void setDatatypePropertySet(Set<String> dpSet);
