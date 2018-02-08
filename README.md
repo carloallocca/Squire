@@ -5,7 +5,7 @@ This is a library that, given a SPARQL query that can be satisfied by a certain 
 ## Building
 You can build the project using Maven 3 and a Java 8 SDK. From the project directory you can build all the modules by running
 
-    `mvn install -Dmaven.test.skip=true`
+    mvn install -Dmaven.test.skip=true
 
 When all unit tests work offline, we will stop recommending the `-Dmaven.test.skip` flag.
 
