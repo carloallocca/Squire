@@ -3,11 +3,17 @@
 This is a library that, given a SPARQL query that can be satisfied by a certain RDF dataset, recommends semantically similar queries that can be satisfied by another dataset.
 
 ## Building
-You can build the project using Maven 3 and a Java 8 SDK. These are the modules that can be built.
+You can build the project using Maven 3 and a Java 8 SDK. From the project directory you can build all the modules by running
+
+    `mvn install -Dmaven.test.skip=true`
+
+When all unit tests work offline, we will stop recommending the `-Dmaven.test.skip` flag.
+
+If you want to build only some modules individually:
 
 * __`squire`__ : the core implementation, build this first.
 * __`launcher`__ : command-line Java application as executable JAR file, depends on squire
-* __`websquire`__ : Web Service version with HTTP API available as a WAr archive.
+* __`websquire`__ : Web Service version with HTTP API available as a WAR archive.
 
 ## Running
 After building the project:
