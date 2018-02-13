@@ -5,6 +5,7 @@
  */
 package uk.ac.open.kmi.squire.core4;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,15 +57,18 @@ import uk.ac.open.kmi.squire.utils.PowerSetFactory;
  */
 public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
-	private static final String TEST_RESULT_DIR_PREFIX = "/Users/carloallocca/Desktop/KMi/KMi Started 2015/KMi2015Development/WebSquire/TestResults/";
+	// private static final String _TEST_RESULT_DIR_PREFIX =
+	// "/Users/carloallocca/Desktop/KMi/KMi Started
+	// 2015/KMi2015Development/WebSquire/TestResults/";
+	private static final String _TEST_RESULT_DIR_PREFIX = "TestResults/";
 	// private static final String TEST_RESULT_METRICS =
 	// "QueryRootDistanceSimilarity/";
 
-	// private static final String TEST_RESULT_METRICS =
+	// private static final String _TEST_RESULT_METRICS =
 	// "QueryRootDistanceSimilarity/";
-	// private static final String TEST_RESULT_METRICS =
+	// private static final String _TEST_RESULT_METRICS =
 	// "QuerySpecificityDistanceSimilarity/";
-	// private static final String TEST_RESULT_METRICS =
+	// private static final String _TEST_RESULT_METRICS =
 	// "QueryResultTypeSimilarity/";
 	private static final String TEST_RESULT_METRICS = "All/";
 
@@ -74,38 +78,39 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 	private final static String TEST_FOUR = "Museum/";
 	private final static String TEST_FIVE = "GovernmentOpenData/";
 
+	private static final String TEST_RESULT_NAME_PREFIX = "testResult";
+
+	private static int testResultIndex = 0;
+	private static int class_instanciation_number = 0;
+	private static String INSTANCE_OP = "I";
+
+	private static String REMOVE_TP_OP = "R";
+	private static final String CLASS_TEMPLATE_VAR = "ct";
+
+	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
+	private static final String DT_PROP_TEMPLATE_VAR = "dpt";
+
+	private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
+
+	private static final String LITERAL_TEMPLATE_VAR = "lt";
 	// private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS +
 	// TEST_ONE + TEST_RESULT_NAME_PREFIX;
 	// private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS +
 	// TEST_TWO + TEST_RESULT_NAME_PREFIX;
-	private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
+	private String fullPrefix = _TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE + TEST_RESULT_NAME_PREFIX;
 	// private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS +
 	// TEST_FOUR + TEST_RESULT_NAME_PREFIX;
 	// private String fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS +
 	// TEST_FIVE + TEST_RESULT_NAME_PREFIX;
 
-	private static final String TEST_RESULT_NAME_PREFIX = "testResult";
-	private static int testResultIndex = 0;
-	private static int class_instanciation_number = 0;
-
-	private static String INSTANCE_OP = "I";
-	private static String REMOVE_TP_OP = "R";
-
-	private final List<QueryAndContextNode> specializableQueryAndContextNodeList = new ArrayList();
-	private final List<QueryAndContextNode> recommandedQueryList = new ArrayList();
+	private final List<QueryAndContextNode> specializableQueryAndContextNodeList = new ArrayList<>();
+	private final List<QueryAndContextNode> recommandedQueryList = new ArrayList<>();
 
 	private HashMap<String, Query> queryIndex = new HashMap<>();
-
-	private IRDFDataset rdfd1;
-	private IRDFDataset rdfd2;
-
-	private Query qO;
-	private Query qR;
-
-	private float resultTypeSimilarityDegree;
-	private float queryRootDistanceDegree;
-	private float resultSizeSimilarityDegree;
-	private float querySpecificityDistanceDegree;
+	private IRDFDataset rdfd1, rdfd2;
+	private Query qO, qR;
+	private float resultTypeSimilarityDegree, queryRootDistanceDegree, resultSizeSimilarityDegree,
+			querySpecificityDistanceDegree;
 
 	private LiteralVarMapping literalVarTable;
 	private ClassVarMapping classVarTable;
@@ -114,21 +119,11 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 	private ObjectPropertyVarMapping objectProperyVarTable;
 	private RDFVocVarMapping rdfVocVarTable;
 
-	private static final String CLASS_TEMPLATE_VAR = "ct";
-	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
-	private static final String DT_PROP_TEMPLATE_VAR = "dpt";
-	private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
-	private static final String LITERAL_TEMPLATE_VAR = "lt";
-
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	private long stopTime;
 	private long elapsedTime;
 	private long startTime;
-
-	public QuerySpecializer4() {
-		super();
-	}
 
 	public QuerySpecializer4(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, ClassVarMapping cVM,
 			ObjectPropertyVarMapping opVM, DatatypePropertyVarMapping dpVM, IndividualVarMapping indVM,
@@ -268,31 +263,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		addSpecializableQueryList(qAndcNode);
 		// this.recommandedQueryList.add(qAndcNode);
 
-		// String fullPrefix = "";
-		// switch (QuerySpecializer4.class_instanciation_number) {
-		// case 1:
-		// fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_ONE +
-		// TEST_RESULT_NAME_PREFIX;
-		// break;
-		// case 2:
-		// fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_TWO +
-		// TEST_RESULT_NAME_PREFIX;
-		// break;
-		// case 3:
-		// fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_THREE +
-		// TEST_RESULT_NAME_PREFIX;
-		// break;
-		// case 4:
-		// fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FOUR +
-		// TEST_RESULT_NAME_PREFIX;
-		// break;
-		// case 5:
-		// fullPrefix = TEST_RESULT_DIR_PREFIX + TEST_RESULT_METRICS + TEST_FIVE +
-		// TEST_RESULT_NAME_PREFIX;
-		// break;
-		// default:
-		// break;
-		// }
+		new File(fullPrefix).mkdirs(); // XXX This will create an additional unused directory
 		String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
 		log.info("newTextFile 1 =======" + newTextFile);
 
@@ -300,7 +271,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 			FileWriter fw = new FileWriter(newTextFile, true);
 			fw.write("\n");
 			fw.write("\n");
-			fw.write("Process Start Time " + Long.toString(startTime));
+			fw.write("Process Start Time " + startTime);
 			fw.write("\n");
 			fw.write("\n");
 			fw.write("\n");
@@ -320,15 +291,21 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 			fw.write("============= NEW QUERY RECOMMENDATIONS =============");
 			fw.write("\n");
 			fw.write("\n");
-			fw.write("qR score == " + Float.toString(qAndcNode.getqRScore()));
+			fw.write("qR score == " + qAndcNode.getqRScore());
 			fw.write("\n");
 			fw.write(qAndcNode.getqR().toString());
 			fw.close();
 		} catch (IOException e) {
-			log.info(e.getMessage());
+			// FIXME WTF
+			log.error(e.getMessage());
 			// exception handling left as an exercise for the reader
+			throw new RuntimeException(e);
 		}
 
+	}
+
+	public List<QueryAndContextNode> getRecommandedQueryList() {
+		return recommandedQueryList;
 	}
 
 	public List<QueryAndContextNode> specialize() throws Exception {
@@ -424,42 +401,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 					this.specializableQueryAndContextNodeList.get(0).getqO());
 			addSpecializableQueryList(childNode);
 			this.recommandedQueryList.add(childNode);
-			this.notifyQueryRecommendation(this.specializableQueryAndContextNodeList.get(0).getqO(), 1);
-			this.notifyQueryRecommendationCompletion(true);
+			notifyQueryRecommendation(this.specializableQueryAndContextNodeList.get(0).getqO(), 1);
+			notifyQueryRecommendationCompletion(true);
 
-			String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
-			// String newTextFile = TEST_RESULT_DIR_PREFIX +
-			// Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
-			log.info("newTextFile 2 =======" + newTextFile);
-			try {
-				long qRArrivalTime = System.currentTimeMillis();
-				long queryElapsedTime = qRArrivalTime - startTime;
-
-				FileWriter fw = new FileWriter(newTextFile, true);
-				fw.write("\n");
-				fw.write("\n");
-				fw.write("qR Arrival Time == " + Long.toString(qRArrivalTime));
-				fw.write("\n");
-				fw.write("qR Query Elapsed Time == " + Long.toString(queryElapsedTime));
-				fw.write("\n");
-				fw.write("qR score == " + Float.toString(childNode.getqRScore()));
-				fw.write("\n");
-				fw.write(childNode.getqR().toString());
-
-				stopTime = System.currentTimeMillis();
-				elapsedTime = stopTime - startTime;
-				fw.write("\n");
-				fw.write("\n");
-				fw.write("Process Stop Time == " + Long.toString(stopTime));
-				fw.write("\n");
-				fw.write("Process Elapsed Time == " + Long.toString(elapsedTime));
-				fw.write("\n");
-				fw.close();
-
-				fw.close();
-			} catch (IOException e) {
-				// exception handling left as an exercise for the reader
-			}
+			printSpecialize(childNode);
 
 			return this.recommandedQueryList;
 		}
@@ -499,23 +444,9 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 						Set<Var> qTempVarSet = getQueryTemplateVariableSet(childQueryCopy);
 						Query childQueryCopyInstanciated = null;
 
-						ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList = new ArrayList(); // this
-																													// contains
-																													// all
-																													// the
-																													// tuples
-																													// <varName,
-																													// entityQo,
-																													// entityQr>
-																													// for
-																													// each
-																													// varName
-																													// that
-																													// is
-																													// going
-																													// to
-																													// be
-																													// instantiated
+						// this contains all the tuples <varName, entityQo, entityQr> for each varName
+						// that is going to be instantiated
+						ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList = new ArrayList();
 						for (Var tv : qTempVarSet) {
 							// log.info("Var tv: " +tv.getVarName());
 							// log.info("Var tv: " +tv.getName());
@@ -560,7 +491,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 									log.info("qR score ======" + childNode.getqRScore());
 									log.info("qR " + childNode.getqR());
 
-									this.notifyQueryRecommendation(childNode.getqR(), childNode.getqRScore());
+									notifyQueryRecommendation(childNode.getqR(), childNode.getqRScore());
 
 									// add qWithoutTriple to the index
 									addQueryToIndexIFAbsent(childQueryCopyInstanciated);
@@ -649,6 +580,152 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		}
 
 		return this.recommandedQueryList;
+	}
+
+	// private boolean isQueryIndexed(QueryAndContextNode qRScoreMaxNodeCloned) {
+	// Query q = qRScoreMaxNodeCloned.getqR();
+	// Set<TriplePath> triplePathCollection =
+	// qRScoreMaxNodeCloned.getqRTriplePathSet();
+	// ArrayList<String> s = new ArrayList<String>(); //and use Collections.sort()
+	// for (TriplePath tp : triplePathCollection) {
+	// s.add(tp.toString());
+	// }
+	// Collections.sort(s);
+	// return queryAndContextNodeIndex.containsKey(s.toString());
+	// }
+	private void addQueryToIndexIFAbsent(Query qWithoutTriple) {
+
+		Set<TriplePath> triplePathCollection = getQueryTriplePathSet(qWithoutTriple);
+
+		ArrayList<String> s = new ArrayList<String>(); // and use Collections.sort()
+		for (TriplePath tp : triplePathCollection) {
+			s.add(tp.toString());
+		}
+		queryIndex.putIfAbsent(s.toString(), qWithoutTriple);
+	}
+
+	private void addSpecializableQueryList(QueryAndContextNode d1) {
+		this.specializableQueryAndContextNodeList.add(d1);
+		Collections.sort(this.specializableQueryAndContextNodeList, new QueryAndContextNode.QRScoreComparator());
+	}
+
+	private Query applyInstanciationOP(Query queryChild, QuerySolution sol) {
+
+		Set<Var> qTempVarSet = getQueryTemplateVariableSet(queryChild);
+		for (Var tv : qTempVarSet) {
+			RDFNode node = sol.get(tv.getName());
+			SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
+			queryChild = instOP.instantiateVarTemplate(queryChild, tv, node.asNode());
+
+			// String entityqO =
+			// this.classVarTable.getClassFromVar(templateVar.getVarName());
+			// String entityqR = clas;
+			//
+			// ArrayList<String> childOperationList = new ArrayList();
+			// childOperationList.addAll(pNode.getOperationList());
+			// childOperationList.add(INSTANCE_OP);
+			// String op = INSTANCE_OP;
+		}
+		return queryChild;
+	}
+
+	private void applyRemovalOp(QueryAndContextNode qRScoreMaxNode) {
+
+		Query qRCopy = qRScoreMaxNode.getqR();
+		Set<TriplePath> triplePathSet = getQueryTriplePathSet(qRCopy);
+
+		for (TriplePath tp : triplePathSet) {
+
+			// 1. Remove the TriplePath tp from the qRCopy
+			RemoveTriple instance = new RemoveTriple();
+			Query qWithoutTriple = instance.removeTP(qRCopy, tp.asTriple());
+
+			// 2. Check if it is alredy indexed and therefore generated
+			if (!(isQueryIndexed(qWithoutTriple))) {
+
+				// // BUILD A NEW QueryAndContextNode
+				// // 2.1. Clone the QueryAndContextNode with qRScore max so it can be processed
+				// for applying operations
+				// QueryAndContextNode qRScoreMaxNodeCloned =
+				// qRScoreMaxNode.cloneMe(qRScoreMaxNode);
+				//
+				// // 2.2 Update the triplePathSet of the clonedNode
+				// qRScoreMaxNodeCloned.getqRTriplePathSet().remove(tp);
+				//
+				// // 2.3. Update the recommended query of the clonedNode
+				// qRScoreMaxNodeCloned.setqR(qWithoutTriple);
+				//
+				// // 2.4. devo fare tutti gli aggiornameti: operation list, le quattro misure,
+				// etc...
+				// ArrayList<String> clonedOperationList = new ArrayList();
+				// clonedOperationList.addAll(qRScoreMaxNode.getOperationList());
+				// clonedOperationList.add(REMOVE_TP_OP);
+				// qRScoreMaxNodeCloned.setOperationList(clonedOperationList);
+				//
+				// qRScoreMaxNodeCloned.setOp(REMOVE_TP_OP);
+				//
+				// //In generale guarda dall'altra procedura per capire cosa manca
+				//
+				// // 7. devo aggiungere to specializableQueryAndContextNodeList in order to be
+				// further specialized
+				// addSpecializableQueryList(qRScoreMaxNodeCloned);
+				//
+				// this.recommandedQueryList.add(qRScoreMaxNodeCloned);
+				//
+				// // 8. Add node to the index
+				// addQueryToIndexIFAbsent(qWithoutTriple);
+			}
+
+		}
+
+	}
+
+	private float computeInstanciateOperationCost(String entityqO, String entityqR) {
+		if (entityqO == null || entityqR == null) {
+			return (float) 0.0;
+		}
+		JaroWinklerSimilarity jwSim = new JaroWinklerSimilarity();
+		float sim = jwSim.computeMatchingScore(entityqO, entityqR);
+		// return (float) (1.0 - sim);
+		return sim;
+	}
+
+	private float computeInstanciationOperationCost(
+			ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
+		int size = templVarEntityQoQrInstanciatedList.size();
+		float nodeCost = 0;
+		if (size > 0) {
+			for (VarTemplateAndEntityQoQr item : templVarEntityQoQrInstanciatedList) {
+				String entityqO_TMP = getLocalName(item.getEntityQo());
+				String entityqR_TMP = getLocalName(item.getEntityQr());
+				nodeCost = nodeCost + computeInstanciateOperationCost(entityqO_TMP, entityqR_TMP);
+			}
+			return (float) 1 - (nodeCost / size); // we divide by size as we want the value to be between 0 and 1.
+		}
+		return 0;
+	}
+
+	private float computeRemoveOperationCost(Query originalQuery, Query childQuery) {
+		QueryGPESim queryGPEsim = new QueryGPESim();
+		float sim = queryGPEsim.computeQueryPatternsSim(originalQuery, childQuery);
+		return (float) 1.0 - sim;
+		// return sim;
+		// return 0;
+	}
+
+	private QueryAndContextNode createEmptyQueryAndContextNode(Query qo) throws Exception {
+		QueryAndContextNode childQueryAndContextNode = new QueryAndContextNode();
+
+		Query clonedqO = QueryFactory.create(qo);
+		childQueryAndContextNode.setqO(clonedqO);
+
+		Query clonedqR = QueryFactory.create(qo);
+		childQueryAndContextNode.setqR(clonedqR);
+
+		childQueryAndContextNode.setqRScore(1);
+
+		return childQueryAndContextNode;
+
 	}
 
 	private QueryAndContextNode createNewQueryAndContextNodeForInstanciateOp(Query childQueryCopyInstanciated,
@@ -940,332 +1017,6 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		return childQueryAndContextNode;
 	}
 
-	private float computeInstanciationOperationCost(
-			ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
-		int size = templVarEntityQoQrInstanciatedList.size();
-		float nodeCost = 0;
-		if (size > 0) {
-			for (VarTemplateAndEntityQoQr item : templVarEntityQoQrInstanciatedList) {
-				String entityqO_TMP = getLocalName(item.getEntityQo());
-				String entityqR_TMP = getLocalName(item.getEntityQr());
-				nodeCost = nodeCost + computeInstanciateOperationCost(entityqO_TMP, entityqR_TMP);
-			}
-			return (float) 1 - (nodeCost / size); // we divide by size as we want the value to be between 0 and 1.
-		}
-		return 0;
-	}
-
-	private float computeInstanciateOperationCost(String entityqO, String entityqR) {
-		if (entityqO == null || entityqR == null) {
-			return (float) 0.0;
-		}
-		JaroWinklerSimilarity jwSim = new JaroWinklerSimilarity();
-		float sim = jwSim.computeMatchingScore(entityqO, entityqR);
-		// return (float) (1.0 - sim);
-		return sim;
-	}
-
-	private String getLocalName(String entityqO) {
-		String localName = "";
-		if (entityqO.startsWith("http://") || entityqO.startsWith("https://")) {
-			if (entityqO.contains("#")) {
-				localName = entityqO.substring(entityqO.indexOf("#") + 1, entityqO.length());
-				return localName;
-			}
-			localName = entityqO.substring(entityqO.lastIndexOf("/") + 1, entityqO.length());
-			return localName;
-		} else {
-			return entityqO;
-		}
-	}
-
-	private String getEntityQo(Var tv) {
-		String entityQo = "";
-		String varName = tv.getVarName();
-
-		if (varName.startsWith(CLASS_TEMPLATE_VAR)) {
-			entityQo = this.classVarTable.getClassFromVar(varName);
-		} else if (varName.startsWith(OBJ_PROP_TEMPLATE_VAR)) {
-			entityQo = this.objectProperyVarTable.getObjectProperyFromVar(varName);
-		} else if (varName.startsWith(DT_PROP_TEMPLATE_VAR)) {
-			entityQo = this.datatypePropertyVarTable.getDatatypeProperyFromVar(varName);
-		}
-		return entityQo;
-	}
-
-	private Query applyInstanciationOP(Query queryChild, QuerySolution sol) {
-
-		Set<Var> qTempVarSet = getQueryTemplateVariableSet(queryChild);
-		for (Var tv : qTempVarSet) {
-			RDFNode node = sol.get(tv.getName());
-			SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
-			queryChild = instOP.instantiateVarTemplate(queryChild, tv, node.asNode());
-
-			// String entityqO =
-			// this.classVarTable.getClassFromVar(templateVar.getVarName());
-			// String entityqR = clas;
-			//
-			// ArrayList<String> childOperationList = new ArrayList();
-			// childOperationList.addAll(pNode.getOperationList());
-			// childOperationList.add(INSTANCE_OP);
-			// String op = INSTANCE_OP;
-		}
-		return queryChild;
-	}
-
-	public List<QueryAndContextNode> getRecommandedQueryList() {
-		return recommandedQueryList;
-	}
-
-	private void addSpecializableQueryList(QueryAndContextNode d1) {
-		this.specializableQueryAndContextNodeList.add(d1);
-		Collections.sort(this.specializableQueryAndContextNodeList, new QueryAndContextNode.QRScoreComparator());
-	}
-
-	private Set<TriplePath> getQueryTriplePathSet(Query q) {
-		if (q == null) {
-			throw new IllegalStateException(
-					"[QueryRecommendation::getTriplePathSet(Query originalQuery)]The query is null!!");
-		}
-		// Remember distinct objects in this
-		final Set<TriplePath> tpSet = new HashSet<TriplePath>();
-		// This will walk through all parts of the query
-		ElementWalker.walk(q.getQueryPattern(),
-				// For each element
-				new ElementVisitorBase() {
-					// ...when it's a block of triples...
-					public void visit(ElementPathBlock el) {
-						// ...go through all the triples...
-						Iterator<TriplePath> triples = el.patternElts();
-						while (triples.hasNext()) {
-							tpSet.add(triples.next());
-						}
-					}
-				});
-		return tpSet;
-	}
-
-	private Set<Var> getQueryTemplateVariableSet(Query qR) {
-		SQTemplateVariableVisitor v = new SQTemplateVariableVisitor();
-		// ... This will walk through all parts of the query
-		ElementWalker.walk(qR.getQueryPattern(), v);
-		return v.getQueryTemplateVariableSet();
-
-	}
-
-	private void printQuerySolutionSpace(QueryAndContextNode qRScoreMaxNode) {
-
-		List<QuerySolution> qTsolList = qRScoreMaxNode.getQueryTempVarSolutionSpace();
-
-		// System.out.println("[QuerySpecializer::printQuerySolutionSpace] There are " +
-		// qTsolList.size() + " solutions");
-		if (qTsolList != null) {
-			System.out.println(
-					"[QuerySpecializer::printQuerySolutionSpace] There are " + qTsolList.size() + " solutions");
-
-			// Set<Var> tempVarSet = qRScoreMaxNode.getqRTemplateVariableSet();
-			Set<Var> tempVarSet = getQueryTemplateVariableSet(qRScoreMaxNode.getqR());// .getqRTemplateVariableSet();
-
-			for (QuerySolution sol : qTsolList) {
-				for (Var vt : tempVarSet) {
-					System.out.println("[QuerySpecializer::printQuerySolutionSpace] " + vt.getName() + "="
-							+ sol.get(vt.getName()).toString());
-				}
-				System.out.println("");
-			}
-
-		}
-
-		//
-		// for (QuerySolution sol : qTsolList) {
-		// Iterator<String> varNameItr = sol.varNames();
-		// while (varNameItr.hasNext()) {
-		// System.out.println("[QuerySpecializer::specialize] varNameItr.next() == " +
-		// varNameItr.next());
-		// }
-		//
-		//// if (sol.get("class").asResource().getURI() != null) {
-		//// this.classSet.add(sol.get("class").asResource().getURI());
-		//// }
-		// }
-	}
-
-	private QueryAndContextNode getMaxQueryAndContextNode() {
-
-		// Collections.sort(this.specializableQueryAndContextNodeList, new
-		// QueryAndContextNode.QRScoreComparator());
-		if (this.specializableQueryAndContextNodeList.size() > 0) {
-			QueryAndContextNode maxNode = this.specializableQueryAndContextNodeList.get(0);
-			this.specializableQueryAndContextNodeList.remove(maxNode);
-			return maxNode;
-		}
-		return null;
-	}
-
-	private boolean isRProcessable(QueryAndContextNode qRScoreMaxNodeCloned) {
-		Query q = qRScoreMaxNodeCloned.getqR();
-		return getQueryTriplePathSet(q).size() > 1;
-	}
-
-	private boolean isIProcessable(QueryAndContextNode qRScoreMaxNodeCloned) {
-		Set<Var> tempVarSet = getQueryTemplateVariableSet(qRScoreMaxNodeCloned.getqR());
-		return tempVarSet.size() > 0;
-	}
-
-	private void applyRemovalOp(QueryAndContextNode qRScoreMaxNode) {
-
-		Query qRCopy = qRScoreMaxNode.getqR();
-		Set<TriplePath> triplePathSet = getQueryTriplePathSet(qRCopy);
-
-		for (TriplePath tp : triplePathSet) {
-
-			// 1. Remove the TriplePath tp from the qRCopy
-			RemoveTriple instance = new RemoveTriple();
-			Query qWithoutTriple = instance.removeTP(qRCopy, tp.asTriple());
-
-			// 2. Check if it is alredy indexed and therefore generated
-			if (!(isQueryIndexed(qWithoutTriple))) {
-
-				// // BUILD A NEW QueryAndContextNode
-				// // 2.1. Clone the QueryAndContextNode with qRScore max so it can be processed
-				// for applying operations
-				// QueryAndContextNode qRScoreMaxNodeCloned =
-				// qRScoreMaxNode.cloneMe(qRScoreMaxNode);
-				//
-				// // 2.2 Update the triplePathSet of the clonedNode
-				// qRScoreMaxNodeCloned.getqRTriplePathSet().remove(tp);
-				//
-				// // 2.3. Update the recommended query of the clonedNode
-				// qRScoreMaxNodeCloned.setqR(qWithoutTriple);
-				//
-				// // 2.4. devo fare tutti gli aggiornameti: operation list, le quattro misure,
-				// etc...
-				// ArrayList<String> clonedOperationList = new ArrayList();
-				// clonedOperationList.addAll(qRScoreMaxNode.getOperationList());
-				// clonedOperationList.add(REMOVE_TP_OP);
-				// qRScoreMaxNodeCloned.setOperationList(clonedOperationList);
-				//
-				// qRScoreMaxNodeCloned.setOp(REMOVE_TP_OP);
-				//
-				// //In generale guarda dall'altra procedura per capire cosa manca
-				//
-				// // 7. devo aggiungere to specializableQueryAndContextNodeList in order to be
-				// further specialized
-				// addSpecializableQueryList(qRScoreMaxNodeCloned);
-				//
-				// this.recommandedQueryList.add(qRScoreMaxNodeCloned);
-				//
-				// // 8. Add node to the index
-				// addQueryToIndexIFAbsent(qWithoutTriple);
-			}
-
-		}
-
-	}
-
-	// private boolean isQueryIndexed(QueryAndContextNode qRScoreMaxNodeCloned) {
-	// Query q = qRScoreMaxNodeCloned.getqR();
-	// Set<TriplePath> triplePathCollection =
-	// qRScoreMaxNodeCloned.getqRTriplePathSet();
-	// ArrayList<String> s = new ArrayList<String>(); //and use Collections.sort()
-	// for (TriplePath tp : triplePathCollection) {
-	// s.add(tp.toString());
-	// }
-	// Collections.sort(s);
-	// return queryAndContextNodeIndex.containsKey(s.toString());
-	// }
-	private void addQueryToIndexIFAbsent(Query qWithoutTriple) {
-
-		Set<TriplePath> triplePathCollection = getQueryTriplePathSet(qWithoutTriple);
-
-		ArrayList<String> s = new ArrayList<String>(); // and use Collections.sort()
-		for (TriplePath tp : triplePathCollection) {
-			s.add(tp.toString());
-		}
-		queryIndex.putIfAbsent(s.toString(), qWithoutTriple);
-	}
-
-	private boolean isQueryIndexed(Query qWithoutTriple) {
-		Set<TriplePath> triplePathCollection = getQueryTriplePathSet(qWithoutTriple);
-		ArrayList<String> s = new ArrayList<String>(); // and use Collections.sort()
-		for (TriplePath tp : triplePathCollection) {
-			s.add(tp.toString());
-		}
-		Collections.sort(s);
-		return queryIndex.containsKey(s.toString());
-	}
-
-	private float computeRemoveOperationCost(Query originalQuery, Query childQuery) {
-		QueryGPESim queryGPEsim = new QueryGPESim();
-		float sim = queryGPEsim.computeQueryPatternsSim(originalQuery, childQuery);
-		return (float) 1.0 - sim;
-		// return sim;
-		// return 0;
-	}
-
-	private void printQuerySolutionSpaceMap(QueryAndContextNode parentQueryAndContextNode) {
-
-		System.out.println("Query Child === ");
-		System.out.println(parentQueryAndContextNode.getqR().toString());
-
-		System.out.println("Query Child Template Var === ");
-
-		Map<Var, Set<RDFNode>> tmpMap = parentQueryAndContextNode.getQueryTempVarValueMap();
-		printMap(tmpMap);
-
-		// if (tmpMap!=null) {
-		// Iterator<Entry<Var, Set<RDFNode>>> iter = tmpMap.entrySet().iterator();
-		//
-		// while (iter.hasNext()) {
-		// Entry<Var, Set<RDFNode>> entry = iter.next();
-		// System.out.println("Var= " + entry.getKey().asNode().getName());
-		// Set<RDFNode> valuList = entry.getValue();
-		// for (RDFNode value : valuList) {
-		// System.out.println("Value= " + value.asNode().getName());
-		// }
-		// }
-		//
-		// }
-	}
-
-	private void printMap(Map<Var, Set<RDFNode>> tmpMap) {
-
-		System.out.println("[QueryTempVarSolutionSpace::printMap]");
-
-		if (tmpMap != null) {
-			Iterator<Map.Entry<Var, Set<RDFNode>>> iter = tmpMap.entrySet().iterator();
-
-			while (iter.hasNext()) {
-				Map.Entry<Var, Set<RDFNode>> entry = iter.next();
-				System.out.println("Var= " + entry.getKey().asNode().getName());
-				Set<RDFNode> valuList = entry.getValue();
-
-				System.out.println("CardinalitySet= " + valuList.size());
-
-				// for (RDFNode value : valuList) {
-				// System.out.println("Value= " + value.toString());
-				// }
-			}
-
-		}
-
-	}
-
-	private void printQueryChildNodeSolutionSpace(QueryAndContextNode parentQueryAndContextNode) {
-		System.out.println("");
-		System.out.println("");
-		System.out.println("");
-		System.out.println("Query === ");
-		System.out.println(parentQueryAndContextNode.getqR().toString());
-
-		System.out.println("Solution === ");
-
-		List<QuerySolution> solList = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
-		for (QuerySolution qSol : solList) {
-			System.out.println(qSol.toString());
-		}
-	}
-
 	// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
 	// <http://purl.org/dc/terms/title> ),
 	private List<QuerySolution> eliminateSolutionBindedToTheSameValue(List<QuerySolution> qSolList) {
@@ -1307,18 +1058,223 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
 	}
 
-	private QueryAndContextNode createEmptyQueryAndContextNode(Query qo) throws Exception {
-		QueryAndContextNode childQueryAndContextNode = new QueryAndContextNode();
+	private String getEntityQo(Var tv) {
+		String entityQo = "";
+		String varName = tv.getVarName();
 
-		Query clonedqO = QueryFactory.create(qo);
-		childQueryAndContextNode.setqO(clonedqO);
+		if (varName.startsWith(CLASS_TEMPLATE_VAR)) {
+			entityQo = this.classVarTable.getClassFromVar(varName);
+		} else if (varName.startsWith(OBJ_PROP_TEMPLATE_VAR)) {
+			entityQo = this.objectProperyVarTable.getObjectProperyFromVar(varName);
+		} else if (varName.startsWith(DT_PROP_TEMPLATE_VAR)) {
+			entityQo = this.datatypePropertyVarTable.getDatatypeProperyFromVar(varName);
+		}
+		return entityQo;
+	}
 
-		Query clonedqR = QueryFactory.create(qo);
-		childQueryAndContextNode.setqR(clonedqR);
+	private String getLocalName(String entityqO) {
+		String localName = "";
+		if (entityqO.startsWith("http://") || entityqO.startsWith("https://")) {
+			if (entityqO.contains("#")) {
+				localName = entityqO.substring(entityqO.indexOf("#") + 1, entityqO.length());
+				return localName;
+			}
+			localName = entityqO.substring(entityqO.lastIndexOf("/") + 1, entityqO.length());
+			return localName;
+		} else {
+			return entityqO;
+		}
+	}
 
-		childQueryAndContextNode.setqRScore(1);
+	private QueryAndContextNode getMaxQueryAndContextNode() {
 
-		return childQueryAndContextNode;
+		// Collections.sort(this.specializableQueryAndContextNodeList, new
+		// QueryAndContextNode.QRScoreComparator());
+		if (this.specializableQueryAndContextNodeList.size() > 0) {
+			QueryAndContextNode maxNode = this.specializableQueryAndContextNodeList.get(0);
+			this.specializableQueryAndContextNodeList.remove(maxNode);
+			return maxNode;
+		}
+		return null;
+	}
+
+	private Set<Var> getQueryTemplateVariableSet(Query qR) {
+		SQTemplateVariableVisitor v = new SQTemplateVariableVisitor();
+		// ... This will walk through all parts of the query
+		ElementWalker.walk(qR.getQueryPattern(), v);
+		return v.getQueryTemplateVariableSet();
+
+	}
+
+	private Set<TriplePath> getQueryTriplePathSet(Query q) {
+		if (q == null) {
+			throw new IllegalStateException(
+					"[QueryRecommendation::getTriplePathSet(Query originalQuery)]The query is null!!");
+		}
+		// Remember distinct objects in this
+		final Set<TriplePath> tpSet = new HashSet<TriplePath>();
+		// This will walk through all parts of the query
+		ElementWalker.walk(q.getQueryPattern(),
+				// For each element
+				new ElementVisitorBase() {
+					// ...when it's a block of triples...
+					public void visit(ElementPathBlock el) {
+						// ...go through all the triples...
+						Iterator<TriplePath> triples = el.patternElts();
+						while (triples.hasNext()) {
+							tpSet.add(triples.next());
+						}
+					}
+				});
+		return tpSet;
+	}
+
+	private boolean isIProcessable(QueryAndContextNode qRScoreMaxNodeCloned) {
+		Set<Var> tempVarSet = getQueryTemplateVariableSet(qRScoreMaxNodeCloned.getqR());
+		return tempVarSet.size() > 0;
+	}
+
+	private boolean isQueryIndexed(Query qWithoutTriple) {
+		Set<TriplePath> triplePathCollection = getQueryTriplePathSet(qWithoutTriple);
+		ArrayList<String> s = new ArrayList<String>(); // and use Collections.sort()
+		for (TriplePath tp : triplePathCollection) {
+			s.add(tp.toString());
+		}
+		Collections.sort(s);
+		return queryIndex.containsKey(s.toString());
+	}
+
+	private boolean isRProcessable(QueryAndContextNode qRScoreMaxNodeCloned) {
+		Query q = qRScoreMaxNodeCloned.getqR();
+		return getQueryTriplePathSet(q).size() > 1;
+	}
+
+	private void printMap(Map<Var, Set<RDFNode>> tmpMap) {
+
+		System.out.println("[QueryTempVarSolutionSpace::printMap]");
+
+		if (tmpMap != null) {
+			Iterator<Map.Entry<Var, Set<RDFNode>>> iter = tmpMap.entrySet().iterator();
+
+			while (iter.hasNext()) {
+				Map.Entry<Var, Set<RDFNode>> entry = iter.next();
+				System.out.println("Var= " + entry.getKey().asNode().getName());
+				Set<RDFNode> valuList = entry.getValue();
+
+				System.out.println("CardinalitySet= " + valuList.size());
+
+				// for (RDFNode value : valuList) {
+				// System.out.println("Value= " + value.toString());
+				// }
+			}
+
+		}
+
+	}
+
+	private void printQueryChildNodeSolutionSpace(QueryAndContextNode parentQueryAndContextNode) {
+		System.out.println("");
+		System.out.println("");
+		System.out.println("");
+		System.out.println("Query === ");
+		System.out.println(parentQueryAndContextNode.getqR().toString());
+
+		System.out.println("Solution === ");
+
+		List<QuerySolution> solList = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
+		for (QuerySolution qSol : solList) {
+			System.out.println(qSol.toString());
+		}
+	}
+
+	private void printQuerySolutionSpace(QueryAndContextNode qRScoreMaxNode) {
+
+		List<QuerySolution> qTsolList = qRScoreMaxNode.getQueryTempVarSolutionSpace();
+
+		// System.out.println("[QuerySpecializer::printQuerySolutionSpace] There are " +
+		// qTsolList.size() + " solutions");
+		if (qTsolList != null) {
+			System.out.println(
+					"[QuerySpecializer::printQuerySolutionSpace] There are " + qTsolList.size() + " solutions");
+
+			// Set<Var> tempVarSet = qRScoreMaxNode.getqRTemplateVariableSet();
+			Set<Var> tempVarSet = getQueryTemplateVariableSet(qRScoreMaxNode.getqR());// .getqRTemplateVariableSet();
+
+			for (QuerySolution sol : qTsolList) {
+				for (Var vt : tempVarSet) {
+					System.out.println("[QuerySpecializer::printQuerySolutionSpace] " + vt.getName() + "="
+							+ sol.get(vt.getName()).toString());
+				}
+				System.out.println("");
+			}
+
+		}
+
+		//
+		// for (QuerySolution sol : qTsolList) {
+		// Iterator<String> varNameItr = sol.varNames();
+		// while (varNameItr.hasNext()) {
+		// System.out.println("[QuerySpecializer::specialize] varNameItr.next() == " +
+		// varNameItr.next());
+		// }
+		//
+		//// if (sol.get("class").asResource().getURI() != null) {
+		//// this.classSet.add(sol.get("class").asResource().getURI());
+		//// }
+		// }
+	}
+
+	private void printQuerySolutionSpaceMap(QueryAndContextNode parentQueryAndContextNode) {
+
+		System.out.println("Query Child === ");
+		System.out.println(parentQueryAndContextNode.getqR().toString());
+
+		System.out.println("Query Child Template Var === ");
+
+		Map<Var, Set<RDFNode>> tmpMap = parentQueryAndContextNode.getQueryTempVarValueMap();
+		printMap(tmpMap);
+
+		// if (tmpMap!=null) {
+		// Iterator<Entry<Var, Set<RDFNode>>> iter = tmpMap.entrySet().iterator();
+		//
+		// while (iter.hasNext()) {
+		// Entry<Var, Set<RDFNode>> entry = iter.next();
+		// System.out.println("Var= " + entry.getKey().asNode().getName());
+		// Set<RDFNode> valuList = entry.getValue();
+		// for (RDFNode value : valuList) {
+		// System.out.println("Value= " + value.asNode().getName());
+		// }
+		// }
+		//
+		// }
+	}
+
+	/*
+	 * Part of a desperate attempt to reduce the amount of code in specialize()
+	 */
+	private void printSpecialize(QueryAndContextNode node) throws IOException {
+		log.info(new File(fullPrefix).getAbsolutePath());
+		String newTextFile = fullPrefix + Integer.toString(QuerySpecializer4.testResultIndex) + ".txt";
+		log.info("newTextFile 2 =======" + newTextFile);
+		long qRArrivalTime = System.currentTimeMillis();
+		FileWriter fw = new FileWriter(newTextFile, true);
+		fw.write("\n");
+		fw.write("\n");
+		fw.write("qR Arrival Time == " + qRArrivalTime);
+		fw.write("\n");
+		fw.write("qR Query Elapsed Time == " + (qRArrivalTime - startTime));
+		fw.write("\n");
+		fw.write("qR score == " + node.getqRScore());
+		fw.write("\n");
+		fw.write(node.getqR().toString());
+		stopTime = System.currentTimeMillis(); // Do we really need to measure it again here?
+		fw.write("\n");
+		fw.write("\n");
+		fw.write("Process Stop Time == " + stopTime);
+		fw.write("\n");
+		fw.write("Process Elapsed Time == " + (stopTime - startTime));
+		fw.write("\n");
+		fw.close();
 
 	}
 

@@ -8,11 +8,8 @@ package uk.ac.open.kmi.squire.rdfdataset;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.channels.ClosedByInterruptException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,12 +34,8 @@ import org.apache.lucene.store.LockObtainFailedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
+import uk.ac.open.kmi.squire.utils.SparqlUtils;
 import uk.ac.open.kmi.squire.utils.StringUtils;
 
 /**
@@ -292,30 +285,14 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	}
 
 	private void createSPARQLEndPoint(boolean overwrite) throws IOException, LockObtainFailedException {
-		// Document d = this.signatureDoc;
-		// if (d != null) {
-		// String cSet = d.get("ClassSet");
-		// this.classSet = FromStringToArrayList.transform(cSet);
-		// String oPropSet = d.get("ObjectPropertySet");
-		// this.objectPropertySet = FromStringToArrayList.transform(oPropSet);
-		// String dPropertySet = d.get("DatatypePropertySet");
-		// this.datatypePropertySet = FromStringToArrayList.transform(dPropertySet);
-		// String litSet = d.get("LiteralSet");
-		// this.literalSet = FromStringToArrayList.transform(litSet);
-		// String indSet = d.get("IndividualSet");
-		// this.individualSet = FromStringToArrayList.transform(indSet);
-		// String rdfVoc = d.get("RDFVocabulary");
-		// this.rdfVocabulary = FromStringToArrayList.transform(rdfVoc);
-		// String propSet = d.get("PropertySet");
-		// this.propertySet = FromStringToArrayList.transform(propSet);
-		// }
-		// else{
 		if (this.signatureDoc == null) {
 			computeClassSet();
 			try {
 				computeObjectPropertySet();
 				computeDataTypePropertySet();
 			} catch (BootedException e) {
+				// Fall back to computing properties in general
+				// if failing to compute them by type.
 				computePropertySet();
 			}
 			computeRDFVocabularySet();
@@ -328,24 +305,6 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	private Set<String> loadSingle(String field) {
 		String val = signatureDoc.get(field);
 		return val == null ? new HashSet<>() : StringUtils.commaSeparated2List(val);
-	}
-
-	private List<String> parseSparqlResultsJson(String result, String varString) {
-		List<String> output = new ArrayList<>();
-		JsonParser jsonParser = new JsonParser();
-		JsonArray results = jsonParser.parse(result).getAsJsonObject().get("results").getAsJsonObject()
-				.getAsJsonArray("bindings");
-		for (JsonElement result1 : results) {
-			JsonObject jClazz = result1.getAsJsonObject().getAsJsonObject(varString);
-			String value = jClazz.get("value").getAsString();
-			try {
-				new URI(value); // To test the syntax
-				output.add(value);
-			} catch (URISyntaxException ex) {
-				log.error("Bad URI synax for string '{}'", value);
-			}
-		}
-		return output;
 	}
 
 	/**
@@ -404,7 +363,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 				String result = "";
 				while ((output = br.readLine()) != null)
 					result = result + output;
-				itemList = parseSparqlResultsJson(result, "x");
+				itemList = SparqlUtils.getValuesFromSparqlJson(result, "x");
 			} else {
 				// Don't die. Keep whatever was indexed so far.
 				String reason = response.getStatusLine().getReasonPhrase();

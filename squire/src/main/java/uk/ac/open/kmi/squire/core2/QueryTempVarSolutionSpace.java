@@ -8,6 +8,7 @@ package uk.ac.open.kmi.squire.core2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -23,8 +24,10 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -55,6 +58,29 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
  *
  */
 public class QueryTempVarSolutionSpace {
+
+	private static Set<Var> getQueryTemplateVariableSet(Query qR) {
+		SQTemplateVariableVisitor v = new SQTemplateVariableVisitor();
+		// ... This will walk through all parts of the query
+		ElementWalker.walk(qR.getQueryPattern(), v);
+		return v.getQueryTemplateVariableSet();
+
+	}
+
+	private static Query rewriteQueryWithTemplateVar(Query qR) {
+		Set<Var> templateVarSet = getQueryTemplateVariableSet(qR);
+		Element elem = qR.getQueryPattern();
+		Query qT = QueryFactory.make();
+		qT.setDistinct(true);
+		qT.setQueryPattern(elem);
+		qT.setQuerySelectType();
+		for (Var tv : templateVarSet) {
+			qT.addResultVar(tv.getName());
+		}
+		return qT;
+	}
+
+	private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
 
 	public QueryTempVarSolutionSpace() {
 		super();
@@ -98,8 +124,6 @@ public class QueryTempVarSolutionSpace {
 		return new HashMap<>();
 	}
 
-	private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
-
 	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2) {
 		// 0. Check if the input query has aany template variable, otherwise qTsol is
 		// empty
@@ -124,38 +148,25 @@ public class QueryTempVarSolutionSpace {
 		return new ArrayList<>();
 	}
 
-	private static Set<Var> getQueryTemplateVariableSet(Query qR) {
-		SQTemplateVariableVisitor v = new SQTemplateVariableVisitor();
-		// ... This will walk through all parts of the query
-		ElementWalker.walk(qR.getQueryPattern(), v);
-		return v.getQueryTemplateVariableSet();
-
-	}
-
-	private static Query rewriteQueryWithTemplateVar(Query qR) {
-		Set<Var> templateVarSet = getQueryTemplateVariableSet(qR);
-		Element elem = qR.getQueryPattern();
-		Query qT = QueryFactory.make();
-		qT.setDistinct(true);
-		qT.setQueryPattern(elem);
-		qT.setQuerySelectType();
-		for (Var tv : templateVarSet) {
-			qT.addResultVar(tv.getName());
-		}
-		return qT;
-	}
-
-	private List<QuerySolution> computeSolutionSpace(Query q, IRDFDataset rdfd2) throws java.net.ConnectException {
+	private List<QuerySolution> computeSolutionSpace(Query q, IRDFDataset rdfd2) throws ConnectException {
 		log.info("This is the subquery: " + q.toString());
 		try {
 			String encodedQuery = URLEncoder.encode(q.toString(), "UTF-8");
 			String GET_URL = rdfd2.getEndPointURL() + "?query=" + encodedQuery;
-			DefaultHttpClient httpClient = new DefaultHttpClient();
+
+			int timeout = 300;
+			RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+					.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+			CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+
+			// DefaultHttpClient httpClient = new DefaultHttpClient();
+
 			HttpGet getRequest = new HttpGet(GET_URL);
 			// getRequest.addHeader("accept", "application/sparql-results+json");
 			getRequest.addHeader("accept", "application/sparql-results+json");
 
-			HttpResponse response = httpClient.execute(getRequest);
+			// HttpResponse response = httpClient.execute(getRequest);
+			HttpResponse response = client.execute(getRequest);
 			if (response.getStatusLine().getStatusCode() != 200) {
 				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
 			}
@@ -165,7 +176,8 @@ public class QueryTempVarSolutionSpace {
 			while ((output = br.readLine()) != null) {
 				result = result + output;
 			}
-			httpClient.getConnectionManager().shutdown();
+			// CloseableHttpClient getConnectionManager().shutdown();
+			client.close();
 			log.info("solution space result " + result);
 
 			ArrayList<QuerySolution> resultList = writeQueryResultsAsJenaQuerySolution(result, q.getProjectVars());
@@ -199,6 +211,37 @@ public class QueryTempVarSolutionSpace {
 	// //return new ArrayList<>();
 	// }
 
+	private boolean isValidateURI(String cleanedVarValue) {
+		final IRIFactory u = IRIFactory.iriImplementation();
+		try {
+			u.create(cleanedVarValue);// = IRIResolver(cleanedVarValue);
+			return true;
+		} catch (Exception e1) {
+			return false;
+		}
+
+	}
+
+	private void printQuerySolutionSpaceMap(Map<Var, Set<RDFNode>> tmpMap) {
+
+		System.out.println("[QueryTempVarSolutionSpace::printQuerySolutionSpaceMap]");
+
+		if (tmpMap != null) {
+			Iterator<Map.Entry<Var, Set<RDFNode>>> iter = tmpMap.entrySet().iterator();
+
+			while (iter.hasNext()) {
+				Map.Entry<Var, Set<RDFNode>> entry = iter.next();
+				System.out.println("Var= " + entry.getKey().asNode().getName());
+				Set<RDFNode> valuList = entry.getValue();
+				for (RDFNode value : valuList) {
+					System.out.println("Value= " + value.toString());
+				}
+			}
+
+		}
+
+	}
+
 	private Map<Var, Set<RDFNode>> tranformToMap(List<QuerySolution> qTsol, Query qChild) {
 
 		if (qTsol != null && qTsol.size() > 0) {
@@ -223,26 +266,6 @@ public class QueryTempVarSolutionSpace {
 			return map;
 		}
 		return new HashMap<>();
-	}
-
-	private void printQuerySolutionSpaceMap(Map<Var, Set<RDFNode>> tmpMap) {
-
-		System.out.println("[QueryTempVarSolutionSpace::printQuerySolutionSpaceMap]");
-
-		if (tmpMap != null) {
-			Iterator<Map.Entry<Var, Set<RDFNode>>> iter = tmpMap.entrySet().iterator();
-
-			while (iter.hasNext()) {
-				Map.Entry<Var, Set<RDFNode>> entry = iter.next();
-				System.out.println("Var= " + entry.getKey().asNode().getName());
-				Set<RDFNode> valuList = entry.getValue();
-				for (RDFNode value : valuList) {
-					System.out.println("Value= " + value.toString());
-				}
-			}
-
-		}
-
 	}
 
 	private ArrayList<QuerySolution> writeQueryResultsAsJenaQuerySolution(String result, List<Var> projectVars) {
@@ -356,17 +379,6 @@ public class QueryTempVarSolutionSpace {
 			}
 		}
 		return output;
-	}
-
-	private boolean isValidateURI(String cleanedVarValue) {
-		final IRIFactory u = IRIFactory.iriImplementation();
-		try {
-			u.create(cleanedVarValue);// = IRIResolver(cleanedVarValue);
-			return true;
-		} catch (Exception e1) {
-			return false;
-		}
-
 	}
 
 }

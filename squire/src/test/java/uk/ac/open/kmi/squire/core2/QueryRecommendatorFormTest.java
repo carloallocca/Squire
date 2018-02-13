@@ -9,10 +9,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.mksmart.squire.websquire.v1.resources.QueryStringScorePair;
 
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
@@ -23,25 +19,6 @@ import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
  * @author carloallocca
  */
 public class QueryRecommendatorFormTest {
-
-	public QueryRecommendatorFormTest() {
-	}
-
-	@BeforeClass
-	public static void setUpClass() {
-	}
-
-	@AfterClass
-	public static void tearDownClass() {
-	}
-
-	@Before
-	public void setUp() {
-	}
-
-	@After
-	public void tearDown() {
-	}
 
 	/**
 	 * Test of recommend method, of class QueryRecommendatorForm.

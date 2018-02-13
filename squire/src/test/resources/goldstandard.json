@@ -1,195 +1,195 @@
-[
-   {
-      "description":"Educational data, set 1: Open University and Oxford University",
-      "source":"http://data.open.ac.uk/query",
-      "target":"https://data.ox.ac.uk/sparql/",
-      "queries":[
-         {
-            "description":"Give me the URIs and names of all course modules",
-            "original":"SELECT DISTINCT ?mod ?title WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module> . ?mod <http://purl.org/dc/terms/title> ?title }",
-            "expected":[
-               "SELECT DISTINCT  ?course ?title WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title }"
-            ]
-         },
-         {
-            "description":"Give me the URIs, names and codes of all course modules (may vary in interpretation)",
-            "original":"PREFIX aiiso: <http://purl.org/vocab/aiiso/schema#> SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a aiiso:Module . ?mod <http://purl.org/dc/terms/title> ?title . ?mod aiiso:code ?code }",
-            "expected":[
-               "SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a <http://xcri.org/profiles/1.2/course> ; <http://purl.org/dc/terms/title>  ?title ; <http://purl.org/dc/terms/identifier> ?code }",
-               "SELECT DISTINCT ?course ?name ?code WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?name . ?course <http://www.w3.org/2004/02/skos/core#notation> ?code }"
-            ]
-         },
-         {
-            "description":"Also give me the regulations of all course modules (example where properties are preserved)",
-            "original":"SELECT DISTINCT ?mod ?title ?code ?regulation WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module>. ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/vocab/aiiso/schema#code> ?code . ?mod <http://xcri.org/profiles/catalog/1.2/regulations> ?regulation }",
-            "expected":[
-               "SELECT DISTINCT ?course ?title ?code ?regulation WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title . ?course <http://www.w3.org/2004/02/skos/core#notation> ?code . ?course <http://xcri.org/profiles/1.2/regulations> ?regulation }"
-            ]
-         },
-         {
-            "description":"This and the previous one are examples of two equivalent source queries that have the same expected query",
-            "original":"SELECT DISTINCT ?mod ?title ?descr WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module> . ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/dc/elements/1.1/description> ?descr }",
-            "expected":[
-               "SELECT DISTINCT  ?course ?title ?descr ?regulation WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title . ?course <http://purl.org/dc/terms/description> ?descr }"
-            ]
-         }
-      ]
-   },
-   {
-      "description":"Open Government Data: UK and Switzerland",
-      "source":"http://opendatacommunities.org/sparql",
-      "target":"http://data.admin.ch/sparql/",
-      "queries":[
-         {
-            "description":"Tell me everything about all the administrative districts.",
-            "original":"SELECT DISTINCT ?s ?p ?o WHERE {?s a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District> . ?s ?p ?o }",
-            "expected":[
-               "SELECT DISTINCT ?s ?p ?o WHERE { ?s a <https://gont.ch/District> . ?s ?p ?o }"
-            ]
-         },
-         {
-            "description":"Tell me the codes of all the administrative districts.",
-            "original":"SELECT DISTINCT ?dist ?code WHERE { ?dist a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District> . ?dist <http://www.w3.org/2004/02/skos/core#notation> ?code }",
-            "expected":[
-               "SELECT DISTINCT ?dis ?id WHERE { ?dis a <https://gont.ch/District> . ?dis <https://gont.ch/id> ?id }"
-            ]
-         },
-         {
-            "description":"List the labels and identifiers of all local authorities.",
-            "original":"SELECT DISTINCT ?s ?id ?label WHERE { ?s a <http://opendatacommunities.org/def/local-government/LocalAuthority> .?s <http://data.ordnancesurvey.co.uk/ontology/admingeo/gssCode> ?id . ?s <http://www.w3.org/2000/01/rdf-schema#label> ?label }",
-            "expected":[
-               "SELECT DISTINCT ?authority ?id ?label WHERE { ?authority a  <http://lindas-data.ch/def/top/Authority> . ?authority <http://purl.org/dc/elements/1.1/identifier> ?id . ?authority <http://www.w3.org/2004/02/skos/core#prefLabel> ?label }"
-            ]
-         },
-         {
-            "description":"List the labels and denominations of all schools.",
-            "original":"SELECT DISTINCT ?school ?label ?notation WHERE { ?school rdf:type <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority> . ?school <http://www.w3.org/2004/02/skos/core#prefLabel> ?label . ?school <http://www.w3.org/2004/02/skos/core#notation> ?notation }",
-            "expected":[
-               "SELECT DISTINCT ?school ?denomination ?label WHERE { ?school a <http://schema.org/School> . ?school <http://gov.genealogy.net/ontology.owl#hasDenomination> ?notation . ?school <http://schema.org/legalName> ?label }"
-            ]
-         },
-         {
-            "description":"List the identifiers and descriptions of all administrative services.",
-            "original":"SELECT DISTINCT ?service ?description ?identifier WHERE { ?service a <http://def.esd.org.uk/Service> . ?service <http://purl.org/dc/terms/description> ?description . ?service <http://purl.org/dc/terms/identifier> ?identifier }",
-            "expected":[
-               "SELECT DISTINCT ?service ?description ?identifier WHERE { ?service a <http://lindas-data.ch/def/top/Service> . ?service <http://www.w3.org/2004/02/skos/core#prefLabel> ?description . ?service <http://purl.org/dc/elements/1.1/identifier> ?identifier }"
-            ]
-         }
-      ]
-   },
-   {
-      "description":"Art: Museum of Fine Arts Budapest & Artium",
-      "source":"http://data.szepmuveszeti.hu/sparql",
-      "target":"http://datos.artium.org:8890/sparql",
-      "queries":[
-         {
-            "description":"List types and descriptions of all catalogued physical art objects",
-            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?physicalThing ?hasType ?descr WHERE { ?physicalThing a ecrm:E18_Physical_Thing . ?physicalThing ecrm:P2_has_type ?hasType . ?physicalThing ecrm:P1_is_identified_by ?id . ?id ecrm:P3_has_note ?descr }",
-            "expected":[
-               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?physicalThing ?hasType ?descr WHERE { ?physicalThing a ecrm:E24_Physical_Man-Made_Thing . ?physicalThing ecrm:P2_has_type ?hasType . ?physicalThing ecrm:P3_has_note ?descr }"
-            ]
-         },
-         {
-            "description":"List who created what",
-            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?creation ?partecipant WHERE { ?creation a ecrm:E65_Creation . ?creation ecrm:P11_had_participant ?partecipant }",
-            "expected":[
-               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?creation ?partecipant WHERE { ?creation a ecrm:E65_Creation . ?creation ecrm:P14_carried_out_by ?partecipant }"
-            ]
-         },
-         {
-            "description":"List the periods in which people died (this is a case of the expected query matching the given one)",
-            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathTimeSpan WHERE {?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan }",
-            "expected":[
-               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathTimeSpan WHERE {?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan }"
-            ]
-         },
-         {
-            "description":"List the death dates of people",
-            "original":"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathDate WHERE {?deathEntity a ecrm:E69_Death .?deathEntity ecrm:P4_has_time-span ?deathTimeSpan . ?deathTimeSpan ecrm:P78_is_identified_by ?deathTimeSpanID . ?deathTimeSpanID ecrm:P3_has_note ?deathDate }",
-            "expected":[
-               "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathDate WHERE { ?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan . ?deathTimeSpan ecrm:P78_is_identified_by ?deathTimeSpanID . ?deathTimeSpanID ecrm:P3_has_note ?deathDate }"
-            ]
-         },
-         {
-            "description":"List the labels and variants of all the topics in the dataset (another example of the expected query being the same, but with a different vocabulary)",
-            "original":"PREFIX mads: <http://www.loc.gov/mads/rdf/v1#> SELECT DISTINCT ?topic ?authoritativeLabel ?variant WHERE { ?topic a mads:Topic .?topic mads:authoritativeLabel ?authoritativeLabel . ?topic mads:hasVariant ?variant }",
-            "expected":[
-               "PREFIX mads: <http://www.loc.gov/mads/rdf/v1#> SELECT DISTINCT ?topic ?authoritativeLabel ?hasVariant WHERE { ?topic a mads:Topic . ?topic mads:authoritativeLabel ?authoritativeLabel . ?topic mads:hasVariant ?hasVariant }"
-            ]
-         }
-      ]
-   },
-   {
-      "description":"Educational data, set 2: Open University and Aalto University",
-      "source":"http://data.open.ac.uk/query",
-      "target":"http://data.aalto.fi/sparql",
-      "queries":[
-         {
-            "description":"List the URIs and descriptions of all video podcasts (course material)",
-            "original":"SELECT DISTINCT ?thing ?description WHERE { ?thing a <http://data.open.ac.uk/podcast/ontology/VideoPodcast> . ?thing <http://purl.org/dc/terms/description> ?description }",
-            "expected":[
-               "SELECT DISTINCT ?course ?descr { ?course a <http://linkedscience.org/teach/ns#Material> . ?course <http://linkedscience.org/teach/ns#hasTitle> ?descr }"
-            ]
-         },
-         {
-            "description":"List people with name and surname",
-            "original":"SELECT DISTINCT ?x WHERE { ?x <http://xmlns.com/foaf/0.1/familyName> ?y . ?x <http://xmlns.com/foaf/0.1/givenName> ?z }",
-            "expected":[
-               "SELECT DISTINCT ?x WHERE { ?x <http://xmlns.com/foaf/0.1/familyName> ?y . ?x <http://xmlns.com/foaf/0.1/firstName> ?z }"
-            ]
-         },
-         {
-            "description":"Metadata about course materials - note it is not semantically equivalent due to publisher/published but it is the closest satisfiable query",
-            "original":"PREFIX dc: <http://purl.org/dc/terms/> SELECT DISTINCT ?thing ?info ?published ?anotherThing WHERE { ?thing dc:published ?published . ?thing <http://digitalbazaar.com/media/download> ?info . ?thing dc:isPartOf ?anotherThing }",
-            "expected":[
-               "PREFIX dc: <http://purl.org/dc/terms/> SELECT DISTINCT ?thing ?info ?published ?anotherThing WHERE { ?thing dc:isPartOf ?anotherThing . ?thing dc:publisher ?published . ?thing dc:title ?info }"
-            ]
-         },
-         {
-            "description":"Data about catalogue patents",
-            "original":"PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?patent dc:date ?date .?patent dc:title ?title .?patent dc:creator ?creator . ?patent bibo:status ?status . ?patent bibo:authorList ?authorList }",
-            "expected":[
-               "PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent dc:date ?date . ?patent dc:title ?title . ?patent bibo:authorList ?authorList }"
-            ]
-         },
-         {
-            "description":"Names and postcodes of campus buildings",
-            "original":"SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://vocab.deri.ie/rooms#Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.geonames.org/ontology#name> ?buildName . ?building <http://www.geonames.org/ontology#postalCode> ?postCode }",
-            "expected":[
-               "SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://dbpedia.org/ontology/Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.w3.org/2006/vcard/ns#country-name> ?buildName . ?building <http://www.w3.org/2006/vcard/ns#postal-code> ?postCode }"
-            ]
-         }
-      ]
-   },
-   {
-      "description":"Museums: Rijksmuseum and Smithsonian",
-      "source":"http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/",
-      "target":"http://edan.si.edu/saam/sparql/",
-      "queries":[
-         {
-            "id":"q1",
-            "description":"List the URIs and labels of all places",
-            "original":"SELECT DISTINCT ?place ?label WHERE { ?place a <http://www.europeana.eu/schemas/edm/Place> . ?place <http://www.w3.org/2004/02/skos/core#prefLabel> ?label }",
-            "expected":[
-               "SELECT DISTINCT ?place ?label WHERE { ?place a <http://www.cidoc-crm.org/cidoc-crm/E53_Place> . ?place <http://www.w3.org/2000/01/rdf-schema#label> ?label }"
-            ]
-         },
-         {
-            "id":"q2",
-            "description":"List the collections that belong to another collection, and describe the collections they belong to",
-            "original":"SELECT DISTINCT ?collection ?parentCollection ?parentId ?parentDescr WHERE { ?collection a <http://www.w3.org/2004/02/skos/core#OrderedCollection> . ?collection <http://www.w3.org/2004/02/skos/core#member> ?parentCollection . ?parentCollection <http://purl.org/dc/elements/1.1/identifier> ?parentId . ?parentCollection <http://vocab.getty.edu/ontology#parentString> ?parentDescr }",
-            "expected":[
-               "SELECT DISTINCT ?collection ?descr ?collectionMember WHERE { ?collection a <http://www.loc.gov/mads/rdf/v1#MADSCollection> . ?collection <http://www.loc.gov/mads/rdf/v1#hasMADSCollectionMember> ?collectionMember . ?collection <http://www.w3.org/2000/01/rdf-schema#comment> ?descr }"
-            ]
-         },
-         {
-            "id":"q3",
-            "description":"List the URIS and labels of all concepts in the museum thesauri",
-            "original":"SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> . ?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel }",
-            "expected":[
-               "SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> . ?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel . ?concept <http://www.w3.org/2004/02/skos/core#inScheme> ?inScheme }"
-            ]
-         }
-      ]
-   }
-]
+{
+	"edu_1": {
+		"description": "Educational data, set 1: Open University and Oxford University",
+		"source": "http://data.open.ac.uk/query",
+		"target": "https://data.ox.ac.uk/sparql/",
+		"queries": [
+			{
+				"description": "Give me the URIs and names of all course modules",
+				"original": "SELECT DISTINCT ?mod ?title WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module> . ?mod <http://purl.org/dc/terms/title> ?title }",
+				"expected": [
+					"SELECT DISTINCT  ?course ?title WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title }"
+				]
+			},
+			{
+				"description": "Give me the URIs, names and codes of all course modules (may vary in interpretation)",
+				"original": "PREFIX aiiso: <http://purl.org/vocab/aiiso/schema#> SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a aiiso:Module . ?mod <http://purl.org/dc/terms/title> ?title . ?mod aiiso:code ?code }",
+				"expected": [
+					"SELECT DISTINCT ?mod ?title ?code WHERE { ?mod a <http://xcri.org/profiles/1.2/course> ; <http://purl.org/dc/terms/title>  ?title ; <http://purl.org/dc/terms/identifier> ?code }",
+					"SELECT DISTINCT ?course ?name ?code WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?name . ?course <http://www.w3.org/2004/02/skos/core#notation> ?code }"
+				]
+			},
+			{
+				"description": "Also give me the regulations of all course modules (example where properties are preserved)",
+				"original": "SELECT DISTINCT ?mod ?title ?code ?regulation WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module>. ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/vocab/aiiso/schema#code> ?code . ?mod <http://xcri.org/profiles/catalog/1.2/regulations> ?regulation }",
+				"expected": [
+					"SELECT DISTINCT ?course ?title ?code ?regulation WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title . ?course <http://www.w3.org/2004/02/skos/core#notation> ?code . ?course <http://xcri.org/profiles/1.2/regulations> ?regulation }"
+				]
+			},
+			{
+				"description": "This and the previous one are examples of two equivalent source queries that have the same expected query",
+				"original": "SELECT DISTINCT ?mod ?title ?descr WHERE { ?mod a <http://purl.org/vocab/aiiso/schema#Module> . ?mod <http://purl.org/dc/terms/title> ?title . ?mod <http://purl.org/dc/elements/1.1/description> ?descr }",
+				"expected": [
+					"SELECT DISTINCT  ?course ?title ?descr ?regulation WHERE { ?course a <http://xcri.org/profiles/1.2/course> . ?course <http://purl.org/dc/terms/title> ?title . ?course <http://purl.org/dc/terms/description> ?descr }"
+				]
+			}
+		]
+	},
+	"egov_1": {
+		"description": "Open Government Data: UK and Switzerland",
+		"source": "http://opendatacommunities.org/sparql",
+		"target": "http://data.admin.ch/sparql/",
+		"queries": [
+			{
+				"description": "Tell me everything about all the administrative districts.",
+				"original": "SELECT DISTINCT ?s ?p ?o WHERE {?s a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District> . ?s ?p ?o }",
+				"expected": [
+					"SELECT DISTINCT ?s ?p ?o WHERE { ?s a <https://gont.ch/District> . ?s ?p ?o }"
+				]
+			},
+			{
+				"description": "Tell me the codes of all the administrative districts.",
+				"original": "SELECT DISTINCT ?dist ?code WHERE { ?dist a <http://data.ordnancesurvey.co.uk/ontology/admingeo/District> . ?dist <http://www.w3.org/2004/02/skos/core#notation> ?code }",
+				"expected": [
+					"SELECT DISTINCT ?dis ?id WHERE { ?dis a <https://gont.ch/District> . ?dis <https://gont.ch/id> ?id }"
+				]
+			},
+			{
+				"description": "List the labels and identifiers of all local authorities.",
+				"original": "SELECT DISTINCT ?s ?id ?label WHERE { ?s a <http://opendatacommunities.org/def/local-government/LocalAuthority> .?s <http://data.ordnancesurvey.co.uk/ontology/admingeo/gssCode> ?id . ?s <http://www.w3.org/2000/01/rdf-schema#label> ?label }",
+				"expected": [
+					"SELECT DISTINCT ?authority ?id ?label WHERE { ?authority a  <http://lindas-data.ch/def/top/Authority> . ?authority <http://purl.org/dc/elements/1.1/identifier> ?id . ?authority <http://www.w3.org/2004/02/skos/core#prefLabel> ?label }"
+				]
+			},
+			{
+				"description": "List the labels and denominations of all schools.",
+				"original": "SELECT DISTINCT ?school ?label ?notation WHERE { ?school rdf:type <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority> . ?school <http://www.w3.org/2004/02/skos/core#prefLabel> ?label . ?school <http://www.w3.org/2004/02/skos/core#notation> ?notation }",
+				"expected": [
+					"SELECT DISTINCT ?school ?denomination ?label WHERE { ?school a <http://schema.org/School> . ?school <http://gov.genealogy.net/ontology.owl#hasDenomination> ?notation . ?school <http://schema.org/legalName> ?label }"
+				]
+			},
+			{
+				"description": "List the identifiers and descriptions of all administrative services.",
+				"original": "SELECT DISTINCT ?service ?description ?identifier WHERE { ?service a <http://def.esd.org.uk/Service> . ?service <http://purl.org/dc/terms/description> ?description . ?service <http://purl.org/dc/terms/identifier> ?identifier }",
+				"expected": [
+					"SELECT DISTINCT ?service ?description ?identifier WHERE { ?service a <http://lindas-data.ch/def/top/Service> . ?service <http://www.w3.org/2004/02/skos/core#prefLabel> ?description . ?service <http://purl.org/dc/elements/1.1/identifier> ?identifier }"
+				]
+			}
+		]
+	},
+	"arts_1": {
+		"description": "Art: Museum of Fine Arts Budapest & Artium",
+		"source": "http://data.szepmuveszeti.hu/sparql",
+		"target": "http://datos.artium.org:8890/sparql",
+		"queries": [
+			{
+				"description": "List types and descriptions of all catalogued physical art objects",
+				"original": "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?physicalThing ?hasType ?descr WHERE { ?physicalThing a ecrm:E18_Physical_Thing . ?physicalThing ecrm:P2_has_type ?hasType . ?physicalThing ecrm:P1_is_identified_by ?id . ?id ecrm:P3_has_note ?descr }",
+				"expected": [
+					"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?physicalThing ?hasType ?descr WHERE { ?physicalThing a ecrm:E24_Physical_Man-Made_Thing . ?physicalThing ecrm:P2_has_type ?hasType . ?physicalThing ecrm:P3_has_note ?descr }"
+				]
+			},
+			{
+				"description": "List who created what",
+				"original": "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?creation ?partecipant WHERE { ?creation a ecrm:E65_Creation . ?creation ecrm:P11_had_participant ?partecipant }",
+				"expected": [
+					"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?creation ?partecipant WHERE { ?creation a ecrm:E65_Creation . ?creation ecrm:P14_carried_out_by ?partecipant }"
+				]
+			},
+			{
+				"description": "List the periods in which people died (this is a case of the expected query matching the given one)",
+				"original": "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathTimeSpan WHERE {?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan }",
+				"expected": [
+					"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathTimeSpan WHERE {?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan }"
+				]
+			},
+			{
+				"description": "List the death dates of people",
+				"original": "PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathDate WHERE {?deathEntity a ecrm:E69_Death .?deathEntity ecrm:P4_has_time-span ?deathTimeSpan . ?deathTimeSpan ecrm:P78_is_identified_by ?deathTimeSpanID . ?deathTimeSpanID ecrm:P3_has_note ?deathDate }",
+				"expected": [
+					"PREFIX ecrm: <http://erlangen-crm.org/current/> SELECT DISTINCT ?deathEntity ?deathDate WHERE { ?deathEntity a ecrm:E69_Death . ?deathEntity ecrm:P4_has_time-span ?deathTimeSpan . ?deathTimeSpan ecrm:P78_is_identified_by ?deathTimeSpanID . ?deathTimeSpanID ecrm:P3_has_note ?deathDate }"
+				]
+			},
+			{
+				"description": "List the labels and variants of all the topics in the dataset (another example of the expected query being the same, but with a different vocabulary)",
+				"original": "PREFIX mads: <http://www.loc.gov/mads/rdf/v1#> SELECT DISTINCT ?topic ?authoritativeLabel ?variant WHERE { ?topic a mads:Topic .?topic mads:authoritativeLabel ?authoritativeLabel . ?topic mads:hasVariant ?variant }",
+				"expected": [
+					"PREFIX mads: <http://www.loc.gov/mads/rdf/v1#> SELECT DISTINCT ?topic ?authoritativeLabel ?hasVariant WHERE { ?topic a mads:Topic . ?topic mads:authoritativeLabel ?authoritativeLabel . ?topic mads:hasVariant ?hasVariant }"
+				]
+			}
+		]
+	},
+	"edu_2": {
+		"description": "Educational data, set 2: Open University and Aalto University",
+		"source": "http://data.open.ac.uk/query",
+		"target": "http://data.aalto.fi/sparql",
+		"queries": [
+			{
+				"description": "List the URIs and descriptions of all video podcasts (course material)",
+				"original": "SELECT DISTINCT ?thing ?description WHERE { ?thing a <http://data.open.ac.uk/podcast/ontology/VideoPodcast> . ?thing <http://purl.org/dc/terms/description> ?description }",
+				"expected": [
+					"SELECT DISTINCT ?course ?descr { ?course a <http://linkedscience.org/teach/ns#Material> . ?course <http://linkedscience.org/teach/ns#hasTitle> ?descr }"
+				]
+			},
+			{
+				"description": "List people with name and surname",
+				"original": "SELECT DISTINCT ?x WHERE { ?x <http://xmlns.com/foaf/0.1/familyName> ?y . ?x <http://xmlns.com/foaf/0.1/givenName> ?z }",
+				"expected": [
+					"SELECT DISTINCT ?x WHERE { ?x <http://xmlns.com/foaf/0.1/familyName> ?y . ?x <http://xmlns.com/foaf/0.1/firstName> ?z }"
+				]
+			},
+			{
+				"description": "Metadata about course materials - note it is not semantically equivalent due to publisher/published but it is the closest satisfiable query",
+				"original": "PREFIX dc: <http://purl.org/dc/terms/> SELECT DISTINCT ?thing ?info ?published ?anotherThing WHERE { ?thing dc:published ?published . ?thing <http://digitalbazaar.com/media/download> ?info . ?thing dc:isPartOf ?anotherThing }",
+				"expected": [
+					"PREFIX dc: <http://purl.org/dc/terms/> SELECT DISTINCT ?thing ?info ?published ?anotherThing WHERE { ?thing dc:isPartOf ?anotherThing . ?thing dc:publisher ?published . ?thing dc:title ?info }"
+				]
+			},
+			{
+				"description": "Data about catalogue patents",
+				"original": "PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?patent dc:date ?date .?patent dc:title ?title .?patent dc:creator ?creator . ?patent bibo:status ?status . ?patent bibo:authorList ?authorList }",
+				"expected": [
+					"PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent dc:date ?date . ?patent dc:title ?title . ?patent bibo:authorList ?authorList }"
+				]
+			},
+			{
+				"description": "Names and postcodes of campus buildings",
+				"original": "SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://vocab.deri.ie/rooms#Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.geonames.org/ontology#name> ?buildName . ?building <http://www.geonames.org/ontology#postalCode> ?postCode }",
+				"expected": [
+					"SELECT DISTINCT ?building ?label ?buildName ?postCode WHERE { ?building a <http://dbpedia.org/ontology/Building> . ?building <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?building <http://www.w3.org/2006/vcard/ns#country-name> ?buildName . ?building <http://www.w3.org/2006/vcard/ns#postal-code> ?postCode }"
+				]
+			}
+		]
+	},
+	"museum_1": {
+		"description": "Museums: Rijksmuseum and Smithsonian",
+		"source": "http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/",
+		"target": "http://edan.si.edu/saam/sparql/",
+		"queries": [
+			{
+				"id": "q1",
+				"description": "List the URIs and labels of all places",
+				"original": "SELECT DISTINCT ?place ?label WHERE { ?place a <http://www.europeana.eu/schemas/edm/Place> . ?place <http://www.w3.org/2004/02/skos/core#prefLabel> ?label }",
+				"expected": [
+					"SELECT DISTINCT ?place ?label WHERE { ?place a <http://www.cidoc-crm.org/cidoc-crm/E53_Place> . ?place <http://www.w3.org/2000/01/rdf-schema#label> ?label }"
+				]
+			},
+			{
+				"id": "q2",
+				"description": "List the collections that belong to another collection, and describe the collections they belong to",
+				"original": "SELECT DISTINCT ?collection ?parentCollection ?parentId ?parentDescr WHERE { ?collection a <http://www.w3.org/2004/02/skos/core#OrderedCollection> ; <http://www.w3.org/2004/02/skos/core#member> ?parentCollection . ?parentCollection <http://purl.org/dc/elements/1.1/identifier> ?parentId ; <http://vocab.getty.edu/ontology#parentString> ?parentDescr }",
+				"expected": [
+					"SELECT DISTINCT ?collection ?descr ?collectionMember WHERE { ?collection a <http://www.loc.gov/mads/rdf/v1#MADSCollection> . ?collection <http://www.loc.gov/mads/rdf/v1#hasMADSCollectionMember> ?collectionMember . ?collection <http://www.w3.org/2000/01/rdf-schema#comment> ?descr }"
+				]
+			},
+			{
+				"id": "q3",
+				"description": "List the URIs and labels of all concepts in the museum thesauri",
+				"original": "SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> . ?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel }",
+				"expected": [
+					"SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> ; <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel ; <http://www.w3.org/2004/02/skos/core#inScheme> ?thesaurus }"
+				]
+			}
+		]
+	}
+}

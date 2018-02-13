@@ -7,7 +7,9 @@ package uk.ac.open.kmi.squire.core4;
 
 import java.nio.channels.ClosedByInterruptException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -39,6 +41,8 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 
 	private final float resultTypeSimilarityDegree;
 
+	private Set<QueryRecommendationListener> listeners = new HashSet<>();
+
 	public QueryRecommendatorForm4(String qString, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree,
 			String token) {
@@ -56,6 +60,14 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 
 	}
 
+	public void addListener(QueryRecommendationListener listener) {
+		listeners.add(listener);
+	}
+
+	public boolean removeListener(QueryRecommendationListener listener) {
+		return listeners.remove(listener);
+	}
+
 	@Override
 	public void run() {
 		try {
@@ -66,30 +78,31 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 			if (ex instanceof ClosedByInterruptException) {
 				log.warn(" A task with token " + token + " was interrupted."
 						+ " This may have been requested by a client.");
-			} else
-				log.error("Caught exception of type " + ex.getClass().getName() + " : " + ex.getMessage()
-						+ " - doing nothing with it.", ex);
+			} else log.error("Caught exception of type " + ex.getClass().getName() + " : " + ex.getMessage()
+					+ " - doing nothing with it.", ex);
 		}
 	}
 
 	@Override
 	public void updateDatasetSimilarity(float simScore, String token) {
-		this.notifyDatatsetSimilarity(simScore);
+		notifyDatatsetSimilarity(simScore);
 	}
 
 	@Override
 	public void updateQueryRecommendated(Query qR, float score, String token) {
-		this.notifyQueryRecommendation(qR, score);
+		fireQueryRecommended(qR, score);
+		notifyQueryRecommendation(qR, score);
 	}
 
 	@Override
 	public void updateQueryRecommendationCompletion(Boolean finished, String token) {
-		this.notifyQueryRecommendationCompletion(finished);
+		notifyQueryRecommendationCompletion(finished);
+
 	}
 
 	@Override
 	public void updateSatisfiableMessage(String msg, String token) {
-		this.notifyQuerySatisfiableMessage(msg);
+		notifyQuerySatisfiableMessage(msg);
 	}
 
 	@Override
@@ -97,12 +110,12 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		if (value) {
 			// System.out.println("[QueryRecommendatorForm4::updateSatisfiableValue] value
 			// is " + value);
-			this.notifyQuerySatisfiableMessage(
+			notifyQuerySatisfiableMessage(
 					"[QueryRecommendatorForm4::updateSatisfiableValue] The input query is satisfiable ");
 		} else {
 			// System.out.println("[QueryRecommendatorForm4::updateSatisfiableValue] value
 			// is " + value);
-			this.notifyQuerySatisfiableMessage(
+			notifyQuerySatisfiableMessage(
 					"[QueryRecommendatorForm4::updateSatisfiableValue] The input query is NOT satisfiable ");
 		}
 	}
@@ -139,8 +152,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 				// Phase 3 : recommend
 				QueryRecommendator4 qR = new QueryRecommendator4(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
 						queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree);
-
-				this.notifyQuerySatisfiableValue(true);
+				notifyQuerySatisfiableValue(true);
 				RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
 				querySim.register(this);
 				float score = querySim.computeSim(rdfd1, rdfd2);
@@ -152,11 +164,16 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 				log.error("", ex);
 			}
 		} else {
-			this.notifyQuerySatisfiableValue(false);
-			this.notifyQuerySatisfiableMessage(
+			notifyQuerySatisfiableValue(false);
+			notifyQuerySatisfiableMessage(
 					"[QueryRecommendatorForm4::recommendWithToken]The input query is not satisfiable w.r.t the input dataset... ");
 		}
 		return Collections.emptyList();
+	}
+
+	protected void fireQueryRecommended(Query query, float score) {
+		for (QueryRecommendationListener listener : listeners)
+			listener.queryRecommended(query, score, queryString);
 	}
 
 }

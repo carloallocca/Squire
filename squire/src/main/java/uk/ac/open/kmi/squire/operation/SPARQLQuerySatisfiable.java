@@ -11,8 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,16 +41,12 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 import uk.ac.open.kmi.squire.core4.AbstractQueryRecommendationObservable;
 import uk.ac.open.kmi.squire.core4.VarNameVarValuePair;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
+import uk.ac.open.kmi.squire.utils.SparqlUtils;
 
 /**
  *
@@ -479,7 +473,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 
 			if (!outputVarList.isEmpty()) {
 				String firstVar = outputVarList.get(0);
-				ArrayList<String> resList = parseSparqlResultsJson(result, firstVar);
+				List<String> resList = SparqlUtils.getValuesFromSparqlJson(result, firstVar);
 				return resList.size() > 0;
 			}
 			httpClient.getConnectionManager().shutdown();
@@ -491,24 +485,5 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 		return false;
 	}
 
-	private ArrayList<String> parseSparqlResultsJson(String result, String varString) {
-
-		ArrayList<String> output = new ArrayList<>();
-		JsonParser jsonParser = new JsonParser();
-		JsonArray results = jsonParser.parse(result).getAsJsonObject().get("results").getAsJsonObject()
-				.getAsJsonArray("bindings");
-		for (JsonElement result1 : results) {
-			JsonObject _class = result1.getAsJsonObject().getAsJsonObject(varString);
-			String value = _class.get("value").getAsString();
-			try {
-				URI valueURI = new URI(value);
-				output.add(value);
-				// System.out.println(valueURI);
-			} catch (URISyntaxException ex) {
-				log.error("Bad URI synax for string '{}'", value);
-			}
-		}
-		return output;
-	}
 
 }

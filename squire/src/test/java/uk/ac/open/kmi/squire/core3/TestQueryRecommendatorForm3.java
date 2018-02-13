@@ -18,7 +18,7 @@ import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
  *
  * @author carloallocca
  */
-public class QueryRecommendatorForm3Test {
+public class TestQueryRecommendatorForm3 {
 
 	/**
 	 * Test of recommend method, of class QueryRecommendatorForm3.
@@ -72,7 +72,7 @@ public class QueryRecommendatorForm3Test {
 				}
 			}
 		} catch (Exception ex) {
-			Logger.getLogger(QueryRecommendatorForm3Test.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(TestQueryRecommendatorForm3.class.getName()).log(Level.SEVERE, null, ex);
 		}
 	}
 

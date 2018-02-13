@@ -10,12 +10,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -28,13 +24,10 @@ import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import uk.ac.open.kmi.squire.index.II.RDFDatasetIndexerTest;
+import uk.ac.open.kmi.squire.utils.SparqlUtils;
 
 /**
  *
@@ -45,6 +38,8 @@ import uk.ac.open.kmi.squire.index.II.RDFDatasetIndexerTest;
  *
  */
 public class SPARQLEndPointTest {
+
+	private Logger log = LoggerFactory.getLogger(getClass());
 
 	/**
 	 * Test of setDatasetPath method, of class SPARQLEndPointBasedRDFDataset.
@@ -604,7 +599,7 @@ public class SPARQLEndPointTest {
 			while ((output = br.readLine()) != null) {
 				result = result + output;
 			}
-			ArrayList<String> classList = parseSparqlResultsJson(result, "class");
+			List<String> classList = SparqlUtils.getValuesFromSparqlJson(result, "class");
 
 			httpClient.getConnectionManager().shutdown();
 		} catch (ClientProtocolException e) {
@@ -613,26 +608,6 @@ public class SPARQLEndPointTest {
 			e.printStackTrace();
 		}
 
-	}
-
-	private ArrayList<String> parseSparqlResultsJson(String result, String varString) {
-
-		ArrayList<String> output = new ArrayList<>();
-		JsonParser jsonParser = new JsonParser();
-		JsonArray results = jsonParser.parse(result).getAsJsonObject().get("results").getAsJsonObject()
-				.getAsJsonArray("bindings");
-		for (JsonElement result1 : results) {
-			JsonObject _class = result1.getAsJsonObject().getAsJsonObject(varString);
-			String value = _class.get("value").getAsString();
-			try {
-				URI valueURI = new URI(value);
-				output.add(value);
-				// System.out.println(valueURI);
-			} catch (URISyntaxException ex) {
-				System.out.println(ex.getReason());
-			}
-		}
-		return output;
 	}
 
 	// @Test
@@ -668,7 +643,7 @@ public class SPARQLEndPointTest {
 							computeDataTypePropertySet(strLine, "");
 
 						} catch (Exception ex) {
-							Logger.getLogger(SPARQLEndPointTest.class.getName()).log(Level.SEVERE, null, ex);
+							log.error("{}", ex);
 						}
 
 						System.out.println(" ");
@@ -678,24 +653,23 @@ public class SPARQLEndPointTest {
 						System.out.println(" ");
 					}
 				} catch (IOException ex) {
-					Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 1", ex);
+					log.error("TEST:CARLO 1", ex);
 				} catch (Exception ex) {
-
-					Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 2", ex);
+					log.error("TEST:CARLO 2", ex);
 				}
 			}
 		} catch (FileNotFoundException ex) {
-			Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 3", ex);
+			log.error("TEST:CARLO 3", ex);
 		} catch (IOException ex) {
 
-			Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 4", ex);
+			log.error("TEST:CARLO 4", ex);
 		} finally {
 			try {
 				if (fstream != null) {
 					fstream.close();
 				}
 			} catch (IOException ex) {
-				Logger.getLogger(RDFDatasetIndexerTest.class.getName()).log(Level.SEVERE, "TEST:CARLO 7", ex);
+				log.error("TEST:CARLO 7", ex);
 			}
 		}
 

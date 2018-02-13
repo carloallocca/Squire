@@ -26,21 +26,26 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  *
  * @author carloallocca
  */
-public class QueryRecommendator4<T> extends AbstractQueryRecommendationObservable
-		implements IQueryRecommendationObserver {
+public class QueryRecommendator4 extends AbstractQueryRecommendationObservable implements IQueryRecommendationObserver {
 
-	private final IRDFDataset rdfD1;
+	private static final String CLASS_TEMPLATE_VAR = "ct";
+	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
+	private static final String DT_PROP_TEMPLATE_VAR = "dpt";
+
+	private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
+	private static final String LITERAL_TEMPLATE_VAR = "lt";
+	private static final String INSTANCE_OP = "I";
+	private static final String REMOVE_TP_OP = "R";
+
+	private final IRDFDataset rdfD1, rdfD2;
+
 	private final Query q0;
-	private final Query q0Copy;
-	private Query qTemplate;
 
+	private Query qTemplate;
 	private final float resultTypeSimilarityDegree;
 	private final float queryRootDistanceDegree;
 	private final float resultSizeSimilarityDegree;
 	private final float querySpecificityDistanceDegree;
-
-	private final IRDFDataset rdfD2;
-
 	/*
 	 * This is for storing the output of the specializer
 	 */
@@ -50,27 +55,17 @@ public class QueryRecommendator4<T> extends AbstractQueryRecommendationObservabl
 	 * This is for storing the output of the QueryRecommendator
 	 */
 	private List<QueryScorePair> sortedRecomQueryList = new ArrayList<>();
-
 	private LiteralVarMapping literalVarTable;
 	private ClassVarMapping classVarTable;
 	private DatatypePropertyVarMapping datatypePropertyVarTable;
 	private IndividualVarMapping individualVarTable;
+
 	private ObjectPropertyVarMapping objectProperyVarTable;
 	private RDFVocVarMapping rdfVocVarTable;
-
-	private static final String CLASS_TEMPLATE_VAR = "ct";
-	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
-	private static final String DT_PROP_TEMPLATE_VAR = "dpt";
-	private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
-	private static final String LITERAL_TEMPLATE_VAR = "lt";
-
-	private static final String INSTANCE_OP = "I";
-	private static final String REMOVE_TP_OP = "R";
 
 	public QueryRecommendator4(Query query, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree) {
 		q0 = QueryFactory.create(query.toString());
-		q0Copy = QueryFactory.create(query.toString());
 		rdfD1 = d1;
 		classVarTable = new ClassVarMapping();
 		individualVarTable = new IndividualVarMapping();
@@ -88,7 +83,7 @@ public class QueryRecommendator4<T> extends AbstractQueryRecommendationObservabl
 	public void buildRecommendation() throws Exception {
 
 		// GENERALIZE...
-		QueryGeneralizer4 qG = new QueryGeneralizer4(this.q0Copy, this.rdfD1, this.rdfD2);
+		QueryGeneralizer4 qG = new QueryGeneralizer4(this.q0, this.rdfD1, this.rdfD2);
 		this.qTemplate = qG.generalize();
 		System.out.println(" ");
 		System.out.println("[QueryRecommendation, generalizeToQueryTemplate()] THE GENERALIZED QUERY: ");
@@ -102,13 +97,11 @@ public class QueryRecommendator4<T> extends AbstractQueryRecommendationObservabl
 		this.rdfVocVarTable = qG.getRdfVocVarTable();
 
 		// SPECIALIZE...
-		QuerySpecializer4 qS = new QuerySpecializer4(this.q0Copy, this.qTemplate, this.rdfD1, this.rdfD2,
-
+		QuerySpecializer4 qS = new QuerySpecializer4(this.q0, this.qTemplate, this.rdfD1, this.rdfD2,
 				this.classVarTable, this.objectProperyVarTable, this.datatypePropertyVarTable, this.individualVarTable,
-				this.literalVarTable, this.rdfVocVarTable,
-
-				this.resultTypeSimilarityDegree, this.queryRootDistanceDegree, this.resultSizeSimilarityDegree,
-				this.querySpecificityDistanceDegree, this.token);
+				this.literalVarTable, this.rdfVocVarTable, this.resultTypeSimilarityDegree,
+				this.queryRootDistanceDegree, this.resultSizeSimilarityDegree, this.querySpecificityDistanceDegree,
+				this.token);
 		qS.register(this);
 		qS.specialize();
 
@@ -127,18 +120,9 @@ public class QueryRecommendator4<T> extends AbstractQueryRecommendationObservabl
 		return sortedRecomQueryList;
 	}
 
-	private void applyRankingToRecommandedQueryList(List<QueryAndContextNode> qRList) {
-		for (QueryAndContextNode qrRecom : qRList) {
-			QueryScorePair pair = new QueryScorePair(qrRecom.getqR(), qrRecom.getqRScore());
-			this.sortedRecomQueryList.add(pair);
-		}
-		Collections.sort(this.sortedRecomQueryList, QueryScorePair.queryScoreComp);
-	}
-
 	@Override
 	public void updateDatasetSimilarity(float simScore, String token) {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-																		// Tools | Templates.
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
@@ -147,20 +131,26 @@ public class QueryRecommendator4<T> extends AbstractQueryRecommendationObservabl
 	}
 
 	@Override
+	public void updateQueryRecommendationCompletion(Boolean finished, String token) {
+		this.notifyQueryRecommendationCompletion(finished);
+	}
+
+	@Override
 	public void updateSatisfiableMessage(String msg, String token) {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-																		// Tools | Templates.
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
 	@Override
 	public void updateSatisfiableValue(Boolean value, String token) {
-		throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-																		// Tools | Templates.
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 
-	@Override
-	public void updateQueryRecommendationCompletion(Boolean finished, String token) {
-		this.notifyQueryRecommendationCompletion(finished);
+	private void applyRankingToRecommandedQueryList(List<QueryAndContextNode> qRList) {
+		for (QueryAndContextNode qrRecom : qRList) {
+			QueryScorePair pair = new QueryScorePair(qrRecom.getqR(), qrRecom.getqRScore());
+			this.sortedRecomQueryList.add(pair);
+		}
+		Collections.sort(this.sortedRecomQueryList, QueryScorePair.queryScoreComp);
 	}
 
 }
