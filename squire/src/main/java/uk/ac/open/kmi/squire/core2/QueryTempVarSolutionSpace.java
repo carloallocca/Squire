@@ -18,8 +18,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -38,6 +36,7 @@ import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.core4.VarNameVarValuePair;
@@ -80,49 +79,7 @@ public class QueryTempVarSolutionSpace {
 		return qT;
 	}
 
-	private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
-
-	public QueryTempVarSolutionSpace() {
-		super();
-	}
-
-	public Map<Var, Set<RDFNode>> compute(Query qChild, IRDFDataset rdfd2, QueryAndContextNode parentNode) {
-		if (parentNode == null) {// compute
-			// 0. Check if the input query has aany template variable, otherwise qTsol is
-			// empty
-			Set<Var> templateVarSet = getQueryTemplateVariableSet(qChild);
-			if (templateVarSet.size() > 0) {
-				try {
-					// 1. Transform the the query qChild into a query containg the template variable
-					// only.
-					Query qT = rewriteQueryWithTemplateVar(qChild);
-					// 2. Compute the QuerySolution for qT;
-					qT.setLimit(1000);
-					List<QuerySolution> qTsol = computeSolutionSpace(qT, rdfd2);
-					Map<Var, Set<RDFNode>> qTsolMap = tranformToMap(qTsol, qChild);
-					return qTsolMap;
-				} catch (Exception ex) {
-					Logger.getLogger(QueryTempVarSolutionSpace.class.getName()).log(Level.SEVERE, null, ex);
-					return new HashMap<>();
-				}
-			}
-		} else { // take it from parent node
-			Set<Var> templateVarSet = getQueryTemplateVariableSet(qChild);
-			if (templateVarSet.size() > 0) {
-				Map<Var, Set<RDFNode>> qTsolChildMap = new HashMap<>();
-				Map<Var, Set<RDFNode>> qTsolParentMap = parentNode.getQueryTempVarValueMap();
-				for (Var vt : templateVarSet) {
-					Set<RDFNode> value = new HashSet<>();
-					value.addAll(qTsolParentMap.get(vt));
-					qTsolChildMap.put(vt, value);
-				}
-				printQuerySolutionSpaceMap(qTsolChildMap);
-				return qTsolChildMap;
-			}
-			return new HashMap<>();
-		}
-		return new HashMap<>();
-	}
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2) {
 		// 0. Check if the input query has aany template variable, otherwise qTsol is
@@ -140,8 +97,9 @@ public class QueryTempVarSolutionSpace {
 				List<QuerySolution> qTsol = computeSolutionSpace(qT, rdfd2);
 				log.info("[QueryTempVarSolutionSpace::compute]qTsol size; " + qTsol.size());
 				return qTsol;
-			} catch (Exception ex) {
-				Logger.getLogger(QueryTempVarSolutionSpace.class.getName()).log(Level.SEVERE, null, ex);
+			} catch (ConnectException ex) {
+				log.error("Connection failed while checking solution space.", ex);
+				log.error("Returning empty solution space.");
 				return new ArrayList<>();
 			}
 		}
@@ -150,47 +108,41 @@ public class QueryTempVarSolutionSpace {
 
 	private List<QuerySolution> computeSolutionSpace(Query q, IRDFDataset rdfd2) throws ConnectException {
 		log.info("This is the subquery: " + q.toString());
+		int timeout = 30;
+		RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+				.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+		CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 		try {
 			String encodedQuery = URLEncoder.encode(q.toString(), "UTF-8");
 			String GET_URL = rdfd2.getEndPointURL() + "?query=" + encodedQuery;
-
-			int timeout = 300;
-			RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-					.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-			CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-
-			// DefaultHttpClient httpClient = new DefaultHttpClient();
-
+			log.trace(" * Full request URI: {}", GET_URL);
 			HttpGet getRequest = new HttpGet(GET_URL);
-			// getRequest.addHeader("accept", "application/sparql-results+json");
 			getRequest.addHeader("accept", "application/sparql-results+json");
-
-			// HttpResponse response = httpClient.execute(getRequest);
 			HttpResponse response = client.execute(getRequest);
-			if (response.getStatusLine().getStatusCode() != 200) {
+			if (response.getStatusLine().getStatusCode() != 200)
 				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-			}
 			BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
 			String output;
 			String result = "";
-			while ((output = br.readLine()) != null) {
+			while ((output = br.readLine()) != null)
 				result = result + output;
-			}
-			// CloseableHttpClient getConnectionManager().shutdown();
-			client.close();
-			log.info("solution space result " + result);
-
-			ArrayList<QuerySolution> resultList = writeQueryResultsAsJenaQuerySolution(result, q.getProjectVars());
+			log.debug("Raw query result follows:");
+			log.debug("{}", result);
+			List<QuerySolution> resultList = asJenaQuerySolutions(result, q.getProjectVars());
 			// log.info("This is the solution space query: " + q.toString());
 			log.info("solution space result size " + resultList.size());
 			return resultList;
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			throw new ConnectException("Caused by org.apache.http.client.ClientProtocolException : " + e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new ConnectException("Cauded by java.io.IOException : " + e.getMessage());
+		} finally {
+			try {
+				client.close();
+			} catch (IOException e) {
+				log.warn("Failed to close HTTP client. This isn't usually fatal but you may want to check why.", e);
+			}
 		}
-
-		return new ArrayList<>();
 	}
 	// based on jena
 	// private List<QuerySolution> computeSolutionSpace(Query q, IRDFDataset rdfd2)
@@ -268,19 +220,18 @@ public class QueryTempVarSolutionSpace {
 		return new HashMap<>();
 	}
 
-	private ArrayList<QuerySolution> writeQueryResultsAsJenaQuerySolution(String result, List<Var> projectVars) {
+	private List<QuerySolution> asJenaQuerySolutions(String resultString, List<Var> projected) {
 
-		for (Var v : projectVars) {
+		for (Var v : projected)
 			log.info("var " + v.getName());
-		}
 
 		// TO MANAGE:
 		// [QueryTempVarSolutionSpace]: ::result{ "head": { "vars": [ "opt2" , "opt1" ]
 		// } , "results": { "bindings": [ ] }}
 		// [INFO ]
-		log.info("::result" + result);
+		log.info("::result" + resultString);
 		ArrayList<QuerySolution> output = new ArrayList<>();
-		String[] resBindings = result.split("bindings");
+		String[] resBindings = resultString.split("bindings");
 
 		try {
 			// it could be " [ ] }}"
@@ -370,7 +321,7 @@ public class QueryTempVarSolutionSpace {
 					}
 
 				}
-				if (varNameVarValuePairList.size() == projectVars.size()) {
+				if (varNameVarValuePairList.size() == projected.size()) {
 					output.add(qs);
 				}
 

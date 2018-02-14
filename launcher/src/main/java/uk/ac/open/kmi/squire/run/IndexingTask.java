@@ -1,6 +1,5 @@
 package uk.ac.open.kmi.squire.run;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.LinkedList;
@@ -46,12 +45,7 @@ public class IndexingTask {
 		}
 		for (String url : endpoints) {
 			log.info("Inspecting endpoint <{}>", url);
-			SparqlIndexedDataset indexed;
-			try {
-				indexed = new SparqlIndexedDataset(url, force);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			SparqlIndexedDataset indexed = new SparqlIndexedDataset(url, force);
 			if (indexed.isIndexed()) {
 				log.info(" ... already indexed (classes={};OPs={};DPs={};Ps={}).", indexed.getClassSet().size(),
 						indexed.getObjectPropertySet().size(), indexed.getDatatypePropertySet().size(),

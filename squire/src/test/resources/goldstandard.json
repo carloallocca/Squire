@@ -38,7 +38,8 @@
 	"egov_1": {
 		"description": "Open Government Data: UK and Switzerland",
 		"source": "http://opendatacommunities.org/sparql",
-		"target": "http://data.admin.ch/sparql/",
+		"target": "http://data.admin.ch/query/",
+		"notes": "As of Feb 2018 the <http://data.admin.ch/sparql/> URL points to the YasGUI but does not redirect when requesting JSON or XML, so we replaced it with the raw endpoint <http://data.admin.ch/query/>.",
 		"queries": [
 			{
 				"description": "Tell me everything about all the administrative districts.",

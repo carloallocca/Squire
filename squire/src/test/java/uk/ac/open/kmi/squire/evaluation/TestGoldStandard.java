@@ -64,12 +64,12 @@ public class TestGoldStandard {
 		unpackAndRun("arts_1");
 	}
 
-	@Test
+	// @Test
 	public void testEducationI() throws Exception {
 		unpackAndRun("edu_1");
 	}
 
-	@Test
+	// @Test
 	public void testEducationII() throws Exception {
 		// Generalised is too generic! Aalto keeps us waiting forever on
 		// SELECT DISTINCT ?dpt1 ?opt1 ?dpt2
@@ -97,7 +97,7 @@ public class TestGoldStandard {
 		unpackAndRun("egov_1");
 	}
 
-	@Test
+	// @Test
 	public void testMuseum() throws Exception {
 		unpackAndRun("museum_1");
 	}
@@ -157,7 +157,7 @@ public class TestGoldStandard {
 			Reporter rep = new Reporter(q, new URL(source), new URL(target));
 			R1.addListener(rep);
 			R1.run();
-			rep.printReport(new PrintWriter(new FileWriter("TestResults/" + key + "_q" + nQ++ + ".txt")));
+			rep.printReport(new PrintWriter(new FileWriter("TestResults/" + key + "_q" + nQ++ + ".txt")), 50);
 		}
 	}
 

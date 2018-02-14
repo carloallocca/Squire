@@ -5,7 +5,6 @@
  */
 package uk.ac.open.kmi.squire.jobs;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,8 +35,7 @@ public class JobManager implements IQueryRecommendationObserver {
 	private static int tokenCounter = 0;
 
 	public static JobManager getInstance() {
-		if (me == null)
-			me = new JobManager();
+		if (me == null) me = new JobManager();
 		return me;
 	}
 
@@ -126,33 +124,29 @@ public class JobManager implements IQueryRecommendationObserver {
 			map.put(strToken, new RecommendationJobStatus());
 
 		}
-		try {
-			IRDFDataset d1 = new SparqlIndexedDataset(endPointURI, graphName);
-			if (!d1.isIndexed()) {
-				// RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 
-				// System.out.println("[SPARQLEndPoint::SPARQLEndPoint, constructor] SPARQL
-				// endpoint " +
-				// urlAddress + " is not yet indexed ");
-				// d1.computeClassSet();
-				// d1.computeObjectPropertySet();
-				// d1.computeDataTypePropertySet();
-				// d1.computeRDFVocabularySet();
-				// instance.indexSignature(endPointURI, graphName, d1.getClassSet(),
-				// d1.getObjectPropertySet(),
-				// d1.getDatatypePropertySet(), d1.getIndividualSet(), d1.getLiteralSet(),
-				// d1.getRDFVocabulary(), d1.getPropertySet());
+		IRDFDataset d1 = new SparqlIndexedDataset(endPointURI, graphName);
+		if (!d1.isIndexed()) {
+			// RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 
-				// R1.register(this);
+			// System.out.println("[SPARQLEndPoint::SPARQLEndPoint, constructor] SPARQL
+			// endpoint " +
+			// urlAddress + " is not yet indexed ");
+			// d1.computeClassSet();
+			// d1.computeObjectPropertySet();
+			// d1.computeDataTypePropertySet();
+			// d1.computeRDFVocabularySet();
+			// instance.indexSignature(endPointURI, graphName, d1.getClassSet(),
+			// d1.getObjectPropertySet(),
+			// d1.getDatatypePropertySet(), d1.getIndividualSet(), d1.getLiteralSet(),
+			// d1.getRDFVocabulary(), d1.getPropertySet());
 
-			}
+			// R1.register(this);
 
-			Future<?> promise = this.threadPool.submit(d1);
-			taskMap.put(strToken, promise);
-
-		} catch (IOException ex) {
-			log.error("Exception logged.", ex);
 		}
+
+		Future<?> promise = this.threadPool.submit(d1);
+		taskMap.put(strToken, promise);
 
 		// IRDFDataset d2 = new SPARQLEndPoint(target_endpoint, "");
 		//
@@ -182,8 +176,7 @@ public class JobManager implements IQueryRecommendationObserver {
 	public synchronized boolean stopJob(String token) {
 		Future<?> promise = taskMap.get(token);
 		boolean existed = promise != null;
-		if (existed)
-			promise.cancel(true);
+		if (existed) promise.cancel(true);
 		taskMap.remove(token);
 		return existed;
 	}

@@ -60,7 +60,15 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 	// private static final String _TEST_RESULT_DIR_PREFIX =
 	// "/Users/carloallocca/Desktop/KMi/KMi Started
 	// 2015/KMi2015Development/WebSquire/TestResults/";
+
+	/*
+	 * Will log to working directory no matter what.
+	 * 
+	 * The goal anyway is to remove file writing from this class entirely. The
+	 * Reporter class should handle all of it externally.
+	 */
 	private static final String _TEST_RESULT_DIR_PREFIX = "TestResults/";
+
 	// private static final String TEST_RESULT_METRICS =
 	// "QueryRootDistanceSimilarity/";
 
@@ -730,7 +738,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
 	private QueryAndContextNode createNewQueryAndContextNodeForInstanciateOp(Query childQueryCopyInstanciated,
 			QueryAndContextNode parentQueryAndContextNode,
-			ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) throws Exception {
+			ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
 		QueryAndContextNode childQueryAndContextNode = new QueryAndContextNode();
 		// ...set the original query and the recommendated query;
 		Query clonedqO = QueryFactory.create(parentQueryAndContextNode.getqO());
@@ -739,22 +747,21 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		Query clonedqR = QueryFactory.create(childQueryCopyInstanciated.toString());
 		childQueryAndContextNode.setqR(clonedqR);
 
+		// XXX cloning the dataset object for the child nodes, why?
 		// ..set the RDF dataset 1
 		IRDFDataset rdfD1 = parentQueryAndContextNode.getRdfD1();
 		if (rdfD1 instanceof SparqlIndexedDataset) {
-			IRDFDataset newRdfD1 = new SparqlIndexedDataset(
-					((String) parentQueryAndContextNode.getRdfD1().getEndPointURL()),
-					(String) parentQueryAndContextNode.getRdfD1().getGraph());
-			childQueryAndContextNode.setRdfD1(newRdfD1);
+			childQueryAndContextNode
+					.setRdfD1(new SparqlIndexedDataset((String) parentQueryAndContextNode.getRdfD1().getEndPointURL(),
+							(String) parentQueryAndContextNode.getRdfD1().getGraph()));
 		} else { // TO ADD the case of FILEBASED dataset
 		}
 		// ..set the RDF dataset 2
 		IRDFDataset rdfD2 = parentQueryAndContextNode.getRdfD2();
 		if (rdfD2 instanceof SparqlIndexedDataset) {
-			IRDFDataset newRdfD2 = new SparqlIndexedDataset(
-					((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
-					(String) parentQueryAndContextNode.getRdfD2().getGraph());
-			childQueryAndContextNode.setRdfD2(newRdfD2);
+			childQueryAndContextNode
+					.setRdfD2(new SparqlIndexedDataset(((String) parentQueryAndContextNode.getRdfD2().getEndPointURL()),
+							(String) parentQueryAndContextNode.getRdfD2().getGraph()));
 			// //C. Compute the QueryTempVarSolutionSpace
 			// QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
 			// // [REPLACED] List<QuerySolution> qTsolMap =
@@ -762,10 +769,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 			// //Map<Var, Set<RDFNode>> qTsolMap =
 			// temVarValueSpace.computeTempVarSolutionSpace(clonedqR, this.rdfd2, null);
 			// childQueryAndContextNode.setQueryTempVarValueMap(qTsolMap);
-			List<QuerySolution> qTsol = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
-			List<QuerySolution> qTsolChild = new ArrayList();
-			qTsolChild.addAll(qTsol);
-			childQueryAndContextNode.setSolutionSpace(qTsolChild);
+			childQueryAndContextNode
+					.setSolutionSpace(new ArrayList<>(parentQueryAndContextNode.getQueryTempVarSolutionSpace()));
 		} else { // TO ADD the case of FILEBASED dataset
 		}
 
@@ -1142,11 +1147,6 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		}
 		Collections.sort(s);
 		return queryIndex.containsKey(s.toString());
-	}
-
-	private boolean isRProcessable(QueryAndContextNode qRScoreMaxNodeCloned) {
-		Query q = qRScoreMaxNodeCloned.getqR();
-		return getQueryTriplePathSet(q).size() > 1;
 	}
 
 	private void printMap(Map<Var, Set<RDFNode>> tmpMap) {

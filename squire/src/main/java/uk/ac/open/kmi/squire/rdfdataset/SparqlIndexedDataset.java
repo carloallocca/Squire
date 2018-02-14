@@ -57,20 +57,19 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	 */
 	protected Set<String> propertySet = new HashSet<>();
 
-	public SparqlIndexedDataset(String urlAddress) throws IOException, LockObtainFailedException {
+	public SparqlIndexedDataset(String urlAddress) {
 		this(urlAddress, "", false);
 	}
 
-	public SparqlIndexedDataset(String urlAddress, boolean replacing) throws IOException, LockObtainFailedException {
+	public SparqlIndexedDataset(String urlAddress, boolean replacing) {
 		this(urlAddress, "", replacing);
 	}
 
-	public SparqlIndexedDataset(String urlAddress, String graphName) throws IOException, LockObtainFailedException {
+	public SparqlIndexedDataset(String urlAddress, String graphName) {
 		this(urlAddress, graphName, false);
 	}
 
-	public SparqlIndexedDataset(String urlAddress, String graphName, boolean replacing)
-			throws IOException, LockObtainFailedException {
+	public SparqlIndexedDataset(String urlAddress, String graphName, boolean replacing) {
 		this.graphName = graphName;
 		this.endpointURL = urlAddress;
 		this.replacing = replacing;
@@ -347,10 +346,10 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			String GET_URL = this.endpointURL + "?query=" + encodedQuery;
 
 			// set the connection timeout value to 30 seconds (30000 milliseconds)
+			// TODO do it with the new Builder
 			final HttpParams httpParams = new BasicHttpParams();
 			HttpConnectionParams.setConnectionTimeout(httpParams, 300000000);
 			DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
-			// DefaultHttpClient httpClient = new DefaultHttpClient();
 
 			HttpGet getRequest = new HttpGet(GET_URL);
 			getRequest.addHeader("Accept", "application/sparql-results+json");
