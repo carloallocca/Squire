@@ -135,7 +135,7 @@ public class QueryTempVarSolutionSpace {
 		} catch (ClientProtocolException e) {
 			throw new ConnectException("Caused by org.apache.http.client.ClientProtocolException : " + e.getMessage());
 		} catch (IOException e) {
-			throw new ConnectException("Cauded by java.io.IOException : " + e.getMessage());
+			throw new ConnectException("Caused by java.io.IOException : " + e.getMessage());
 		} finally {
 			try {
 				client.close();

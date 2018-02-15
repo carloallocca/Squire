@@ -38,7 +38,6 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	private final IRDFDataset rdfd2;
 
 	private final float resultSizeSimilarityDegree;
-
 	private final float resultTypeSimilarityDegree;
 
 	private Set<QueryRecommendationListener> listeners = new HashSet<>();
@@ -123,6 +122,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	private List<QueryStringScorePair> recommendWithToken(String token) {
 		Query query;
 		try {
+			System.out.println(queryString);
 			query = QueryFactory.create(queryString);
 			System.out.println("");
 			System.out.println("[QueryRecommendatorForm4::recommend] THE SOURCE QUERY ");

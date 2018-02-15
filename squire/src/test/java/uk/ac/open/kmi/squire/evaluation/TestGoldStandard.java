@@ -24,7 +24,8 @@ import uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4;
 import uk.ac.open.kmi.squire.jobs.JobManager;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
-import uk.ac.open.kmi.squire.report.Reporter;
+import uk.ac.open.kmi.squire.report.RecordKeeper;
+import uk.ac.open.kmi.squire.report.Tracer;
 
 /**
  *
@@ -33,10 +34,10 @@ import uk.ac.open.kmi.squire.report.Reporter;
 public class TestGoldStandard {
 
 	private class Config {
-		float resultTypeSimilarityDegree = 1;
-		float queryRootDistanceDegree = 1;
-		float resultSizeSimilarityDegree = 1;
-		float querySpecificityDistanceDegree = 1;
+		float wQueryRootDistance = 1;
+		float wQuerySpecificityDistance = 1;
+		float wResultSizeSimilarity = 1;
+		float wResultTypeSimilarity = 1;
 	}
 
 	private static JsonObject testdata;
@@ -64,12 +65,12 @@ public class TestGoldStandard {
 		unpackAndRun("arts_1");
 	}
 
-	// @Test
+	@Test
 	public void testEducationI() throws Exception {
 		unpackAndRun("edu_1");
 	}
 
-	// @Test
+	@Test
 	public void testEducationII() throws Exception {
 		// Generalised is too generic! Aalto keeps us waiting forever on
 		// SELECT DISTINCT ?dpt1 ?opt1 ?dpt2
@@ -97,7 +98,7 @@ public class TestGoldStandard {
 		unpackAndRun("egov_1");
 	}
 
-	// @Test
+	@Test
 	public void testMuseum() throws Exception {
 		unpackAndRun("museum_1");
 	}
@@ -150,14 +151,19 @@ public class TestGoldStandard {
 		IRDFDataset d1 = new SparqlIndexedDataset(source), d2 = new SparqlIndexedDataset(target);
 		int nQ = 1;
 		for (String q : queries) {
-			QueryRecommendatorForm4 R1 = new QueryRecommendatorForm4(q, d1, d2,
-					configuration.resultTypeSimilarityDegree, configuration.queryRootDistanceDegree,
-					configuration.resultSizeSimilarityDegree, configuration.querySpecificityDistanceDegree,
-					Integer.toString(1));
-			Reporter rep = new Reporter(q, new URL(source), new URL(target));
-			R1.addListener(rep);
-			R1.run();
-			rep.printReport(new PrintWriter(new FileWriter("TestResults/" + key + "_q" + nQ++ + ".txt")), 50);
+			QueryRecommendatorForm4 recom = new QueryRecommendatorForm4(q, d1, d2, configuration.wResultTypeSimilarity,
+					configuration.wQueryRootDistance, configuration.wResultSizeSimilarity,
+					configuration.wQuerySpecificityDistance, Integer.toString(1));
+			RecordKeeper rep = new RecordKeeper(q, new URL(source), new URL(target));
+			String filename = key + "_q" + nQ++;
+			Tracer tracer = new Tracer(q, new URL(source), new URL(target),
+					new PrintWriter(new FileWriter("TestResults/" + filename + ".log")));
+			tracer.printHeader();
+			recom.addListener(rep);
+			recom.addListener(tracer);
+			recom.run();
+			tracer.printFooter();
+			rep.printReport(new PrintWriter(new FileWriter("TestResults/" + filename + ".txt")), 50);
 		}
 	}
 

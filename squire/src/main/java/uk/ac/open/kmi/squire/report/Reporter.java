@@ -1,55 +1,24 @@
 package uk.ac.open.kmi.squire.report;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.jena.query.Query;
-import org.mksmart.squire.websquire.v1.resources.QueryStringScorePair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.core4.QueryRecommendationListener;
 
 /**
- * Can be attached to a query recommendation generator in order to do
- * record-keeping and reporting during or at the end of computation.
+ * Objects that listen to query recommendations being fired with the objective
+ * of printing a log or report will instantiate an extension of this class.
  * 
  * @author alessandro
  *
  */
-public class Reporter implements QueryRecommendationListener {
+public abstract class Reporter implements QueryRecommendationListener {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	protected String originalQuery;
 
-	private ArrayList<QueryStringScorePair> recommendations = new ArrayList<>();
-
-	private Map<String, Integer> order = new HashMap<>();
-
-	private String originalQuery;
-
-	private URL sourceEndpoint, targetEndpoint;
-
-	/**
-	 * Keeps track of how many recommended queries have been received since
-	 * record-keeping began (or since the reporter was last reset).
-	 */
-	private int counter = 0;
-
-	/**
-	 * Inverse sorter that compares by score, higher first.
-	 */
-	private Comparator<QueryStringScorePair> comparator = new Comparator<QueryStringScorePair>() {
-		public int compare(QueryStringScorePair o1, QueryStringScorePair o2) {
-			return o1.getScore() < o2.getScore() ? 1 : o1.getScore() > o2.getScore() ? -1 : 0;
-		}
-	};
+	protected URL sourceEndpoint, targetEndpoint;
 
 	public Reporter(String originalQuery, URL sourceEndpoint, URL targetEndpoint) {
 		if (originalQuery == null || originalQuery.isEmpty())
@@ -62,50 +31,15 @@ public class Reporter implements QueryRecommendationListener {
 	}
 
 	/**
-	 * Prints a report of the current recommendation records for up to the top 20
-	 * recommended queries.
-	 * 
-	 * @param out
-	 *            the writer to print to
-	 * @throws IOException
+	 * Tells this reporter to start keeping records from scratch. This operation is
+	 * expected to preserve the original SPARQL query and the endpoints.
 	 */
-	public void printReport(PrintWriter out) throws IOException {
-		printReport(out, Math.min(recommendations.size(), 20));
-	}
+	public abstract void reset();
 
-	/**
-	 * Prints a report of the current recommendation records for the top k
-	 * recommended queries (or less if the total number of recommendations is
-	 * lower).
-	 * 
-	 * @param out
-	 *            the writer to print to
-	 * @param topK
-	 *            the number of highest-scored queries to show in the report
-	 * @throws IOException
+	/*
+	 * TODO make private and support end of computation with another event type.
 	 */
-	public void printReport(PrintWriter out, int topK) throws IOException {
-		out.println("# SQUIRE query recommendation report");
-		out.println();
-		out.println("Original query:");
-		out.println(this.originalQuery);
-		out.println("Satisfiable on endpoint: " + this.sourceEndpoint);
-		out.println("Reformulated for endpoint: " + this.targetEndpoint);
-		out.println();
-		out.println("## Recommendations");
-		out.println("Top " + Math.min(topK, recommendations.size()) + " recommended queries follow.");
-		recommendations.sort(comparator);
-		int total = recommendations.size();
-		for (int i = 0; i < topK && i < total; i++) {
-			out.println("=========");
-			out.println("Rank = " + (i + 1));
-			out.println("Score = " + recommendations.get(i).getScore());
-			out.println("Position on arrival = " + order.get(recommendations.get(i).getQuery()).intValue() + " of "
-					+ total);
-			out.println("Query:");
-			out.println(recommendations.get(i).getQuery());
-			out.println();
-		}
+	protected void printFooter(PrintWriter out) {
 		out.println("=========");
 		out.println("This report generated: "
 				+ new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(Calendar.getInstance().getTime()));
@@ -113,25 +47,22 @@ public class Reporter implements QueryRecommendationListener {
 		out.flush();
 	}
 
-	@Override
-	public void queryRecommended(Query query, float score, String original) {
-		if (originalQuery != null && !original.equals(this.originalQuery)) {
-			log.warn("Original query has changed!");
-			log.warn(" * Got: {}", original);
-			log.warn(" * Expected: {}", this.originalQuery);
-		} else this.originalQuery = original;
-		recommendations.add(new QueryStringScorePair(query.serialize(), score));
-		order.put(query.serialize(), ++counter);
+	protected void printHeader(PrintWriter out) {
+		printHeader(out, "SQUIRE query recommendation report");
 	}
 
-	/**
-	 * Tells this reporter to start keeping records from scratch, without changing
-	 * the original SPARQL query or the endpoints.
+	/*
+	 * TODO make private and support start of computation with another event type.
 	 */
-	public void reset() {
-		counter = 0;
-		recommendations.clear();
-		order.clear();
+	protected void printHeader(PrintWriter out, String title) {
+		out.println("# " + title);
+		out.println();
+		out.println("Original query:");
+		out.println(this.originalQuery);
+		out.println("Satisfiable on endpoint: " + this.sourceEndpoint);
+		out.println("Reformulated for endpoint: " + this.targetEndpoint);
+		out.println();
+		out.flush();
 	}
 
 }

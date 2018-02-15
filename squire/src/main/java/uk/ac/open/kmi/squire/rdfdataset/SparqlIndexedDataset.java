@@ -18,11 +18,10 @@ import java.util.Set;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
@@ -343,15 +342,13 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		log.debug("Sending query: {}", qS);
 		try {
 			String encodedQuery = URLEncoder.encode(qS.toString(), "UTF-8");
-			String GET_URL = this.endpointURL + "?query=" + encodedQuery;
-
+			String url = this.endpointURL + "?query=" + encodedQuery;
 			// set the connection timeout value to 30 seconds (30000 milliseconds)
-			// TODO do it with the new Builder
-			final HttpParams httpParams = new BasicHttpParams();
-			HttpConnectionParams.setConnectionTimeout(httpParams, 300000000);
-			DefaultHttpClient httpClient = new DefaultHttpClient(httpParams);
-
-			HttpGet getRequest = new HttpGet(GET_URL);
+			int timeout = 30;
+			RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
+					.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+			CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+			HttpGet getRequest = new HttpGet(url);
 			getRequest.addHeader("Accept", "application/sparql-results+json");
 			HttpResponse response = httpClient.execute(getRequest);
 			List<String> itemList;
@@ -367,7 +364,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 				// Don't die. Keep whatever was indexed so far.
 				String reason = response.getStatusLine().getReasonPhrase();
 				log.warn("Got remote response {} - {}", stcode, reason);
-				// If it was the first attempt though, raise an exception
+				// If it was the first attempt though, give up and raise an exception.
 				if (iteration == 0) throw new BootedException();
 				log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
 						iteration);
@@ -384,7 +381,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 				if (!itemList.isEmpty())
 					log.debug("All {} RDF resources already present, closing loop.", itemList.size());
 				log.info("DONE. {} total resources indexed.", tgtResourceSet.size());
-			} else {
+			} else { // the recursive call.
 				tgtResourceSet.addAll(itemList);
 				log.info(" ... {} resources indexed so far (last {} in {} ms)", tgtResourceSet.size(), itemList.size(),
 						(System.currentTimeMillis() - before));
@@ -394,7 +391,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 					iterativeComputation(partialQuery, tgtResourceSet, stepLength, iteration + 1, exclusions);
 				} else log.info("DONE. {} total resources indexed for this category.", tgtResourceSet.size());
 			}
-
+			
 		} catch (ClientProtocolException e) {
 			e.printStackTrace(); // TODO Handle properly
 		} catch (IOException e) {

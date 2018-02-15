@@ -698,8 +698,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		return sim;
 	}
 
-	private float computeInstanciationOperationCost(
-			ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
+	private float computeInstanciationOperationCost(List<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
 		int size = templVarEntityQoQrInstanciatedList.size();
 		float nodeCost = 0;
 		if (size > 0) {
@@ -984,7 +983,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		float resultTypeSim = 1 - resulTtypeDist;
 		childQueryAndContextNode.setQueryResultTypeSimilarity(resultTypeSim);
 
-		log.info("newResulttypeSimR " + Float.toString(resultTypeSim));
+		log.debug("newResulttypeSimR = {}", resultTypeSim);
 
 		// log.info("qSpecDistSimVarR " + Float.toString(qSpecDistVar));
 		// log.info("qSpecDistSimTriplePatternR " + Float.toString(qSpecDistTP));

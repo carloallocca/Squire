@@ -30,7 +30,7 @@ public class IndexingTask {
 		this(endpoints, false);
 	}
 
-	public void run() {
+	public void execute() {
 		List<String> failed = new LinkedList<>();
 		for (String ep : endpoints)
 			try {
