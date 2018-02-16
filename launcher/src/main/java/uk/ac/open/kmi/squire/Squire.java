@@ -1,7 +1,10 @@
 package uk.ac.open.kmi.squire;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 
 import org.apache.commons.cli.BasicParser;
@@ -11,6 +14,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonException;
+import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,8 +71,10 @@ public class Squire {
 						for (int i = 1; i < args.length; i++)
 							targetEndpoints[i - 1] = args[i];
 					} else if ("recommend".equals(args[0])) {
+						if (cmd.hasOption('l')) tracing = true;
 						if (cmd.hasOption('d')) {
 							log.info("Using datafile at {}", cmd.getOptionValue('d'));
+							log.info("Ignoring other recommendation parmeters such as -s and -t");
 							datafile = new File(cmd.getOptionValue('d'));
 						} else {
 							if (args.length != 2) {
@@ -81,7 +90,6 @@ public class Squire {
 							sourceEndpoint = cmd.getOptionValue('s');
 							targetEndpoints = new String[] { cmd.getOptionValue('t') };
 							query = args[1];
-							if (cmd.hasOption('l')) tracing = true;
 						}
 						task = "recommend";
 					} else {
@@ -93,7 +101,7 @@ public class Squire {
 				System.err.println(e.getMessage());
 				help();
 			} catch (ParseException e) {
-				log.error("Failed to parse comand line properties", e);
+				log.error("Failed to parse command line properties", e);
 				help();
 
 			}
@@ -127,8 +135,15 @@ public class Squire {
 
 	private static String query;
 
+	/**
+	 * Only the SPARQL endpoint set by command line using -s
+	 */
 	private static String sourceEndpoint;
 
+	/**
+	 * Only the SPARQL endpoints set by command line (using -t for recommend or
+	 * passed as arguments for index).
+	 */
 	private static String[] targetEndpoints = new String[0];
 
 	private static String task = null;
@@ -140,14 +155,49 @@ public class Squire {
 			log.info("Trying to index {} SPARQL endpoints", targetEndpoints.length);
 			new IndexingTask(new HashSet<>(Arrays.asList(targetEndpoints)), forceIndexing).execute();
 		} else if ("recommend".equals(task)) {
-			if (datafile != null && !datafile.exists()) {
-				log.error("Data file {} not found", datafile.getAbsolutePath());
-				System.exit(-1);
-			}
-			new RecommendationTask(query, sourceEndpoint, new HashSet<>(Arrays.asList(targetEndpoints)), tracing)
-					.execute();
+			if (datafile != null) {
+				try {
+					JsonObject json = JSON.parse(new FileInputStream(datafile));
+					log.info("Found {} groups : {}", json.keys().size(), json.keys());
+					for (String key : json.keys())
+						unpackAndRun(json, key);
+				} catch (FileNotFoundException e) {
+					log.error("Data file {} not found", datafile.getAbsolutePath());
+					System.exit(-2);
+				} catch (JsonException ex) {
+					log.error("Data file does not appear to be valid JSON", ex);
+					System.exit(-2);
+				}
+			} else new RecommendationTask(query, sourceEndpoint, new HashSet<>(Arrays.asList(targetEndpoints)), null,
+					tracing).execute();
 		}
 		System.exit(0);
+	}
+
+	private static void unpackAndRun(JsonObject json, String key) {
+		log.info("Scanning for queries at key '{}'...", key);
+		JsonObject group = json.get(key).getAsObject();
+		if (!group.hasKey("source"))
+			throw new RuntimeException("Key '" + key + "' does not seem to have a value for 'source'");
+		if (!group.hasKey("target"))
+			throw new RuntimeException("Key '" + key + "' does not seem to have a value for 'target'");
+		String endpoint_src = group.get("source").getAsString().value();
+		String endpoint_tgt = group.get("target").getAsString().value();
+		if (!group.hasKey("queries")) log.warn("No queries found for group {}, nothing to do.", key);
+		int nQ = 0;
+		for (JsonValue v : group.get("queries").getAsArray()) {
+			String q = null;
+			if (v.isObject()) {
+				JsonObject o = v.getAsObject();
+				if (o.hasKey("original")) q = o.get("original").getAsString().value();
+				else if (o.hasKey("query")) q = o.get("query").getAsString().value();
+			} else if (v.isString()) q = v.getAsString().value();
+			else log.error("Field 'queries' expects an array of either strings or"
+					+ " objects containing the 'original' or 'query' field.");
+			if (q != null) new RecommendationTask(q, endpoint_src, Collections.singleton(endpoint_tgt),
+					key + "_q" + (++nQ), tracing).execute();
+		}
+
 	}
 
 }

@@ -5,6 +5,7 @@
  */
 package uk.ac.open.kmi.squire.core4;
 
+import java.net.ConnectException;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -29,34 +30,28 @@ import uk.ac.open.kmi.squire.rdfdataset.RDFDatasetSimilarity;
 public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservable
 		implements IQueryRecommendationObserver, Runnable {
 
+	private Set<QueryRecommendationListener> listeners = new HashSet<>();
+
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	private final float queryRootDistanceDegree;
-	private final float querySpecificityDistanceDegree;
 
 	private final String queryString;
-	private final IRDFDataset rdfd1;
-	private final IRDFDataset rdfd2;
 
-	private final float resultSizeSimilarityDegree;
-	private final float resultTypeSimilarityDegree;
+	private final IRDFDataset rdfd1, rdfd2;
 
-	private Set<QueryRecommendationListener> listeners = new HashSet<>();
+	private final float queryRootDistanceDegree, querySpecificityDistanceDegree, resultSizeSimilarityDegree,
+			resultTypeSimilarityDegree;
 
 	public QueryRecommendatorForm4(String qString, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree,
 			String token) {
-
 		this.token = token;
-
 		this.queryString = qString;
 		this.rdfd1 = d1;
 		this.rdfd2 = d2;
-
 		this.queryRootDistanceDegree = queryRootDistanceDegree;
 		this.querySpecificityDistanceDegree = querySpecificityDistanceDegree;
 		this.resultSizeSimilarityDegree = resultSizeSimilarityDegree;
 		this.resultTypeSimilarityDegree = resultTypeSimilarityDegree;
-
 	}
 
 	public void addListener(QueryRecommendationListener listener) {
@@ -100,23 +95,8 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	}
 
 	@Override
-	public void updateSatisfiableMessage(String msg, String token) {
-		notifyQuerySatisfiableMessage(msg);
-	}
-
-	@Override
-	public void updateSatisfiableValue(Boolean value, String token) {
-		if (value) {
-			// System.out.println("[QueryRecommendatorForm4::updateSatisfiableValue] value
-			// is " + value);
-			notifyQuerySatisfiableMessage(
-					"[QueryRecommendatorForm4::updateSatisfiableValue] The input query is satisfiable ");
-		} else {
-			// System.out.println("[QueryRecommendatorForm4::updateSatisfiableValue] value
-			// is " + value);
-			notifyQuerySatisfiableMessage(
-					"[QueryRecommendatorForm4::updateSatisfiableValue] The input query is NOT satisfiable ");
-		}
+	public void updateSatisfiableValue(Query query, boolean value, String token) {
+		fireSatisfiabilityChecked(query, value);
 	}
 
 	private List<QueryStringScorePair> recommendWithToken(String token) {
@@ -136,37 +116,28 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		// Phase 1 : check query satisfiability
 		SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable(this.token);
 		qs.register(this);
-		boolean querySat = false;
+		boolean satisfiable = false;
 		try {
 			log.debug("Checking satisfiability against source dataset <{}>", rdfd1.getEndPointURL());
-			querySat = qs.isSatisfiableWRTResultsWithToken(query, rdfd1);
-			log.debug(" ... is satisfiable? {}", querySat);
-		} catch (Exception ex) {
+			satisfiable = qs.isSatisfiableWrtResults(query, rdfd1);
+			log.debug(" ... is satisfiable? {}", satisfiable);
+		} catch (ConnectException ex) {
 			throw new RuntimeException(ex);
 		}
-
+		fireSatisfiabilityChecked(query, satisfiable);
+		notifyQuerySatisfiableValue(query, satisfiable); // FIXME legacy
 		// Phase 2 : check dataset similarity
-		if (querySat) {
-
-			try {
-				// Phase 3 : recommend
-				QueryRecommendator4 qR = new QueryRecommendator4(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
-						queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree);
-				notifyQuerySatisfiableValue(true);
-				RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
-				querySim.register(this);
-				float score = querySim.computeSim(rdfd1, rdfd2);
-				qR.register(this);
-				qR.buildRecommendation();
-				// log.info("::size list of reccomended queries:
-				// "+qR.getSortedRecomQueryList().size());
-			} catch (Exception ex) {
-				log.error("", ex);
-			}
-		} else {
-			notifyQuerySatisfiableValue(false);
-			notifyQuerySatisfiableMessage(
-					"[QueryRecommendatorForm4::recommendWithToken]The input query is not satisfiable w.r.t the input dataset... ");
+		if (satisfiable) try {
+			// Phase 3 : recommend
+			QueryRecommendator4 qR = new QueryRecommendator4(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
+					queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree);
+			RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
+			querySim.register(this);
+			float score = querySim.computeSim(rdfd1, rdfd2);
+			qR.register(this);
+			qR.buildRecommendation();
+		} catch (Exception ex) {
+			log.error("", ex);
 		}
 		return Collections.emptyList();
 	}
@@ -174,6 +145,11 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	protected void fireQueryRecommended(Query query, float score) {
 		for (QueryRecommendationListener listener : listeners)
 			listener.queryRecommended(query, score, queryString);
+	}
+
+	protected void fireSatisfiabilityChecked(Query query, boolean satisfiable) {
+		for (QueryRecommendationListener listener : listeners)
+			listener.satisfiabilityChecked(query, rdfd2, satisfiable);
 	}
 
 }

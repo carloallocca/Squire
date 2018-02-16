@@ -372,7 +372,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 						boolean b = false;
 
 						try {
-							b = qs.isSatisfiableWRTResultsWithToken(subQuery, rdfd2);
+							b = qs.isSatisfiableWrtResults(subQuery, rdfd2);
 							log.info("isSatisfiableWRTResultsWithToken :: " + b);
 						} catch (Exception ex) {
 							log.info(ex.getMessage());
@@ -402,7 +402,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		SPARQLQuerySatisfiable qs1 = new SPARQLQuerySatisfiable();
 		if ((this.specializableQueryAndContextNodeList.size() == 1)
 				&& (this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().isEmpty())
-				&& (qs1.isSatisfiableWRTResultsWithToken(this.specializableQueryAndContextNodeList.get(0).getqO(),
+				&& (qs1.isSatisfiableWrtResults(this.specializableQueryAndContextNodeList.get(0).getqO(),
 						rdfd2))) {
 
 			QueryAndContextNode childNode = createEmptyQueryAndContextNode(
@@ -479,7 +479,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
 								// ...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 								SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-								if (qs.isSatisfiableWRTResultsWithToken(childQueryCopyInstanciated, rdfd2)) {
+								if (qs.isSatisfiableWrtResults(childQueryCopyInstanciated, rdfd2)) {
 									QueryAndContextNode childNode = createNewQueryAndContextNodeForInstanciateOp(
 											childQueryCopyInstanciated, parentQueryAndContextNode,
 											templVarEntityQoQrInstanciatedList);

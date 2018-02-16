@@ -5,10 +5,7 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URLEncoder;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -16,12 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
@@ -35,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
 import uk.ac.open.kmi.squire.utils.SparqlUtils;
+import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
 import uk.ac.open.kmi.squire.utils.StringUtils;
 
 /**
@@ -45,9 +37,9 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 
 	private String endpointURL; // set the path of the RDF dataset. e.g SPARQL endpoint url, or FilePath.
 	private String graphName;
-	private boolean replacing = false;
-
 	private final Logger log = LoggerFactory.getLogger(getClass());
+
+	private boolean replacing = false;
 
 	private Document signatureDoc;
 
@@ -310,7 +302,9 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	 *            the partial query expects to do a "SELECT ?x" and to end with an
 	 *            unclosed FILTER in the WHERE clause
 	 * @param stepLength
+	 *            how many items it should try to fetch on every step
 	 * @param iteration
+	 *            what number of step this is (starts at 0)
 	 * @param exclusions
 	 *            if NULL, the method will do pure pagination
 	 */
@@ -340,63 +334,40 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			}
 		}
 		log.debug("Sending query: {}", qS);
+		List<String> itemList;
 		try {
-			String encodedQuery = URLEncoder.encode(qS.toString(), "UTF-8");
-			String url = this.endpointURL + "?query=" + encodedQuery;
-			// set the connection timeout value to 30 seconds (30000 milliseconds)
-			int timeout = 30;
-			RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-					.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-			CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-			HttpGet getRequest = new HttpGet(url);
-			getRequest.addHeader("Accept", "application/sparql-results+json");
-			HttpResponse response = httpClient.execute(getRequest);
-			List<String> itemList;
-			int stcode = response.getStatusLine().getStatusCode();
-			if (200 == stcode) {
-				BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-				String output;
-				String result = "";
-				while ((output = br.readLine()) != null)
-					result = result + output;
-				itemList = SparqlUtils.getValuesFromSparqlJson(result, "x");
-			} else {
-				// Don't die. Keep whatever was indexed so far.
-				String reason = response.getStatusLine().getReasonPhrase();
-				log.warn("Got remote response {} - {}", stcode, reason);
-				// If it was the first attempt though, give up and raise an exception.
-				if (iteration == 0) throw new BootedException();
-				log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
-						iteration);
-				itemList = Collections.emptyList();
-			}
-
-			/*
-			 * Stop iterating if you received fewer results than the limit or if you already
-			 * have all the RDF resources in the result (the latter means there's something
-			 * wrong with the order in which results are given, therefore one should sort
-			 * but it's costly).
-			 */
-			if (itemList.isEmpty() || tgtResourceSet.containsAll(itemList)) {
-				if (!itemList.isEmpty())
-					log.debug("All {} RDF resources already present, closing loop.", itemList.size());
-				log.info("DONE. {} total resources indexed.", tgtResourceSet.size());
-			} else { // the recursive call.
-				tgtResourceSet.addAll(itemList);
-				log.info(" ... {} resources indexed so far (last {} in {} ms)", tgtResourceSet.size(), itemList.size(),
-						(System.currentTimeMillis() - before));
-				if (stepLength == itemList.size()) {
-					if (exclusions != null) for (String op : itemList)
-						exclusions.add(ResourceFactory.createProperty(op));
-					iterativeComputation(partialQuery, tgtResourceSet, stepLength, iteration + 1, exclusions);
-				} else log.info("DONE. {} total resources indexed for this category.", tgtResourceSet.size());
-			}
-			
-		} catch (ClientProtocolException e) {
-			e.printStackTrace(); // TODO Handle properly
-		} catch (IOException e) {
-			e.printStackTrace(); // TODO Handle properly
+			String res = SparqlUtils.doRawQuery(qS.toString(), this.endpointURL);
+			itemList = SparqlUtils.extractSelectVariableValues(res, "x");
+		} catch (SparqlException e1) {
+			// Don't die. Keep whatever was indexed so far.
+			log.warn("Got remote response : {}", e1.getMessage());
+			// If it was the first attempt though, give up and raise an exception.
+			if (iteration == 0) throw new BootedException();
+			log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
+					iteration);
+			itemList = Collections.emptyList();
 		}
+
+		/*
+		 * Stop iterating if you received fewer results than the limit or if you already
+		 * have all the RDF resources in the result (the latter means there's something
+		 * wrong with the order in which results are given, therefore one should sort
+		 * but it's costly).
+		 */
+		if (itemList.isEmpty() || tgtResourceSet.containsAll(itemList)) {
+			if (!itemList.isEmpty()) log.debug("All {} RDF resources already present, closing loop.", itemList.size());
+			log.info("DONE. {} total resources indexed.", tgtResourceSet.size());
+		} else { // the recursive call.
+			tgtResourceSet.addAll(itemList);
+			log.info(" ... {} resources indexed so far (last {} in {} ms)", tgtResourceSet.size(), itemList.size(),
+					(System.currentTimeMillis() - before));
+			if (stepLength == itemList.size()) {
+				if (exclusions != null) for (String op : itemList)
+					exclusions.add(ResourceFactory.createProperty(op));
+				iterativeComputation(partialQuery, tgtResourceSet, stepLength, iteration + 1, exclusions);
+			} else log.info("DONE. {} total resources indexed for this category.", tgtResourceSet.size());
+		}
+
 	}
 
 	protected void load() {

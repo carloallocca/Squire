@@ -217,17 +217,7 @@ public class JobManager implements IQueryRecommendationObserver {
 	}
 
 	@Override
-	public void updateSatisfiableMessage(String msg, String token) {
-		System.out.println("JobManager::updateSatisfiableMessage");
-		if (map.containsKey(token)) {
-			System.out.println("[JobManager::updateSatisfiableMessage] msg " + msg);
-			getJobStatus(token).setMessage(msg);
-		}
-	}
-
-	@Override
-	public void updateSatisfiableValue(Boolean value, String token) {
-		System.out.println("JobManager::updateSatisfiableValue");
+	public void updateSatisfiableValue(Query query, boolean value, String token) {
 		if (map.containsKey(token)) {
 			getJobStatus(token).setSatisfiable(value);
 		}

@@ -12,14 +12,13 @@ import org.apache.jena.query.Query;
  * @author carloallocca
  */
 public interface IQueryRecommendationObserver {
-    
-    public void updateDatasetSimilarity(float simScore, String token);
-    public void updateQueryRecommendated(Query qR, float score, String token);
-    public void updateSatisfiableMessage(String msg, String token);
-    public void updateSatisfiableValue(Boolean value, String token);
 
-    public void updateQueryRecommendationCompletion(Boolean finished, String token);
-    
-    
-    
+	public void updateDatasetSimilarity(float simScore, String token);
+
+	public void updateQueryRecommendated(Query qR, float score, String token);
+
+	public void updateQueryRecommendationCompletion(Boolean finished, String token);
+
+	public void updateSatisfiableValue(Query query, boolean value, String token);
+
 }

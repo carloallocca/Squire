@@ -7,6 +7,7 @@ package uk.ac.open.kmi.squire.evaluation;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
@@ -18,13 +19,12 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 
 import uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4;
 import uk.ac.open.kmi.squire.jobs.JobManager;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
-import uk.ac.open.kmi.squire.report.RecordKeeper;
+import uk.ac.open.kmi.squire.report.ConsolidatingReporter;
 import uk.ac.open.kmi.squire.report.Tracer;
 
 /**
@@ -65,12 +65,12 @@ public class TestGoldStandard {
 		unpackAndRun("arts_1");
 	}
 
-	@Test
+	// @Test
 	public void testEducationI() throws Exception {
 		unpackAndRun("edu_1");
 	}
 
-	@Test
+	// @Test
 	public void testEducationII() throws Exception {
 		// Generalised is too generic! Aalto keeps us waiting forever on
 		// SELECT DISTINCT ?dpt1 ?opt1 ?dpt2
@@ -83,7 +83,7 @@ public class TestGoldStandard {
 		unpackAndRun("edu_2");
 	}
 
-	@Test
+	// @Test
 	public void testGovernmentOpenData() throws Exception {
 		// This is what is happening for the query q3
 		// Virtuoso 42000 Error The estimated execution time 1376 (sec) exceeds the
@@ -98,7 +98,7 @@ public class TestGoldStandard {
 		unpackAndRun("egov_1");
 	}
 
-	@Test
+	// @Test
 	public void testMuseum() throws Exception {
 		unpackAndRun("museum_1");
 	}
@@ -150,20 +150,22 @@ public class TestGoldStandard {
 			throws Exception {
 		IRDFDataset d1 = new SparqlIndexedDataset(source), d2 = new SparqlIndexedDataset(target);
 		int nQ = 1;
+		String dir = "TestResults/";
+		new File(dir).mkdir();
 		for (String q : queries) {
 			QueryRecommendatorForm4 recom = new QueryRecommendatorForm4(q, d1, d2, configuration.wResultTypeSimilarity,
 					configuration.wQueryRootDistance, configuration.wResultSizeSimilarity,
 					configuration.wQuerySpecificityDistance, Integer.toString(1));
-			RecordKeeper rep = new RecordKeeper(q, new URL(source), new URL(target));
+			ConsolidatingReporter rep = new ConsolidatingReporter(q, new URL(source), new URL(target));
 			String filename = key + "_q" + nQ++;
 			Tracer tracer = new Tracer(q, new URL(source), new URL(target),
-					new PrintWriter(new FileWriter("TestResults/" + filename + ".log")));
+					new PrintWriter(new FileWriter(dir + filename + ".log")));
 			tracer.printHeader();
 			recom.addListener(rep);
 			recom.addListener(tracer);
 			recom.run();
 			tracer.printFooter();
-			rep.printReport(new PrintWriter(new FileWriter("TestResults/" + filename + ".txt")), 50);
+			rep.printReport(new PrintWriter(new FileWriter(dir + filename + ".txt")), 50);
 		}
 	}
 
@@ -179,7 +181,6 @@ public class TestGoldStandard {
 			assertTrue(v.isObject());
 			assertTrue(v.getAsObject().hasKey("original"));
 			queries.add(v.getAsObject().get("original").getAsString().value());
-
 		}
 		runEvaluation(endpoint_src, endpoint_tgt, queries.toArray(new String[0]), this.config, key);
 	}

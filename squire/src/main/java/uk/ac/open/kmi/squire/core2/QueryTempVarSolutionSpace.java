@@ -5,27 +5,12 @@
  */
 package uk.ac.open.kmi.squire.core2;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.ConnectException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -42,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.core4.VarNameVarValuePair;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
+import uk.ac.open.kmi.squire.utils.SparqlUtils;
+import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
 
 /**
  *
@@ -66,6 +53,15 @@ public class QueryTempVarSolutionSpace {
 
 	}
 
+	private static boolean isValidUri(String cleanedVarValue) {
+		try {
+			IRIFactory.iriImplementation().create(cleanedVarValue);// = IRIResolver(cleanedVarValue);
+			return true;
+		} catch (Exception e1) {
+			return false;
+		}
+	}
+
 	private static Query rewriteQueryWithTemplateVar(Query qR) {
 		Set<Var> templateVarSet = getQueryTemplateVariableSet(qR);
 		Element elem = qR.getQueryPattern();
@@ -82,144 +78,33 @@ public class QueryTempVarSolutionSpace {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2) {
-		// 0. Check if the input query has aany template variable, otherwise qTsol is
+		// 0. Check if the input query has any template variable, otherwise qTsol is
 		// empty
 		Set<Var> templateVarSet = getQueryTemplateVariableSet(qChild);
 		if (templateVarSet.size() > 0) {
 			try {
-				// 1. Transform the the query qChild into a query containg the template variable
-				// only.
+				// 1. Transform the the query qChild into a query containing the template
+				// variable only.
 				Query qT = rewriteQueryWithTemplateVar(qChild);
 				// 2. Compute the QuerySolution for qT;
-
-				// qT.setLimit(1000);
-				// log.info("[QueryTempVarSolutionSpace::compute]qT.setLimit(1000); " +qT);
-				List<QuerySolution> qTsol = computeSolutionSpace(qT, rdfd2);
-				log.info("[QueryTempVarSolutionSpace::compute]qTsol size; " + qTsol.size());
+				log.debug("Computing solution space for subquery:");
+				log.debug("{}", qT);
+				String res = SparqlUtils.doRawQuery(qT.toString(), rdfd2.getEndPointURL().toString());
+				List<QuerySolution> qTsol = asJenaQuerySolutions(res, qT.getProjectVars());
+				log.debug(" ... Solution space size = {} ", qTsol.size());
 				return qTsol;
-			} catch (ConnectException ex) {
+			} catch (SparqlException ex) {
 				log.error("Connection failed while checking solution space.", ex);
-				log.error("Returning empty solution space.");
+				log.error("Assuming empty solution space.");
 				return new ArrayList<>();
 			}
 		}
 		return new ArrayList<>();
 	}
 
-	private List<QuerySolution> computeSolutionSpace(Query q, IRDFDataset rdfd2) throws ConnectException {
-		log.info("This is the subquery: " + q.toString());
-		int timeout = 30;
-		RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
-				.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-		CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-		try {
-			String encodedQuery = URLEncoder.encode(q.toString(), "UTF-8");
-			String GET_URL = rdfd2.getEndPointURL() + "?query=" + encodedQuery;
-			log.trace(" * Full request URI: {}", GET_URL);
-			HttpGet getRequest = new HttpGet(GET_URL);
-			getRequest.addHeader("accept", "application/sparql-results+json");
-			HttpResponse response = client.execute(getRequest);
-			if (response.getStatusLine().getStatusCode() != 200)
-				throw new RuntimeException("Failed : HTTP error code : " + response.getStatusLine().getStatusCode());
-			BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-			String output;
-			String result = "";
-			while ((output = br.readLine()) != null)
-				result = result + output;
-			log.debug("Raw query result follows:");
-			log.debug("{}", result);
-			List<QuerySolution> resultList = asJenaQuerySolutions(result, q.getProjectVars());
-			// log.info("This is the solution space query: " + q.toString());
-			log.info("solution space result size " + resultList.size());
-			return resultList;
-		} catch (ClientProtocolException e) {
-			throw new ConnectException("Caused by org.apache.http.client.ClientProtocolException : " + e.getMessage());
-		} catch (IOException e) {
-			throw new ConnectException("Caused by java.io.IOException : " + e.getMessage());
-		} finally {
-			try {
-				client.close();
-			} catch (IOException e) {
-				log.warn("Failed to close HTTP client. This isn't usually fatal but you may want to check why.", e);
-			}
-		}
-	}
-	// based on jena
-	// private List<QuerySolution> computeSolutionSpace(Query q, IRDFDataset rdfd2)
-	// throws java.net.ConnectException {
-	// try{
-	// QueryExecution qexec = new QueryEngineHTTP((String) rdfd2.getEndPointURL(),
-	// q);
-	// ResultSet results = qexec.execSelect();
-	//
-	// List<QuerySolution> solList = ResultSetFormatter.toList(results);//.out(,
-	// results, q);
-	// log.info("[computeSolutionSpace]solList " +solList.size());
-	//
-	// return solList;
-	// }catch(Exception ex){
-	// throw ex;
-	// }
-	// //return new ArrayList<>();
-	// }
-
-	private boolean isValidateURI(String cleanedVarValue) {
-		final IRIFactory u = IRIFactory.iriImplementation();
-		try {
-			u.create(cleanedVarValue);// = IRIResolver(cleanedVarValue);
-			return true;
-		} catch (Exception e1) {
-			return false;
-		}
-
-	}
-
-	private void printQuerySolutionSpaceMap(Map<Var, Set<RDFNode>> tmpMap) {
-
-		System.out.println("[QueryTempVarSolutionSpace::printQuerySolutionSpaceMap]");
-
-		if (tmpMap != null) {
-			Iterator<Map.Entry<Var, Set<RDFNode>>> iter = tmpMap.entrySet().iterator();
-
-			while (iter.hasNext()) {
-				Map.Entry<Var, Set<RDFNode>> entry = iter.next();
-				System.out.println("Var= " + entry.getKey().asNode().getName());
-				Set<RDFNode> valuList = entry.getValue();
-				for (RDFNode value : valuList) {
-					System.out.println("Value= " + value.toString());
-				}
-			}
-
-		}
-
-	}
-
-	private Map<Var, Set<RDFNode>> tranformToMap(List<QuerySolution> qTsol, Query qChild) {
-
-		if (qTsol != null && qTsol.size() > 0) {
-
-			// System.out.println("[QuerySpecializer::printQuerySolutionSpace] There are " +
-			// qTsolList.size() + " solutions");
-			Map<Var, Set<RDFNode>> map = new HashMap<>();
-
-			// Set<Var> tempVarSet = qRScoreMaxNode.getqRTemplateVariableSet();
-			Set<Var> tempVarSet = getQueryTemplateVariableSet(qChild);
-
-			for (Var vt : tempVarSet) {
-				Set<RDFNode> valueList = new HashSet<>();
-				// System.out.println("[QuerySpecializer::printQuerySolutionSpace] " +
-				// vt.getName() + "=" + sol.get(vt.getName()).toString());
-				for (QuerySolution sol : qTsol) {
-
-					valueList.add(sol.get(vt.getName()));
-				}
-				map.put(vt, valueList);
-			}
-			return map;
-		}
-		return new HashMap<>();
-	}
-
+	/*
+	 * FIXME Aeyeucgh!
+	 */
 	private List<QuerySolution> asJenaQuerySolutions(String resultString, List<Var> projected) {
 
 		for (Var v : projected)
@@ -314,7 +199,7 @@ public class QueryTempVarSolutionSpace {
 					String cleanedVarName = v.getVarName();
 					String cleanedVarValue = v.getVarValue();
 
-					if (isValidateURI(cleanedVarValue)) {
+					if (isValidUri(cleanedVarValue)) {
 						final URI uri = URI.create(cleanedVarValue);
 						RDFNode rdfNode = new ResourceImpl(cleanedVarValue);
 						qs.add(cleanedVarName, rdfNode);

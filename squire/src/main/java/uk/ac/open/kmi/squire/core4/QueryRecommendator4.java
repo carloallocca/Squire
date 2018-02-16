@@ -29,39 +29,39 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 public class QueryRecommendator4 extends AbstractQueryRecommendationObservable implements IQueryRecommendationObserver {
 
 	private static final String CLASS_TEMPLATE_VAR = "ct";
-	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
 	private static final String DT_PROP_TEMPLATE_VAR = "dpt";
-
 	private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
-	private static final String LITERAL_TEMPLATE_VAR = "lt";
+
 	private static final String INSTANCE_OP = "I";
+	private static final String LITERAL_TEMPLATE_VAR = "lt";
+	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
 	private static final String REMOVE_TP_OP = "R";
 
-	private final IRDFDataset rdfD1, rdfD2;
+	private ClassVarMapping classVarTable;
 
+	private DatatypePropertyVarMapping datatypePropertyVarTable;
+
+	private IndividualVarMapping individualVarTable;
+	private LiteralVarMapping literalVarTable;
+	private ObjectPropertyVarMapping objectProperyVarTable;
 	private final Query q0;
-
-	private Query qTemplate;
-	private final float resultTypeSimilarityDegree;
-	private final float queryRootDistanceDegree;
-	private final float resultSizeSimilarityDegree;
-	private final float querySpecificityDistanceDegree;
 	/*
 	 * This is for storing the output of the specializer
 	 */
 	private List<QueryAndContextNode> qRList = new ArrayList<>();
+	private Query qTemplate;
 
+	private final float queryRootDistanceDegree;
+	private final float querySpecificityDistanceDegree;
+	private final IRDFDataset rdfD1, rdfD2;
+	private RDFVocVarMapping rdfVocVarTable;
+	private final float resultSizeSimilarityDegree;
+
+	private final float resultTypeSimilarityDegree;
 	/*
 	 * This is for storing the output of the QueryRecommendator
 	 */
 	private List<QueryScorePair> sortedRecomQueryList = new ArrayList<>();
-	private LiteralVarMapping literalVarTable;
-	private ClassVarMapping classVarTable;
-	private DatatypePropertyVarMapping datatypePropertyVarTable;
-	private IndividualVarMapping individualVarTable;
-
-	private ObjectPropertyVarMapping objectProperyVarTable;
-	private RDFVocVarMapping rdfVocVarTable;
 
 	public QueryRecommendator4(Query query, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree) {
@@ -122,7 +122,7 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 
 	@Override
 	public void updateDatasetSimilarity(float simScore, String token) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		// Nothing to do
 	}
 
 	@Override
@@ -136,13 +136,8 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 	}
 
 	@Override
-	public void updateSatisfiableMessage(String msg, String token) {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public void updateSatisfiableValue(Boolean value, String token) {
-		throw new UnsupportedOperationException("Not supported yet.");
+	public void updateSatisfiableValue(Query query, boolean value, String token) {
+		// Nothing to do
 	}
 
 	private void applyRankingToRecommandedQueryList(List<QueryAndContextNode> qRList) {

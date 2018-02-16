@@ -7,6 +7,8 @@ import org.apache.jena.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+
 /**
  * Attached to a query recommendation generator, it will log recommended queries
  * as they come.
@@ -67,6 +69,17 @@ public class Tracer extends Reporter {
 		counter = 0;
 		startTimestamp = System.currentTimeMillis();
 		latestTimestamp = startTimestamp;
+	}
+
+	@Override
+	public void satisfiabilityChecked(Query query, IRDFDataset targetDataset, boolean satisfiable) {
+		out.println("**** WARNING ****");
+		out.println("A recommendation candidate was found to be unsatisfiable with the target dataset.");
+		out.println("Endpoint : " + targetDataset.getEndPointURL());
+		out.println("Query:");
+		out.println(query);
+		out.println("*****************");
+		out.flush();
 	}
 
 }

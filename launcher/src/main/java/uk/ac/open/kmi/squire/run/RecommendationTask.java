@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
-import uk.ac.open.kmi.squire.report.RecordKeeper;
+import uk.ac.open.kmi.squire.report.ConsolidatingReporter;
 import uk.ac.open.kmi.squire.report.Tracer;
 
 public class RecommendationTask {
@@ -23,26 +23,29 @@ public class RecommendationTask {
 
 	private String sourceEndpoint;
 
+	private String id;
+
 	private boolean withLogging = false;
 
 	private Set<String> targetEndpoints;
 
-	public RecommendationTask(String query, String sourceEndpoint, Set<String> targetEndpoints, boolean logging) {
+	public RecommendationTask(String query, String sourceEndpoint, Set<String> targetEndpoints, String id,
+			boolean logging) {
 		this.query = query;
 		this.sourceEndpoint = sourceEndpoint;
 		this.targetEndpoints = targetEndpoints;
 		this.withLogging = logging;
+		this.id = id;
 	}
 
-	public RecommendationTask(String query, String sourceEndpoint, Set<String> targetEndpoints) {
-		this(query, sourceEndpoint, targetEndpoints, false);
+	public RecommendationTask(String query, String sourceEndpoint, Set<String> targetEndpoints, String id) {
+		this(query, sourceEndpoint, targetEndpoints, id, false);
 	}
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 
 	public void execute() {
 		log.info("Start recommendation for query:\r\n{}", query);
-		int nQ = 1;
 		String dir = "TestResults/";
 		new File(dir).mkdir();
 		for (String tgt : targetEndpoints) {
@@ -58,8 +61,8 @@ public class RecommendationTask {
 				break;
 			}
 			String key = uT.getHost().replaceAll("\\.", "_");
-			RecordKeeper rep = new RecordKeeper(query, uS, uT);
-			String filename = key + "-q" + nQ++;
+			ConsolidatingReporter rep = new ConsolidatingReporter(query, uS, uT);
+			String filename = (id != null && !id.trim().isEmpty() ? id.trim() + "__" : "") + key;
 			Tracer tracer = null;
 			if (withLogging) try {
 				tracer = new Tracer(query, uS, uT, new PrintWriter(new FileWriter(dir + filename + ".log")));

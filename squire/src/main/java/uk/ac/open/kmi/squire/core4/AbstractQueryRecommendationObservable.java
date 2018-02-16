@@ -16,7 +16,7 @@ import org.apache.jena.query.Query;
  */
 public abstract class AbstractQueryRecommendationObservable implements IQueryRecommendationObservable {
 
-	private final Set<IQueryRecommendationObserver> observers = new HashSet();
+	private final Set<IQueryRecommendationObserver> observers = new HashSet<>();
 
 	protected String token;
 
@@ -38,10 +38,10 @@ public abstract class AbstractQueryRecommendationObservable implements IQueryRec
 	}
 
 	@Override
-	public void notifyQuerySatisfiableValue(boolean value) {
+	public void notifyQuerySatisfiableValue(Query query, boolean value) {
 		for (IQueryRecommendationObserver observer : observers) {
 			System.out.println("[AbstractQueryRecommendationObservable::notifyQuerySatisfiableValue] value:" + value);
-			observer.updateSatisfiableValue(value, token);
+			observer.updateSatisfiableValue(query, value, token);
 		}
 		//
 		// if(value){
@@ -64,13 +64,6 @@ public abstract class AbstractQueryRecommendationObservable implements IQueryRec
 	public void notifyDatatsetSimilarity(float score) {
 		for (IQueryRecommendationObserver obs : observers) {
 			obs.updateDatasetSimilarity(score, token);
-		}
-	}
-
-	@Override
-	public void notifyQuerySatisfiableMessage(String msg) {
-		for (IQueryRecommendationObserver obs : observers) {
-			obs.updateSatisfiableMessage(msg, token);
 		}
 	}
 

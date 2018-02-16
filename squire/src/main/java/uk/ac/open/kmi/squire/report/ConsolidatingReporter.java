@@ -13,6 +13,8 @@ import org.mksmart.squire.websquire.v1.resources.QueryStringScorePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+
 /**
  * Can be attached to a query recommendation generator in order to do
  * record-keeping and reporting during or at the end of computation.
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
  * @author alessandro
  *
  */
-public class RecordKeeper extends Reporter {
+public class ConsolidatingReporter extends Reporter {
 
 	/**
 	 * Inverse sorter that compares by score, higher first.
@@ -43,7 +45,7 @@ public class RecordKeeper extends Reporter {
 	 */
 	protected int counter = 0;
 
-	public RecordKeeper(String originalQuery, URL sourceEndpoint, URL targetEndpoint) {
+	public ConsolidatingReporter(String originalQuery, URL sourceEndpoint, URL targetEndpoint) {
 		super(originalQuery, sourceEndpoint, targetEndpoint);
 	}
 
@@ -106,6 +108,12 @@ public class RecordKeeper extends Reporter {
 		counter = 0;
 		recommendations.clear();
 		order.clear();
+	}
+
+	@Override
+	public void satisfiabilityChecked(Query query, IRDFDataset targetDataset, boolean satisfiable) {
+		// We are not including the satisfiability of queries in the consolidated
+		// report at the moment.
 	}
 
 }
