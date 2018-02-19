@@ -1,6 +1,7 @@
 package uk.ac.open.kmi.squire.utils;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -9,7 +10,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -21,13 +21,11 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.sparql.core.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import uk.ac.open.kmi.squire.core4.VarNameVarValuePair;
 
 public class SparqlUtils {
 
@@ -61,112 +59,6 @@ public class SparqlUtils {
 
 	private static Logger log = LoggerFactory.getLogger(SparqlUtils.class);
 
-	/**
-	 * A remain from the legacy code we should get rid of.
-	 * 
-	 * @param resultString
-	 * @param projected
-	 * @return
-	 */
-	public static List<QuerySolution> asJenaQuerySolutions(String resultString, List<Var> projected) {
-
-		for (Var v : projected)
-			log.info("var " + v.getName());
-
-		// TO MANAGE:
-		// [QueryTempVarSolutionSpace]: ::result{ "head": { "vars": [ "opt2" , "opt1" ]
-		// } , "results": { "bindings": [ ] }}
-		// [INFO ]
-		log.info("::result" + resultString);
-		ArrayList<QuerySolution> output = new ArrayList<>();
-		String[] resBindings = resultString.split("bindings");
-
-		try {
-			// it could be " [ ] }}"
-			log.info("empty bindings " + resBindings[1]);
-		} catch (Exception ex) {
-			log.info(ex.getMessage());
-		}
-
-		// this is true for the EDUCATION I
-		// String[] solutionAsStrings = resBindings[1].split(" } } ,");
-		String[] solutionAsStrings;
-		if (resBindings[1].contains("]")) {
-			solutionAsStrings = resBindings[1].substring(0, resBindings[1].indexOf("]") - 1).split("}\\s*}\\s*\\,?");
-			// String[] solutionAsStrings = resBindings[1].split("}},");
-
-		} else {
-			solutionAsStrings = resBindings[1].substring(0, resBindings[1].length()).split("}\\s*}\\s*\\,?");
-		}
-		log.info("solutionAsStrings size " + solutionAsStrings.length);
-		// we get up to -1 as the last one could be broken, and we don't want to process
-		// it.
-		for (int i = 0; i <= solutionAsStrings.length - 1; i++) {
-			// for (int i = 0; i <= 4000; i++) {
-			log.info(solutionAsStrings[i]);
-			// This is working for EDUCATION I
-			// String[] solValueArray = solutionAsStrings[i].split("} , ");
-			String[] solValueArray = solutionAsStrings[i].split("}\\s*\\,?");
-
-			// if (solValueArray.length == 1) {
-			// log.info("solValueArray.length==0");
-			// }
-			List<VarNameVarValuePair> varNameVarValuePairList = new ArrayList<>();
-
-			for (String solValueArray1 : solValueArray) {
-				log.info(solValueArray1);
-				// this is working with EDUCATION I
-				// String[] varNameAndvarValueParts = solValueArray1.split("\"type\": \"uri\" ,
-				// \"value\":");
-				// String[] varNameAndvarValueParts =
-				// solValueArray1.split("\"type\"\\s*:\\s*\"uri\"\\s*,\\s*\"value\\s*\":");
-				String[] varNameAndvarValueParts = solValueArray1
-						.split("\"type\"\\s*:\\s*\"uri\"\\s*,\\s*\"value\\s*\"\\s*:");
-				// the regex is not for this case // "ct1": { "type": "typed-literal",
-				// "datatype": "http://www.w3.org/2001/XMLSche
-				if (varNameAndvarValueParts.length < 2) continue;
-
-				// if(varNameAndvarValueParts.length==2){
-				// log.info("::2" +varNameAndvarValueParts[0] +varNameAndvarValueParts[1]);
-				// }
-				// if(varNameAndvarValueParts.length==1){
-				// log.info("::1" +varNameAndvarValueParts[0]);
-				// }
-				//
-				// TODO: (DONE) i need to add the code to extract each part of the solution...
-				String varNamePart = varNameAndvarValueParts[0];// .split(":")[0];
-				String varValuePart = varNameAndvarValueParts[1];
-				// log.info("varNamePart " +varNamePart.substring(varNamePart.indexOf("\"")+1,
-				// varNamePart.lastIndexOf("\"")));
-				String extractedVarName = "";
-				if (varNamePart.contains("[")) {
-					String[] varNameNew = varNamePart.split("\\[");
-					extractedVarName = varNameNew[1];
-				} else extractedVarName = varNamePart;
-
-				String cleanedVarName = StringUtils.substringBetween(extractedVarName, "\"", "\"");
-				String cleanedVarValue = StringUtils.substringBetween(varValuePart, "\"", "\"");
-
-				VarNameVarValuePair newPairItem = new VarNameVarValuePair(cleanedVarName, cleanedVarValue);
-				varNameVarValuePairList.add(newPairItem);
-				log.info("varName " + cleanedVarName);
-				log.info("varValue " + cleanedVarValue);
-			}
-			try {
-				QuerySolutionMap qs = new QuerySolutionMap();
-				for (VarNameVarValuePair v : varNameVarValuePairList) {
-					String cleanedVarName = v.getVarName();
-					String cleanedVarValue = v.getVarValue();
-					if (isValidUri(cleanedVarValue)) qs.add(cleanedVarName, new ResourceImpl(cleanedVarValue));
-				}
-				if (varNameVarValuePairList.size() == projected.size()) output.add(qs);
-			} catch (Exception e1) {
-				log.warn("", e1);
-			}
-		}
-		return output;
-	}
-
 	public static String doRawQuery(String queryString, String endpoint) throws SparqlException {
 		return doRawQuery(queryString, endpoint, 30);
 	}
@@ -183,6 +75,9 @@ public class SparqlUtils {
 	 *             if anything happens other than receiving a HTTP 200 OK
 	 */
 	public static String doRawQuery(String queryString, String endpoint, int timeout) throws SparqlException {
+		log.debug("About to execute the following:");
+		log.debug(" * endpoint: {}", endpoint);
+		log.debug(" * query: {}", queryString.replaceAll("\\s+", " "));
 		String encodedQuery;
 		RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout * 1000)
 				.setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
@@ -220,6 +115,20 @@ public class SparqlUtils {
 		}
 	}
 
+	public static List<QuerySolution> extractProjectedValues(String rawJson, List<Var> vars) {
+		List<QuerySolution> filtered = new ArrayList<>();
+		for (ResultSet parsed = ResultSetFactory.fromJSON(new ByteArrayInputStream(rawJson.getBytes())); parsed
+				.hasNext();) {
+			QuerySolution qs = parsed.next();
+			for (Var v : vars) // One bound variable is enough
+				if (qs.contains(v.getName())) {
+					filtered.add(qs);
+					break;
+				}
+		}
+		return filtered;
+	}
+
 	public static List<String> extractSelectVariableValues(String sparqlResultJson, String variable) {
 		return extractSelectVariableValues(sparqlResultJson, variable, false);
 	}
@@ -251,7 +160,7 @@ public class SparqlUtils {
 		return output;
 	}
 
-	private static boolean isValidUri(String cleanedVarValue) {
+	public static boolean isValidUri(String cleanedVarValue) {
 		try {
 			IRIFactory.iriImplementation().create(cleanedVarValue);// = IRIResolver(cleanedVarValue);
 			return true;

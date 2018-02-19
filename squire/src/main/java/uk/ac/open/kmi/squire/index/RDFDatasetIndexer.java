@@ -79,7 +79,7 @@ public class RDFDatasetIndexer {
 			TopScoreDocCollector collector = TopScoreDocCollector.create(1);
 			searcher.search(queryBuilder.build(), collector);
 			ScoreDoc[] hits = collector.topDocs().scoreDocs;
-			log.debug(" ... Got {} hit{}", hits.length, hits.length > 1 ? "s" : "");
+			log.trace(" ... Got {} hit{}", hits.length, hits.length > 1 ? "s" : "");
 			if (hits.length > 0) {
 				log.debug("Signature index present.");
 				return searcher.doc(hits[0].doc);

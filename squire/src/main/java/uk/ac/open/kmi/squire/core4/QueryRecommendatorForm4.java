@@ -34,12 +34,12 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
+	private final float queryRootDistanceDegree, querySpecificityDistanceDegree, resultSizeSimilarityDegree,
+			resultTypeSimilarityDegree;
+
 	private final String queryString;
 
 	private final IRDFDataset rdfd1, rdfd2;
-
-	private final float queryRootDistanceDegree, querySpecificityDistanceDegree, resultSizeSimilarityDegree,
-			resultTypeSimilarityDegree;
 
 	public QueryRecommendatorForm4(String qString, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree,
@@ -65,14 +65,11 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	@Override
 	public void run() {
 		try {
-
-			// recommend();
 			recommendWithToken(this.token);
 		} catch (Exception ex) {
-			if (ex instanceof ClosedByInterruptException) {
-				log.warn(" A task with token " + token + " was interrupted."
-						+ " This may have been requested by a client.");
-			} else log.error("Caught exception of type " + ex.getClass().getName() + " : " + ex.getMessage()
+			if (ex instanceof ClosedByInterruptException)
+				log.warn(" A task with token {} was interrupted. This may have been requested by a client.", token);
+			else log.error("Caught exception of type " + ex.getClass().getName() + " : " + ex.getMessage()
 					+ " - doing nothing with it.", ex);
 		}
 	}

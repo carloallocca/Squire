@@ -10,8 +10,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.ontology.OntModel;
@@ -20,19 +18,15 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.engine.http.QueryEngineHTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.core4.VarNameVarValuePair;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.utils.SparqlUtils;
 import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
@@ -205,7 +199,7 @@ public class QueryResultTypeSimilarity {
 		List<QuerySolution> resList;
 		try {
 			String raw = SparqlUtils.doRawQuery(qTMP.toString(), d1.getEndPointURL().toString());
-			resList = writeQueryResultsAsJenaQuerySolution(raw, qTMP.getProjectVars());
+			resList = SparqlUtils.extractProjectedValues(raw, qTMP.getProjectVars());
 			log.debug(" ... solution space result size = {}", resList.size());
 		} catch (SparqlException e) {
 			log.error("SPARQL query for solution space failed. Reason follows.", e);
@@ -251,78 +245,6 @@ public class QueryResultTypeSimilarity {
 			// }
 		}
 		return false;
-	}
-
-	/*
-	 * FIXME Aeyeucgh!
-	 */
-	private ArrayList<QuerySolution> writeQueryResultsAsJenaQuerySolution(String result, List<Var> projectVars) {
-
-		ArrayList<QuerySolution> output = new ArrayList<>();
-		String[] resBindings = result.split("bindings");
-
-		// { "bindings
-		// 1: ": [ ] }}
-		String[] solutionAsStrings = new String[0];
-
-		String regEx = "\\[\\s*(.*)\\s*\\]";
-		Pattern pattern = Pattern.compile(regEx);
-		Matcher matcher = pattern.matcher(resBindings[1]);
-		if (matcher.find()) {
-			log.info(matcher.group(1));
-			solutionAsStrings = resBindings[1].substring(0, resBindings[1].indexOf("]") - 1).split("}\\s*}\\s*\\,?");
-		} else {
-			return output;
-		}
-
-		for (int i = 0; i <= solutionAsStrings.length - 1; i++) {
-			String[] solValueArray = solutionAsStrings[i].split("}\\s*\\,?");
-
-			ArrayList<VarNameVarValuePair> varNameVarValuePairList = new ArrayList<>();
-
-			for (String solValueArray1 : solValueArray) {
-				log.info("solution:: " + solValueArray1);
-				// String[] varNameAndvarValueParts =
-				// solValueArray1.split("\"type\"\\s*:\\s*\"uri\"\\s*,\\s*\"value\\s*\"\\s*:");
-
-				String cleanedVarName = "", cleanedVarValue = "";
-				log.info("this one 6:: " + solValueArray1);
-
-				String regEx1 = "\"(\\w+)\"\\s*:\\s*\\{.*\"value\"\\s*:\\s*\"(.*)\"";
-				Pattern pattern1 = Pattern.compile(regEx1);
-				Matcher matcher1 = pattern1.matcher(solValueArray1);
-
-				while (matcher1.find()) {
-					log.info("Variable name : {}", matcher1.group(1));
-					cleanedVarName = matcher1.group(1);
-					log.info("Variable value : {}", matcher1.group(2));
-					cleanedVarValue = matcher1.group(2);
-				}
-				log.info("cleanedVarName : " + cleanedVarName);
-				log.info("cleanedVarValue : " + cleanedVarValue);
-				if (!cleanedVarName.isEmpty() && !cleanedVarValue.isEmpty()) {
-					VarNameVarValuePair newPairItem = new VarNameVarValuePair(cleanedVarName, cleanedVarValue);
-					varNameVarValuePairList.add(newPairItem);
-
-				}
-			}
-			try {
-				QuerySolutionMap qs = new QuerySolutionMap();
-				for (VarNameVarValuePair v : varNameVarValuePairList) {
-					String cleanedVarName = v.getVarName();
-					String cleanedVarValue = v.getVarValue();
-					RDFNode rdfNode = new ResourceImpl(cleanedVarValue);
-					qs.add(cleanedVarName, rdfNode);
-				}
-				if (varNameVarValuePairList.size() == projectVars.size()) {
-					output.add(qs);
-				}
-
-			} catch (Exception e1) {
-				log.info(e1.getMessage());
-			}
-		}
-		return output;
 	}
 
 }

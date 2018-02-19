@@ -61,23 +61,27 @@ public class RecommendationTask {
 				break;
 			}
 			String key = uT.getHost().replaceAll("\\.", "_");
-			ConsolidatingReporter rep = new ConsolidatingReporter(query, uS, uT);
-			String filename = (id != null && !id.trim().isEmpty() ? id.trim() + "__" : "") + key;
+			String fileprefix = (id != null && !id.trim().isEmpty() ? id.trim() + "__" : "") + key;
+			String filename = dir + fileprefix + ".log";
 			Tracer tracer = null;
 			if (withLogging) try {
-				tracer = new Tracer(query, uS, uT, new PrintWriter(new FileWriter(dir + filename + ".log")));
+				tracer = new Tracer(query, uS, uT, new PrintWriter(new FileWriter(filename)));
 				tracer.printHeader();
 				recom.addListener(tracer);
 			} catch (IOException ex) {
-				log.error("Cannot log to file {}", dir + filename + ".log");
+				log.error("Cannot log to file {}", filename);
 			}
+			filename = dir + fileprefix + ".txt";
+			ConsolidatingReporter rep = new ConsolidatingReporter(query, uS, uT);
 			recom.addListener(rep);
 			recom.run();
+			log.info("DONE. Recommendation process complete.");
 			if (tracer != null) tracer.printFooter();
 			try {
-				rep.printReport(new PrintWriter(new FileWriter(dir + filename + ".txt")), 50);
+				log.info("Writing consolidated report to file {}", filename);
+				rep.printReport(new PrintWriter(new FileWriter(filename)), 50);
 			} catch (IOException e) {
-				log.error("Cannot write report to file {}", dir + filename + ".txt");
+				log.error("Cannot write report to file {}", filename);
 				throw new RuntimeException(e);
 			}
 

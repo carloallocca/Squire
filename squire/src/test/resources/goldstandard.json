@@ -164,8 +164,9 @@
 	},
 	"museum_1": {
 		"description": "Museums: Rijksmuseum and Smithsonian",
+		"note": "No trailing slash for Smithsonian SPARQL Endpoint!",
 		"source": "http://rijksmuseum.sealinc.eculture.labs.vu.nl/sparql/",
-		"target": "http://edan.si.edu/saam/sparql/",
+		"target": "http://edan.si.edu/saam/sparql",
 		"queries": [
 			{
 				"id": "q1",
