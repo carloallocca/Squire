@@ -40,6 +40,7 @@ import uk.ac.open.kmi.squire.operation.SPARQLQueryGeneralization;
 import uk.ac.open.kmi.squire.operation.SPARQLQueryInstantiation;
 import uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+import uk.ac.open.kmi.squire.utils.TreeNodez;
 
 /**
  *
@@ -59,9 +60,9 @@ public class QueryRecommendation<T> {
 	private static String REMOVE_TP_OP = "R";
 
 	// private TreeNode<T> root;
-	private TreeNode<T> rootDataNode;
+	private TreeNodez<T> rootDataNode;
 
-	private HashMap<String, TreeNode<T>> treeNodeIndex = new HashMap<>();
+	private HashMap<String, TreeNodez<T>> treeNodeIndex = new HashMap<>();
 	private IRDFDataset rdfd1;
 	private final Query originalQuery;
 	private Query originalQueryCopy;
@@ -98,7 +99,7 @@ public class QueryRecommendation<T> {
 
 	}
 
-	private void addToNodeTreeIndexIFAbsent(TreeNode<Query> currNode) {
+	private void addToNodeTreeIndexIFAbsent(TreeNodez<Query> currNode) {
 		// ////
 		List<TriplePath> triplePathCollection = getTriplePathSet(currNode.getData());
 		ArrayList<String> s = new ArrayList<String>(); // and use Collections.sort()
@@ -106,10 +107,10 @@ public class QueryRecommendation<T> {
 			s.add(tp.toString());
 		}
 		Collections.sort(s);
-		treeNodeIndex.putIfAbsent(s.toString(), (TreeNode<T>) currNode);
+		treeNodeIndex.putIfAbsent(s.toString(), (TreeNodez<T>) currNode);
 	}
 
-	private void addToNodeTreeIndexIFAbsent1(TreeNode<DataNode> childNode) {
+	private void addToNodeTreeIndexIFAbsent1(TreeNodez<DataNode> childNode) {
 
 		DataNode data = childNode.getData();
 		Query q = data.getqR();// currNode.getData();
@@ -119,7 +120,7 @@ public class QueryRecommendation<T> {
 			s.add(tp.toString());
 		}
 		Collections.sort(s);
-		treeNodeIndex.putIfAbsent(s.toString(), (TreeNode<T>) childNode);
+		treeNodeIndex.putIfAbsent(s.toString(), (TreeNodez<T>) childNode);
 	}
 
 	private float computeInstanciateOperationCost(String entityqO, String entityqR) {
@@ -133,7 +134,7 @@ public class QueryRecommendation<T> {
 
 	}
 
-	public void computeRecommendateQueryScore(TreeNode<T> n, int i) {
+	public void computeRecommendateQueryScore(TreeNodez<T> n, int i) {
 		if (n == null) {
 			throw new IllegalStateException(
 					"[QueryRecommendation,computeRecommendateQueryScore]The Query Tree is empty!!");
@@ -223,7 +224,7 @@ public class QueryRecommendation<T> {
 				this.queryRecommendatedList.add(queryScorePair);
 			}
 		}
-		for (TreeNode<T> node : n.getChildren()) {
+		for (TreeNodez<T> node : n.getChildren()) {
 			computeRecommendateQueryScore(node, i + 1);
 		}
 
@@ -396,7 +397,7 @@ public class QueryRecommendation<T> {
 		return queryTemplate;
 	}
 
-	public TreeNode<T> getRootTemplate() {
+	public TreeNodez<T> getRootTemplate() {
 		return rootDataNode;
 	}
 
@@ -789,7 +790,7 @@ public class QueryRecommendation<T> {
 															// | Templates.
 	}
 
-	private boolean isInTreeNodeIndex(TreeNode<Query> currNode) {
+	private boolean isInTreeNodeIndex(TreeNodez<Query> currNode) {
 
 		Query q = currNode.getData();
 
@@ -825,7 +826,7 @@ public class QueryRecommendation<T> {
 		return treeNodeIndex.containsKey(s.toString());
 	}
 
-	private boolean isInTreeNodeIndex1(TreeNode<DataNode> childNode) {
+	private boolean isInTreeNodeIndex1(TreeNodez<DataNode> childNode) {
 		DataNode data = childNode.getData();
 		Query q = data.getqR();// currNode.getData();
 		List<TriplePath> triplePathCollection = this.getTriplePathSet(q);
@@ -891,7 +892,7 @@ public class QueryRecommendation<T> {
 		return true;
 	}
 
-	public void printQueryTemplateTree(TreeNode<T> n, int i) {
+	public void printQueryTemplateTree(TreeNodez<T> n, int i) {
 		if (n == null) {
 			throw new IllegalStateException("[QueryRecommendation,printQueryTemplateTree]The tree is empty!!");
 		}
@@ -903,13 +904,13 @@ public class QueryRecommendation<T> {
 		if (n.getData() != null) {
 			System.out.println("[QueryRecommendation,printQueryTemplateTree]" + n.getData().toString());
 		}
-		for (TreeNode<T> node : n.getChildren()) {
+		for (TreeNodez<T> node : n.getChildren()) {
 			printQueryTemplateTree(node, i + 1);
 		}
 
 	}
 
-	public void printQueryTemplateTree1(TreeNode<T> n, int i) {
+	public void printQueryTemplateTree1(TreeNodez<T> n, int i) {
 		if (n == null) {
 			throw new IllegalStateException("[QueryRecommendation,printQueryTemplateTree]The tree is empty!!");
 		}
@@ -986,13 +987,13 @@ public class QueryRecommendation<T> {
 			}
 
 		}
-		for (TreeNode node : n.getChildren()) {
+		for (TreeNodez node : n.getChildren()) {
 			printQueryTemplateTree1(node, i + 1);
 		}
 
 	}
 
-	private void specialize(TreeNode<T> parentNode, Collection<String> parentPL, Collection<String> parentCL,
+	private void specialize(TreeNodez<T> parentNode, Collection<String> parentPL, Collection<String> parentCL,
 			Collection<String> parentIL, Collection<String> parentLitL) {
 		if (parentNode == null) {
 			throw new IllegalStateException("[QueryRecommendation::specialize()]A ParentNode is null!!");
@@ -1058,16 +1059,16 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(clas));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode;
-							childNode = new TreeNode(childQuery, null);
+							TreeNodez<Query> childNode;
+							childNode = new TreeNodez(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isClassTemplateVariable
@@ -1096,15 +1097,15 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(individual));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode = new TreeNode<>(childQuery, null);
+							TreeNodez<Query> childNode = new TreeNodez<>(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isIndividualTemplateVariable
@@ -1133,15 +1134,15 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(literal));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode = new TreeNode<>(childQuery, null);
+							TreeNodez<Query> childNode = new TreeNodez<>(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isLiteralTemplateVariable
@@ -1171,16 +1172,16 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(property));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode;
-							childNode = new TreeNode<>(childQuery, null);
+							TreeNodez<Query> childNode;
+							childNode = new TreeNodez<>(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 					} // if isPropertyTemplateVariable
 				} // if isTemplateVariable
@@ -1240,8 +1241,8 @@ public class QueryRecommendation<T> {
 						// System.out.println("childQuery ====AFTER== " + childQuery.toString());
 						// Step 4: creating a childNode and we add it to the Tree, if it is not added
 						// alrady.
-						TreeNode<Query> childNode;
-						childNode = new TreeNode(childQuery, null);
+						TreeNodez<Query> childNode;
+						childNode = new TreeNodez(childQuery, null);
 						// Step 5: recall the function on the child;
 						// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 						if (!(isInTreeNodeIndex(childNode))) {
@@ -1249,7 +1250,7 @@ public class QueryRecommendation<T> {
 							// +
 							// "////////////////////////////////// if (!(isInTreeNodeIndex(childNode)))
 							// //////////////");
-							parentNode.addChild((TreeNode<T>) childNode);
+							parentNode.addChild((TreeNodez<T>) childNode);
 							addToNodeTreeIndexIFAbsent(childNode);
 						}
 						// Step 5: recall the function on the child;
@@ -1258,7 +1259,7 @@ public class QueryRecommendation<T> {
 						// System.out.println("childCL ====================== " + childCL.toString());
 						// System.out.println("childIL ====================== " + childIL.toString());
 						// System.out.println("chilLitL ====================== " + chilLitL.toString());
-						specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+						specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 					}
 				}
 			} // if predicate
@@ -1294,16 +1295,16 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(clas));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode;
-							childNode = new TreeNode(childQuery, null);
+							TreeNodez<Query> childNode;
+							childNode = new TreeNodez(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isClassTemplateVariable
@@ -1332,16 +1333,16 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(individual));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode;
-							childNode = new TreeNode(childQuery, null);
+							TreeNodez<Query> childNode;
+							childNode = new TreeNodez(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isIndividualTemplateVariable
@@ -1370,16 +1371,16 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(literal));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode;
-							childNode = new TreeNode<>(childQuery, null);
+							TreeNodez<Query> childNode;
+							childNode = new TreeNodez<>(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isLiteralTemplateVariable
@@ -1408,16 +1409,16 @@ public class QueryRecommendation<T> {
 									NodeFactory.createURI(property));
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
-							TreeNode<Query> childNode;
-							childNode = new TreeNode<>(childQuery, null);
+							TreeNodez<Query> childNode;
+							childNode = new TreeNodez<>(childQuery, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isPropertyTemplateVariable
@@ -1431,7 +1432,7 @@ public class QueryRecommendation<T> {
 	}
 
 	// this works without remove operation;
-	private void specialize1(TreeNode<T> parentNode, List<String> parentPL, List<String> parentCL,
+	private void specialize1(TreeNodez<T> parentNode, List<String> parentPL, List<String> parentCL,
 			List<String> parentIL, List<String> parentLitL) {
 		if (parentNode == null) {
 			throw new IllegalStateException("[QueryRecommendation::specialize()]A ParentNode is null!!");
@@ -1502,12 +1503,12 @@ public class QueryRecommendation<T> {
 
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
-							TreeNode<DataNode> childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode = new TreeNodez(cNode, null);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 					} // if isClassTemplateVariable
 					else if (isIndividualTemplateVariable(tp.getSubject().getName())) {
@@ -1551,16 +1552,16 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isIndividualTemplateVariable
@@ -1606,17 +1607,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isLiteralTemplateVariable
@@ -1669,17 +1670,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode<>(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez<>(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 					} // if isPropertyTemplateVariable
 				} // if isTemplateVariable
@@ -1746,7 +1747,7 @@ public class QueryRecommendation<T> {
 						DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 								childOperationList, op, nodeCost);
 
-						TreeNode<DataNode> childNode = new TreeNode<>(cNode, null);
+						TreeNodez<DataNode> childNode = new TreeNodez<>(cNode, null);
 
 						// Step 5: recall the function on the child;
 						// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -1755,10 +1756,10 @@ public class QueryRecommendation<T> {
 							// +
 							// "////////////////////////////////// if (!(isInTreeNodeIndex(childNode)))
 							// //////////////");
-							parentNode.addChild((TreeNode<T>) childNode);
+							parentNode.addChild((TreeNodez<T>) childNode);
 							addToNodeTreeIndexIFAbsent1(childNode);
 						}
-						specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+						specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 					}
 				}
 			} // if predicate
@@ -1809,17 +1810,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode<>(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez<>(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isClassTemplateVariable
@@ -1865,17 +1866,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isIndividualTemplateVariable
@@ -1921,16 +1922,16 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isLiteralTemplateVariable
@@ -1982,17 +1983,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode<>(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez<>(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize1((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize1((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isPropertyTemplateVariable
@@ -2006,7 +2007,7 @@ public class QueryRecommendation<T> {
 	}
 
 	// Working to include also remove operation
-	private void specialize2(TreeNode<T> parentNode, List<String> parentPL, List<String> parentCL,
+	private void specialize2(TreeNodez<T> parentNode, List<String> parentPL, List<String> parentCL,
 			List<String> parentIL, List<String> parentLitL) {
 		if (parentNode == null) {
 			throw new IllegalStateException("[QueryRecommendation::specialize()]A ParentNode is null!!");
@@ -2119,12 +2120,12 @@ public class QueryRecommendation<T> {
 
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
-							TreeNode<DataNode> childNode = new TreeNode<>(cNode, null);
+							TreeNodez<DataNode> childNode = new TreeNodez<>(cNode, null);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 					} // if isClassTemplateVariable
 					else if (isIndividualTemplateVariable(tp.getSubject().getName())) {
@@ -2168,16 +2169,16 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isIndividualTemplateVariable
@@ -2223,17 +2224,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isLiteralTemplateVariable
@@ -2286,17 +2287,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode<>(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez<>(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 					} // if isPropertyTemplateVariable
 				} // if isTemplateVariable
@@ -2363,8 +2364,8 @@ public class QueryRecommendation<T> {
 						DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 								childOperationList, op, nodeCost);
 
-						TreeNode<DataNode> childNode;
-						childNode = new TreeNode<>(cNode, null);
+						TreeNodez<DataNode> childNode;
+						childNode = new TreeNodez<>(cNode, null);
 
 						// Step 5: recall the function on the child;
 						// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -2373,10 +2374,10 @@ public class QueryRecommendation<T> {
 							// +
 							// "////////////////////////////////// if (!(isInTreeNodeIndex(childNode)))
 							// //////////////");
-							parentNode.addChild((TreeNode<T>) childNode);
+							parentNode.addChild((TreeNodez<T>) childNode);
 							addToNodeTreeIndexIFAbsent1(childNode);
 						}
-						specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+						specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 					}
 				}
 			} // if predicate
@@ -2427,17 +2428,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode<>(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez<>(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isClassTemplateVariable
@@ -2483,17 +2484,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isIndividualTemplateVariable
@@ -2539,16 +2540,16 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isLiteralTemplateVariable
@@ -2600,17 +2601,17 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
 							}
 							// Step 5: recall the function on the child;
-							specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize2((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 
 					} // if isPropertyTemplateVariable
@@ -2624,7 +2625,7 @@ public class QueryRecommendation<T> {
 	}
 
 	// Working to include also remove operation
-	private void specialize3(TreeNode<T> parentNode, Collection<String> parentPL, Collection<String> parentCL,
+	private void specialize3(TreeNodez<T> parentNode, Collection<String> parentPL, Collection<String> parentCL,
 			Collection<String> parentIL, Collection<String> parentLitL) {
 		if (parentNode == null) {
 			throw new IllegalStateException("[QueryRecommendation::specialize3()]A ParentNode is null!!");
@@ -2692,11 +2693,11 @@ public class QueryRecommendation<T> {
 							// "+this.originalQuery);
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
-							TreeNode<DataNode> childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode = new TreeNodez(cNode, null);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 
 						}
@@ -2743,14 +2744,14 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -2801,15 +2802,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -2866,15 +2867,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -2944,8 +2945,8 @@ public class QueryRecommendation<T> {
 						DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 								childOperationList, op, nodeCost);
 
-						TreeNode<DataNode> childNode;
-						childNode = new TreeNode(cNode, null);
+						TreeNodez<DataNode> childNode;
+						childNode = new TreeNodez(cNode, null);
 
 						// Step 5: recall the function on the child;
 						// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -2954,9 +2955,9 @@ public class QueryRecommendation<T> {
 							// +
 							// "////////////////////////////////// if (!(isInTreeNodeIndex(childNode)))
 							// //////////////");
-							parentNode.addChild((TreeNode<T>) childNode);
+							parentNode.addChild((TreeNodez<T>) childNode);
 							addToNodeTreeIndexIFAbsent1(childNode);
-							specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 						// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 					}
@@ -3011,15 +3012,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -3070,15 +3071,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -3129,14 +3130,14 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -3193,15 +3194,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -3243,9 +3244,9 @@ public class QueryRecommendation<T> {
 				// "+this.originalQuery);
 				DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO_TMP, entityqR_TMP,
 						childOperationList, op, nodeCost);
-				TreeNode<DataNode> childNode = new TreeNode(cNode, null);
+				TreeNodez<DataNode> childNode = new TreeNodez(cNode, null);
 				if (!(isInTreeNodeIndex1(childNode))) {
-					parentNode.addChild((TreeNode<T>) childNode);
+					parentNode.addChild((TreeNodez<T>) childNode);
 					addToNodeTreeIndexIFAbsent1(childNode);
 					// specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 				}
@@ -3256,7 +3257,7 @@ public class QueryRecommendation<T> {
 	}
 
 	// Working to include also remove operation. specialize4 = specialize3
-	private void specialize4(TreeNode<T> parentNode, ArrayList<String> parentPL, ArrayList<String> parentCL,
+	private void specialize4(TreeNodez<T> parentNode, ArrayList<String> parentPL, ArrayList<String> parentCL,
 			ArrayList<String> parentIL, ArrayList<String> parentLitL) {
 		if (parentNode == null) {
 			throw new IllegalStateException("[QueryRecommendation::specialize3()]A ParentNode is null!!");
@@ -3320,11 +3321,11 @@ public class QueryRecommendation<T> {
 							// "+this.originalQuery);
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
-							TreeNode<DataNode> childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode = new TreeNodez(cNode, null);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 						}
 					} // if isClassTemplateVariable
@@ -3498,15 +3499,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -3566,15 +3567,15 @@ public class QueryRecommendation<T> {
 						DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 								childOperationList, op, nodeCost);
 
-						TreeNode<DataNode> childNode;
-						childNode = new TreeNode(cNode, null);
+						TreeNodez<DataNode> childNode;
+						childNode = new TreeNodez(cNode, null);
 
 						// Step 5: recall the function on the child;
 						// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 						if (!(isInTreeNodeIndex1(childNode))) {
-							parentNode.addChild((TreeNode<T>) childNode);
+							parentNode.addChild((TreeNodez<T>) childNode);
 							addToNodeTreeIndexIFAbsent1(childNode);
-							specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+							specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 						}
 						// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 					}
@@ -3629,15 +3630,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -3816,15 +3817,15 @@ public class QueryRecommendation<T> {
 							DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO, entityqR,
 									childOperationList, op, nodeCost);
 
-							TreeNode<DataNode> childNode;
-							childNode = new TreeNode(cNode, null);
+							TreeNodez<DataNode> childNode;
+							childNode = new TreeNodez(cNode, null);
 
 							// Step 5: recall the function on the child;
 							// specialize((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 							if (!(isInTreeNodeIndex1(childNode))) {
-								parentNode.addChild((TreeNode<T>) childNode);
+								parentNode.addChild((TreeNodez<T>) childNode);
 								addToNodeTreeIndexIFAbsent1(childNode);
-								specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
+								specialize3((TreeNodez<T>) childNode, childPL, childCL, childIL, chilLitL);
 							}
 							// Step 5: recall the function on the child;
 							// specialize2((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
@@ -3865,9 +3866,9 @@ public class QueryRecommendation<T> {
 				// "+this.originalQuery);
 				DataNode cNode = new DataNode(this.originalQuery, childQuery, entityqO_TMP, entityqR_TMP,
 						childOperationList, op, nodeCost);
-				TreeNode<DataNode> childNode = new TreeNode(cNode, null);
+				TreeNodez<DataNode> childNode = new TreeNodez(cNode, null);
 				if (!(isInTreeNodeIndex1(childNode))) {
-					parentNode.addChild((TreeNode<T>) childNode);
+					parentNode.addChild((TreeNodez<T>) childNode);
 					addToNodeTreeIndexIFAbsent1(childNode);
 					// specialize3((TreeNode<T>) childNode, childPL, childCL, childIL, chilLitL);
 				}
@@ -3896,7 +3897,7 @@ public class QueryRecommendation<T> {
 		// System.out.println("[QueryRecommendation, specializeToQueryInstance()]
 		// rdfd2.getLiteralSet() " +
 		// rdfd2.getLiteralSet());
-		this.rootDataNode = new TreeNode(this.queryTemplate, null);
+		this.rootDataNode = new TreeNodez(this.queryTemplate, null);
 
 		// System.out.println("parentPL ====================== " +
 		// rdfd2.getPropertySet().toString());
@@ -3926,7 +3927,7 @@ public class QueryRecommendation<T> {
 
 		ArrayList<String> operationList = new ArrayList();
 		DataNode rootDN = new DataNode(this.originalQuery, this.queryTemplate, "", "", operationList, "", 0);
-		this.rootDataNode = new TreeNode(rootDN, null);
+		this.rootDataNode = new TreeNodez(rootDN, null);
 		// specialize1(this.rootDataNode,
 		// specialize2(this.rootDataNode,
 

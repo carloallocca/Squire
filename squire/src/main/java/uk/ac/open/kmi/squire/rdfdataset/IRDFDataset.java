@@ -5,9 +5,11 @@
  */
 package uk.ac.open.kmi.squire.rdfdataset;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
+ * TODO use generics for paths and graphs.
  *
  * @author callocca
  */
@@ -15,6 +17,10 @@ public interface IRDFDataset extends Runnable {
 
 	public void clear();
 
+	/**
+	 * Depending on implementation it may or may not compute the signatures for the
+	 * respective classes.
+	 */
 	public void computeClassSet();
 
 	public void computeDataTypePropertySet() throws BootedException;
@@ -30,6 +36,8 @@ public interface IRDFDataset extends Runnable {
 	public void computeRDFVocabularySet();
 
 	public Set<String> getClassSet();
+
+	public Map<String, ClassSignature> getClassSignatures();
 
 	public Set<String> getDatatypePropertySet();
 
@@ -63,20 +71,8 @@ public interface IRDFDataset extends Runnable {
 
 	public boolean isInRDFVocabulary(String rdfEntity);
 
-	public void setClassSet(Set<String> classSet);
-
-	public void setDatatypePropertySet(Set<String> dpSet);
-
 	public void setGraph(Object path);
 
-	public void setIndividualSet(Set<String> indSet);
-
-	public void setLiteralSet(Set<String> litSet);
-
-	public void setObjectPropertySet(Set<String> opSet);
-
 	public void setPath(Object path);
-
-	public void setRDFVocabulary(Set<String> rdfSet);
 
 }

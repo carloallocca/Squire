@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.open.kmi.squire.treequerypatterns;
+package uk.ac.open.kmi.squire.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  *
@@ -18,26 +20,23 @@ public class TreeNode<T> {
 
 	private T data = null;
 
-	private ArrayList<TreeNode<T>> children = new ArrayList<>();
+	private List<TreeNode<T>> children = new ArrayList<>();
 
-	public TreeNode(T data, ArrayList<TreeNode<T>> childs) {
-		if (data != null) {
-			this.data = data;
-		}
-		if (childs != null) {
-			this.children.addAll(childs);
-		}
+	public TreeNode(T data) {
+		this(data, Collections.emptyList());
+	}
 
+	public TreeNode(T data, List<TreeNode<T>> children) {
+		if (data != null) this.data = data;
+		if (children != null) this.children.addAll(children);
 	}
 
 	public void addChild(TreeNode<T> child) {
-		if (this.children == null) {
-			this.children = new ArrayList<>();
-		}
+		if (this.children == null) this.children = new ArrayList<>();
 		this.children.add(child);// .addSibling(childNode);
 	}
 
-	public ArrayList<TreeNode<T>> getChildren() {
+	public List<TreeNode<T>> getChildren() {
 		return children;
 	}
 
@@ -45,7 +44,7 @@ public class TreeNode<T> {
 		return data;
 	}
 
-	public void setChildren(ArrayList<TreeNode<T>> children) {
+	public void setChildren(List<TreeNode<T>> children) {
 		this.children = children;
 	}
 

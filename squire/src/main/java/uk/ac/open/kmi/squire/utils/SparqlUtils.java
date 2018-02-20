@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
@@ -129,6 +130,21 @@ public class SparqlUtils {
 		return filtered;
 	}
 
+	public static String[][] extractSelectValuePairs(String sparqlResultJson, String var1, String var2) {
+		String[][] output;
+		JsonArray results = JSON.parse(sparqlResultJson).get("results").getAsObject().get("bindings").getAsArray();
+		output = new String[results.size()][2];
+		for (int i = 0; i < results.size(); i++) {
+			JsonObject bind = results.get(i).getAsObject();
+			if (bind.hasKey(var1)) {
+				output[i][0] = bind.get(var1).getAsObject().get("value").getAsString().value();
+				output[i][1] = bind.hasKey(var2) ? bind.get(var2).getAsObject().get("value").getAsString().value()
+						: null;
+			}
+		}
+		return output;
+	}
+
 	public static List<String> extractSelectVariableValues(String sparqlResultJson, String variable) {
 		return extractSelectVariableValues(sparqlResultJson, variable, false);
 	}
@@ -157,12 +173,13 @@ public class SparqlUtils {
 				log.error("Bad URI synax for string '{}'", value);
 			}
 		}
-		return output;
+		// Make unique list using Java 8 Stream API
+		return output.stream().distinct().collect(Collectors.toList());
 	}
 
-	public static boolean isValidUri(String cleanedVarValue) {
+	public static boolean isValidUri(String uri) {
 		try {
-			IRIFactory.iriImplementation().create(cleanedVarValue);// = IRIResolver(cleanedVarValue);
+			IRIFactory.iriImplementation().create(uri);// = IRIResolver(uri);
 			return true;
 		} catch (Exception e1) {
 			return false;

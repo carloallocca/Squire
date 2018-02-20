@@ -25,6 +25,7 @@ import uk.ac.open.kmi.squire.entityvariablemapping.LiteralVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.ObjectPropertyVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.RDFVocVarMapping;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+import uk.ac.open.kmi.squire.utils.TreeNodez;
 
 /**
  * 
@@ -32,10 +33,10 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  */
 public class QTTree<T> {
 
-	private TreeNode<T> root;
-	private TreeNode<T> rootTemplate;
+	private TreeNodez<T> root;
+	private TreeNodez<T> rootTemplate;
 
-	private HashMap<String, TreeNode<T>> treeNodeIndex = new HashMap<>();
+	private HashMap<String, TreeNodez<T>> treeNodeIndex = new HashMap<>();
 
 	private IRDFDataset rdfd1;
 
@@ -60,7 +61,7 @@ public class QTTree<T> {
 	// datatypePropertyVarTable = new DatatypePropertyVarMapping();
 	// rdfVocVarTable = new RDFVocVarMapping();
 	// }
-	public QTTree(String query, TreeNode<T> node, IRDFDataset d1, IRDFDataset d2) {
+	public QTTree(String query, TreeNodez<T> node, IRDFDataset d1, IRDFDataset d2) {
 		this.root = node;
 		rdfd1 = d1;
 		classVarTable = new ClassVarMapping();
@@ -72,7 +73,7 @@ public class QTTree<T> {
 		rdfd2 = d2;
 	}
 
-	public void generateQTTree(TreeNode<List<TriplePath>> node) {
+	public void generateQTTree(TreeNodez<List<TriplePath>> node) {
 
 		if (node == null) {
 			return;
@@ -97,7 +98,7 @@ public class QTTree<T> {
 
 			////////////////////////// Applying the Remove operation
 			if (tpSet.size() > 1) {
-				TreeNode<List<TriplePath>> currNode = null;
+				TreeNodez<List<TriplePath>> currNode = null;
 				// We create the triple patterns set for the child node. The set will initially
 				// contains the triple patterns
 				// except the one we are about processing.
@@ -107,7 +108,7 @@ public class QTTree<T> {
 						childTPSet.add(tp1);
 					}
 				}
-				currNode = new TreeNode<>(childTPSet, null);
+				currNode = new TreeNodez<>(childTPSet, null);
 				// Check if the childNode has already been added to the tree.
 				if (!(isInTreeNodeIndex(currNode))) {
 					node.addChild(currNode);
@@ -122,7 +123,7 @@ public class QTTree<T> {
 			// SUBJECT s, s=literal or s=URI that can be one of
 			// [classURI or ObjPropertyURI or datatypePropertyURI or RDFVocabulary]
 			if (tp.getSubject().isURI()) {
-				final TreeNode<List<TriplePath>> currNode;
+				final TreeNodez<List<TriplePath>> currNode;
 				// We create the triple patterns set for the child node. The set will initially
 				// contains the triple patterns
 				// except the one we are about processing.
@@ -141,7 +142,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is an class == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					// Check if the childNode has already been added to the tree.
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
@@ -155,7 +156,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is a individual uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -170,7 +171,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is a objectproperty uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -185,7 +186,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is a datatypeProperty uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -199,7 +200,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is a RDFVocabulary  uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -217,7 +218,7 @@ public class QTTree<T> {
 
 			// s= literal
 			if (tp.getSubject().isLiteral()) {
-				final TreeNode<List<TriplePath>> currNode;
+				final TreeNodez<List<TriplePath>> currNode;
 				// We create the triple patterns set for the child node. The set will initially
 				// contains the triple patterns
 				// except the one we are about processing.
@@ -234,7 +235,7 @@ public class QTTree<T> {
 				System.out.println(tpSet.toString());
 				System.out.println("[QTTree::generateQTTree] subject is a literal == AFTER");
 				System.out.println(childTPSet.toString());
-				currNode = new TreeNode<>(childTPSet, null);
+				currNode = new TreeNodez<>(childTPSet, null);
 				// Check if the childNode has already been added to the tree.
 				if (!(isInTreeNodeIndex(currNode))) {
 					node.addChild(currNode);
@@ -245,7 +246,7 @@ public class QTTree<T> {
 			// PREDICATE p, p=URI that can be one of
 			// [ObjPropertyURI or datatypePropertyURI or RDFVocabulary]
 			if (tp.getPredicate().isURI()) {
-				final TreeNode<List<TriplePath>> currNode;
+				final TreeNodez<List<TriplePath>> currNode;
 				// We create the triple patterns set for the child node. The set will initially
 				// contains the triple patterns
 				// except the one we are about processing.
@@ -263,7 +264,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] predicate is a rdfvoc uri uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -279,7 +280,7 @@ public class QTTree<T> {
 					System.out.println("[QTTree::generateQTTree] object is a a object property uri uri == AFTER");
 					System.out.println(childTPSet.toString());
 
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -293,7 +294,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] object is a a object property uri uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);
+					currNode = new TreeNodez<>(childTPSet, null);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -311,7 +312,7 @@ public class QTTree<T> {
 			// OBJECT o, o=literal or o=URI that can be one of
 			// [classURI or ObjPropertyURI or datatypePropertyURI or RDFVocabulary]
 			if (tp.getObject().isURI()) {
-				final TreeNode<List<TriplePath>> currNode;
+				final TreeNodez<List<TriplePath>> currNode;
 				// We create the triple patterns set for the child node. The set will initially
 				// contains the triple patterns
 				// except the one we are about processing.
@@ -329,7 +330,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] object is a class uri uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);// .setData(newEl);
+					currNode = new TreeNodez<>(childTPSet, null);// .setData(newEl);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -342,7 +343,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] object is an individual uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);// .setData(newEl);
+					currNode = new TreeNodez<>(childTPSet, null);// .setData(newEl);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -356,7 +357,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] object is an object property uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);// .setData(newEl);
+					currNode = new TreeNodez<>(childTPSet, null);// .setData(newEl);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -370,7 +371,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] object is an object property uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);// .setData(newEl);
+					currNode = new TreeNodez<>(childTPSet, null);// .setData(newEl);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -384,7 +385,7 @@ public class QTTree<T> {
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] object is an object property uri == AFTER");
 					System.out.println(childTPSet.toString());
-					currNode = new TreeNode<>(childTPSet, null);// .setData(newEl);
+					currNode = new TreeNodez<>(childTPSet, null);// .setData(newEl);
 					if (!(isInTreeNodeIndex(currNode))) {
 						node.addChild(currNode);
 						addToNodeTreeIndexIFAbsent(currNode);
@@ -401,7 +402,7 @@ public class QTTree<T> {
 			}
 			// OBJECT o=literal
 			if (tp.getObject().isLiteral()) {
-				final TreeNode<List<TriplePath>> currNode;
+				final TreeNodez<List<TriplePath>> currNode;
 				// We create the triple patterns set for the child node. The set will initially
 				// contains the triple patterns
 				// except the one we are about processing.
@@ -418,7 +419,7 @@ public class QTTree<T> {
 				System.out.println(tpSet.toString());
 				System.out.println("[QTTree::generateQTTree] subject is a literal == AFTER");
 				System.out.println(childTPSet.toString());
-				currNode = new TreeNode<>(childTPSet, null);
+				currNode = new TreeNodez<>(childTPSet, null);
 				// Check if the childNode has already been added to the tree.
 				if (!(isInTreeNodeIndex(currNode))) {
 					node.addChild(currNode);
@@ -428,11 +429,11 @@ public class QTTree<T> {
 		}
 	}
 
-	public TreeNode<T> getRoot() {
+	public TreeNodez<T> getRoot() {
 		return root;
 	}
 
-	public void evaluateQTTree(TreeNode<T> n, int i) {
+	public void evaluateQTTree(TreeNodez<T> n, int i) {
 		if (n == null) {
 			throw new IllegalStateException("[QTTree,evaluateQTTree]The tree is empty!!");
 		}
@@ -465,12 +466,12 @@ public class QTTree<T> {
 			System.out.println("[QTTree:evaluateQTTree]" + n.getData().toString());
 		}
 
-		for (TreeNode<T> node : n.getChildren())
+		for (TreeNodez<T> node : n.getChildren())
 			evaluateQTTree(node, i + 1);
 
 	}
 
-	public void printQTTree(TreeNode<T> n, int i) {
+	public void printQTTree(TreeNodez<T> n, int i) {
 		if (n == null) {
 			throw new IllegalStateException("[QTTree,printQTTree]The tree is empty!!");
 		}
@@ -503,7 +504,7 @@ public class QTTree<T> {
 			System.out.println("[QTTree:printQTTree]" + n.getData().toString());
 		}
 
-		for (TreeNode<T> node : n.getChildren()) {
+		for (TreeNodez<T> node : n.getChildren()) {
 
 			printQTTree(node, i + 1);
 		}
@@ -552,7 +553,7 @@ public class QTTree<T> {
 		System.out.println("");
 		System.out.println("");
 		// we set the rootTemplate.
-		this.rootTemplate = new TreeNode(tpTempleteSet, null);
+		this.rootTemplate = new TreeNodez(tpTempleteSet, null);
 
 	}
 
@@ -685,7 +686,7 @@ public class QTTree<T> {
 	// This method builds the query recommendation tree.
 	// Input: it takes the rootTemplate;
 	// output: it gives the rootTemplate;
-	public void specializeToQueryInstance(TreeNode<T> n) {
+	public void specializeToQueryInstance(TreeNodez<T> n) {
 
 		if (this.rootTemplate == null) {
 			throw new IllegalStateException("[QTTree::specializeToQueryInstance()]The tree is empty!!");
@@ -714,7 +715,7 @@ public class QTTree<T> {
 
 	// this is the first version that does not apply the FOR-EACH Predicate, but
 	// just takes the first each time.
-	public void specializeToQueryInstance1(TreeNode<List<TriplePath>> parentNode, List<String> parentPL,
+	public void specializeToQueryInstance1(TreeNodez<List<TriplePath>> parentNode, List<String> parentPL,
 			Map<String, String> parentPTMap, List<String> parentCL, Map<String, String> parentCTMap) {
 
 		if (parentNode == null) {
@@ -786,8 +787,8 @@ public class QTTree<T> {
 							// alrady.
 							// Step 2: create a childNode, which will have all the triple maps
 							// except the one we are processing
-							final TreeNode<List<TriplePath>> childNode;
-							childNode = new TreeNode<>(childTriplePattersSet, null);
+							final TreeNodez<List<TriplePath>> childNode;
+							childNode = new TreeNodez<>(childTriplePattersSet, null);
 							if (!(isInTreeNodeIndex(childNode))) {
 								parentNode.addChild(childNode);
 								addToNodeTreeIndexIFAbsent(childNode);
@@ -808,7 +809,7 @@ public class QTTree<T> {
 
 	// this is the second version: it does apply the FOR-EACH Predicate, but
 	// It does not provide all the solutions. We are going for the version 3
-	public void specializeToQueryInstance2(TreeNode<List<TriplePath>> parentNode, List<String> parentPL,
+	public void specializeToQueryInstance2(TreeNodez<List<TriplePath>> parentNode, List<String> parentPL,
 			Map<String, String> parentPTMap, List<String> parentCL, Map<String, String> parentCTMap) {
 
 		if (parentNode == null) {
@@ -876,8 +877,8 @@ public class QTTree<T> {
 								// alrady.
 								// Step 2: create a childNode, which will have all the triple maps
 								// except the one we are processing
-								final TreeNode<List<TriplePath>> childNode;
-								childNode = new TreeNode<>(childTriplePattersSet, null);
+								final TreeNodez<List<TriplePath>> childNode;
+								childNode = new TreeNodez<>(childTriplePattersSet, null);
 								if (!(isInTreeNodeIndex(childNode))) {
 									parentNode.addChild(childNode);
 									addToNodeTreeIndexIFAbsent(childNode);
@@ -898,8 +899,8 @@ public class QTTree<T> {
 								// alrady.
 								// Step 2: create a childNode, which will have all the triple maps
 								// except the one we are processing
-								final TreeNode<List<TriplePath>> childNode;
-								childNode = new TreeNode<>(childTriplePattersSet, null);
+								final TreeNodez<List<TriplePath>> childNode;
+								childNode = new TreeNodez<>(childTriplePattersSet, null);
 								if (!(isInTreeNodeIndex(childNode))) {
 									parentNode.addChild(childNode);
 									addToNodeTreeIndexIFAbsent(childNode);
@@ -962,8 +963,8 @@ public class QTTree<T> {
 						// alrady.
 						// Step 2: create a childNode, which will have all the triple maps
 						// except the one we are processing
-						final TreeNode<List<TriplePath>> childNode;
-						childNode = new TreeNode<>(childTriplePattersSet, null);
+						final TreeNodez<List<TriplePath>> childNode;
+						childNode = new TreeNodez<>(childTriplePattersSet, null);
 						if (!(isInTreeNodeIndex(childNode))) {
 							parentNode.addChild(childNode);
 							addToNodeTreeIndexIFAbsent(childNode);
@@ -982,7 +983,7 @@ public class QTTree<T> {
 	}
 
 	// this is the third version. Yet, it does not produce the right results.
-	public void specializeToQueryInstance3(TreeNode<List<TriplePath>> parentNode, List<String> parentPL,
+	public void specializeToQueryInstance3(TreeNodez<List<TriplePath>> parentNode, List<String> parentPL,
 			Map<String, String> parentPTMap, List<String> parentCL, Map<String, String> parentCTMap) {
 
 		if (parentNode == null) {
@@ -1045,8 +1046,8 @@ public class QTTree<T> {
 								// alrady.
 								// Step 2: create a childNode, which will have all the triple maps
 								// except the one we are processing
-								TreeNode<List<TriplePath>> childNode;
-								childNode = new TreeNode<>(childTriplePattersSet, null);
+								TreeNodez<List<TriplePath>> childNode;
+								childNode = new TreeNodez<>(childTriplePattersSet, null);
 								if (!(isInTreeNodeIndex(childNode))) {
 									parentNode.addChild(childNode);
 									addToNodeTreeIndexIFAbsent(childNode);
@@ -1070,8 +1071,8 @@ public class QTTree<T> {
 								// alrady.
 								// Step 2: create a childNode, which will have all the triple maps
 								// except the one we are processing
-								TreeNode<List<TriplePath>> childNode;
-								childNode = new TreeNode<>(childTriplePattersSet, null);
+								TreeNodez<List<TriplePath>> childNode;
+								childNode = new TreeNodez<>(childTriplePattersSet, null);
 								if (!(isInTreeNodeIndex(childNode))) {
 									parentNode.addChild(childNode);
 									addToNodeTreeIndexIFAbsent(childNode);
@@ -1134,8 +1135,8 @@ public class QTTree<T> {
 						// alrady.
 						// Step 2: create a childNode, which will have all the triple maps
 						// except the one we are processing
-						final TreeNode<List<TriplePath>> childNode;
-						childNode = new TreeNode<>(childTriplePattersSet, null);
+						final TreeNodez<List<TriplePath>> childNode;
+						childNode = new TreeNodez<>(childTriplePattersSet, null);
 						if (!(isInTreeNodeIndex(childNode))) {
 							parentNode.addChild(childNode);
 							addToNodeTreeIndexIFAbsent(childNode);
@@ -1154,7 +1155,7 @@ public class QTTree<T> {
 	}
 
 	// This is the fourth version. It does produce the right results.
-	public void specializeToQueryInstance4(TreeNode<List<TriplePath>> parentNode, List<String> parentPL,
+	public void specializeToQueryInstance4(TreeNodez<List<TriplePath>> parentNode, List<String> parentPL,
 			Map<String, String> parentPTMap, List<String> parentCL, Map<String, String> parentCTMap) {
 
 		if (parentNode == null) {
@@ -1209,8 +1210,8 @@ public class QTTree<T> {
 						// alrady.
 						// Step 2: create a childNode, which will have all the triple maps
 						// except the one we are processing
-						TreeNode<List<TriplePath>> childNode;
-						childNode = new TreeNode<>(childTriplePattersSet, null);
+						TreeNodez<List<TriplePath>> childNode;
+						childNode = new TreeNodez<>(childTriplePattersSet, null);
 						if (!(isInTreeNodeIndex(childNode))) {
 							System.out.println("[QTTree::specializeToQueryInstance4] IF");
 							parentNode.addChild(childNode);
@@ -1256,8 +1257,8 @@ public class QTTree<T> {
 							// alrady.
 							// Step 2: create a childNode, which will have all the triple maps
 							// except the one we are processing
-							TreeNode<List<TriplePath>> childNode;
-							childNode = new TreeNode<>(childTriplePattersSet, null);
+							TreeNodez<List<TriplePath>> childNode;
+							childNode = new TreeNodez<>(childTriplePattersSet, null);
 							if (!(isInTreeNodeIndex(childNode))) {
 								System.out.println("[QTTree::specializeToQueryInstance4] FOR");
 								parentNode.addChild(childNode);
@@ -1276,7 +1277,7 @@ public class QTTree<T> {
 		}
 	}
 
-	public TreeNode<T> getRootTemplate() {
+	public TreeNodez<T> getRootTemplate() {
 		return rootTemplate;
 	}
 
@@ -1298,7 +1299,7 @@ public class QTTree<T> {
 	//// }
 	//// }
 	// }
-	private boolean isInTreeNodeIndex(TreeNode<List<TriplePath>> currNode) {
+	private boolean isInTreeNodeIndex(TreeNodez<List<TriplePath>> currNode) {
 
 		//////
 		List<TriplePath> triplePathCollection = currNode.getData();
@@ -1330,7 +1331,7 @@ public class QTTree<T> {
 		// return false;
 	}
 
-	private void addToNodeTreeIndexIFAbsent(TreeNode<List<TriplePath>> currNode) {
+	private void addToNodeTreeIndexIFAbsent(TreeNodez<List<TriplePath>> currNode) {
 		//////
 		List<TriplePath> triplePathCollection = currNode.getData();
 		ArrayList<String> s = new ArrayList<String>(); // and use Collections.sort()
@@ -1342,7 +1343,7 @@ public class QTTree<T> {
 		Collections.sort(s);
 		// System.out.println("[QTTree::addToNodeTreeIndexIFAbsent] AFTER SORTED=== " +
 		// s.toString());
-		treeNodeIndex.putIfAbsent(s.toString(), (TreeNode<T>) currNode);
+		treeNodeIndex.putIfAbsent(s.toString(), (TreeNodez<T>) currNode);
 		//////
 
 		// List<TriplePath> triplePathCollection = currNode.getData();

@@ -15,6 +15,7 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 
 import uk.ac.open.kmi.squire.queryvariablepartition.Partition;
+import uk.ac.open.kmi.squire.utils.TreeNodez;
 
 /**
  * This class has the scope of turning a TreeNode into a set of SPARQL queries,
@@ -24,10 +25,10 @@ import uk.ac.open.kmi.squire.queryvariablepartition.Partition;
  */
 public class FromTreeNodeToQuery<T> {
 
-	private final TreeNode<T> node; // input
+	private final TreeNodez<T> node; // input
 	private final ArrayList<Query> queryList; // output
 
-	public FromTreeNodeToQuery(TreeNode<T> n) {
+	public FromTreeNodeToQuery(TreeNodez<T> n) {
 		this.node = n;
 		this.queryList = new ArrayList<>();
 	}

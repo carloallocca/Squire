@@ -8,11 +8,16 @@ package uk.ac.open.kmi.squire.rdfdataset;
 import java.io.IOException;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.jena.atlas.json.JSON;
+import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.vocabulary.OWL;
@@ -25,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
+import uk.ac.open.kmi.squire.index.RDFDatasetIndexer.Fieldd;
 import uk.ac.open.kmi.squire.utils.SparqlUtils;
 import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
 import uk.ac.open.kmi.squire.utils.StringUtils;
@@ -68,7 +74,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		// createSPARQLEndPoint();
 		RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 		this.signatureDoc = instance.getSignature(this.endpointURL, this.graphName);
-		load();
+		loadAll();
 	}
 
 	@Override
@@ -80,11 +86,16 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		this.propertySet.clear();
 	}
 
+	/**
+	 * This implementation also retrieves the immediate class signature for each
+	 * class.
+	 */
 	@Override
 	public void computeClassSet() {
 		StringBuilder qS = new StringBuilder();
-		qS.append("SELECT DISTINCT ?x WHERE { [] a ?x");
-		qS.append(" FILTER ( TRUE"); // unclosed FILTER
+		// qS.append("SELECT DISTINCT ?x WHERE { [] a ?x");
+		qS.append("SELECT DISTINCT ?x ?p1 WHERE { [] a ?x OPTIONAL { ?x ?p1 [] }");
+		qS.append(" FILTER ( ?p1 != <" + RDF.type.getURI() + ">"); // unclosed FILTER
 
 		/*
 		 * To mimic the original behaviour, call iterativeComputation(qS.toString(),
@@ -92,7 +103,16 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 */
 		// No exclusions, creates excessively long queries
 		try {
-			iterativeComputation(qS.toString(), getClassSet(), 50, 0, null);
+			Map<String, Set<String>> tempClasses = new HashMap<>();
+			iterativeComputation(qS.toString(), tempClasses, 100, 0, null);
+			System.out.println(tempClasses.size());
+			for (Entry<String, Set<String>> e : tempClasses.entrySet()) {
+				String k = e.getKey();
+				if (!classSignatures.containsKey(k)) classSignatures.put(k, new ClassSignature(k));
+				ClassSignature cs = classSignatures.get(k);
+				for (String prop : e.getValue())
+					if (prop != null && !cs.hasProperty(prop)) cs.addProperty(prop);
+			}
 		} catch (BootedException e) {
 			log.error("We were kicked out immediately while trying to compute classes."
 					+ " Have no fallback strategy for that.");
@@ -297,20 +317,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		return val == null ? new HashSet<>() : StringUtils.commaSeparated2List(val);
 	}
 
-	/**
-	 * @param partialQuery
-	 *            the partial query expects to do a "SELECT ?x" and to end with an
-	 *            unclosed FILTER in the WHERE clause
-	 * @param stepLength
-	 *            how many items it should try to fetch on every step
-	 * @param iteration
-	 *            what number of step this is (starts at 0)
-	 * @param exclusions
-	 *            if NULL, the method will do pure pagination
-	 */
-	protected void iterativeComputation(final String partialQuery, final Set<String> tgtResourceSet, int stepLength,
-			int iteration, Set<Property> exclusions) throws BootedException {
-		long before = System.currentTimeMillis();
+	private String buildQuery(String partialQuery, int stepLength, int iteration, Set<Property> exclusions) {
 		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
 		int count = 0;
 		StringBuilder qS = new StringBuilder(partialQuery);
@@ -333,10 +340,31 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 				qS.append(stepLength * iteration);
 			}
 		}
-		log.debug("Sending query: {}", qS);
+		return qS.toString();
+	}
+
+	/**
+	 * @param partialQuery
+	 *            the partial query is expected to do a "SELECT ?x" and to end with
+	 *            an unclosed FILTER in the WHERE clause.
+	 * @param stepLength
+	 *            how many items it should try to fetch on every step
+	 * @param iteration
+	 *            what number of step this is (starts at 0)
+	 * @param exclusions
+	 *            the properties that should be excluded from the counting, e.g.
+	 *            because they have already been indexed. If NULL, the method will
+	 *            do pure pagination.
+	 */
+	protected void iterativeComputation(final String partialQuery, final Set<String> targetContainer, int stepLength,
+			int iteration, Set<Property> exclusions) throws BootedException {
+		long before = System.currentTimeMillis();
+		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
+		String q = buildQuery(partialQuery, stepLength, iteration, exclusions);
+		log.debug("Sending query: {}", q);
 		List<String> itemList;
 		try {
-			String res = SparqlUtils.doRawQuery(qS.toString(), this.endpointURL);
+			String res = SparqlUtils.doRawQuery(q, this.endpointURL);
 			itemList = SparqlUtils.extractSelectVariableValues(res, "x");
 		} catch (SparqlException e1) {
 			// Don't die. Keep whatever was indexed so far.
@@ -354,25 +382,123 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 * wrong with the order in which results are given, therefore one should sort
 		 * but it's costly).
 		 */
-		if (itemList.isEmpty() || tgtResourceSet.containsAll(itemList)) {
+		if (itemList.isEmpty() || targetContainer.containsAll(itemList)) {
 			if (!itemList.isEmpty()) log.debug("All {} RDF resources already present, closing loop.", itemList.size());
-			log.info("DONE. {} total resources indexed.", tgtResourceSet.size());
+			log.info("DONE. {} total resources indexed.", targetContainer.size());
 		} else { // the recursive call.
-			tgtResourceSet.addAll(itemList);
-			log.info(" ... {} resources indexed so far (last {} in {} ms)", tgtResourceSet.size(), itemList.size(),
+			targetContainer.addAll(itemList);
+			log.info(" ... {} resources indexed so far (last {} in {} ms)", targetContainer.size(), itemList.size(),
 					(System.currentTimeMillis() - before));
 			if (stepLength == itemList.size()) {
 				if (exclusions != null) for (String op : itemList)
 					exclusions.add(ResourceFactory.createProperty(op));
-				iterativeComputation(partialQuery, tgtResourceSet, stepLength, iteration + 1, exclusions);
-			} else log.info("DONE. {} total resources indexed for this category.", tgtResourceSet.size());
+				iterativeComputation(partialQuery, targetContainer, stepLength, iteration + 1, exclusions);
+			} else log.info("DONE. {} total resources indexed for this category.", targetContainer.size());
 		}
 
 	}
 
-	protected void load() {
+	/**
+	 * @param partialQuery
+	 *            the partial query is expected to do a "SELECT ?x ?p1" and to end
+	 *            with an unclosed FILTER in the WHERE clause. Other variables can
+	 *            be projected, though support for them will depend on
+	 *            implementation.
+	 * @param stepLength
+	 *            how many items it should try to fetch on every step
+	 * @param iteration
+	 *            what number of step this is (starts at 0)
+	 * @param exclusions
+	 *            the properties that should be excluded from the counting, e.g.
+	 *            because they have already been indexed. If NULL, the method will
+	 *            do pure pagination.
+	 */
+	protected void iterativeComputation(final String partialQuery, final Map<String, Set<String>> targetContainer,
+			int stepLength, int iteration, Set<Property> exclusions) throws BootedException {
+		long before = System.currentTimeMillis();
+		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
+		String q = buildQuery(partialQuery, stepLength, iteration, exclusions);
+		log.debug("Sending query: {}", q);
+		String[][] items;
+		try {
+			String res = SparqlUtils.doRawQuery(q, this.endpointURL);
+			items = SparqlUtils.extractSelectValuePairs(res, "x", "p1");
+		} catch (SparqlException e1) {
+			// Don't die. Keep whatever was indexed so far.
+			log.warn("Got remote response : {}", e1.getMessage());
+			// If it was the first attempt though, give up and raise an exception.
+			if (iteration == 0) throw new BootedException();
+			log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
+					iteration);
+			items = new String[0][0];
+		}
+
+		/*
+		 * Stop iterating if you received fewer results than the limit or if you already
+		 * have all the RDF resources in the result (the latter means there's something
+		 * wrong with the order in which results are given, therefore one should sort
+		 * but it's costly).
+		 */
+		boolean doRepeat = false;
+		if (items.length > 0)
+			// Inspect for new bindings: if at least one is found, do another round
+			for (int i = 0; i < items.length; i++) {
+			String k = items[i][0];
+			if (!targetContainer.containsKey(k)) {
+			targetContainer.put(k, new HashSet<>());
+			doRepeat = true;
+			}
+			if (!targetContainer.get(k).contains(items[i][1])) {
+			targetContainer.get(k).add(items[i][1]);
+			doRepeat = true;
+			}
+			}
+		if (!doRepeat) {
+			log.debug("All {} RDF unique resources already present, closing loop.", items.length);
+			log.info("DONE. {} total key resources indexed.", targetContainer.size());
+		} else { // the recursive call.
+			log.info(" ... {} resources indexed so far (last {} in {} ms)", targetContainer.size(), items.length,
+					(System.currentTimeMillis() - before));
+			if (stepLength == items.length) {
+				if (exclusions != null) for (int i = 0; i < items.length; i++)
+					exclusions.add(ResourceFactory.createProperty(items[i][1]));
+				iterativeComputation(partialQuery, targetContainer, stepLength, iteration + 1, exclusions);
+			} else log.info("DONE. {} total resources indexed for this category.", targetContainer.size());
+		}
+
+	}
+
+	@Override
+	public String toString() {
+		if (!(endpointURL == null || endpointURL.isEmpty()) || !(graphName == null || graphName.isEmpty())) {
+			StringBuilder s = new StringBuilder();
+			if (endpointURL != null) {
+				s.append(endpointURL);
+				if (graphName != null) s.append("::");
+			}
+			if (graphName != null) s.append(graphName);
+			return s.toString();
+		}
+		return super.toString();
+	}
+
+	private void loadClassSignatures() {
+		String val = signatureDoc.get(Fieldd.CLASS_SIGNATURES.toString());
+		if (val != null) {
+			JsonObject o = JSON.parse(val);
+			for (String className : o.keys()) {
+				ClassSignature sign = new ClassSignature(className);
+				for (String prop : o.get(className).getAsObject().keys())
+					sign.addProperty(prop);
+				classSignatures.put(className, sign);
+			}
+		}
+	}
+
+	protected void loadAll() {
 		if (signatureDoc != null) {
-			this.classSet = loadSingle("ClassSet");
+			// this.classSet = loadSingle("ClassSet");
+			loadClassSignatures();
 			this.objectPropertySet = loadSingle("ObjectPropertySet");
 			this.datatypePropertySet = loadSingle("DatatypePropertySet");
 			this.literalSet = loadSingle("LiteralSet");

@@ -67,8 +67,10 @@ public class FileBasedRDFDataset extends AbstractRdfDataset {
 
 	@Override
 	public void computeClassSet() {
-		for (ExtendedIterator<OntClass> it = this.inf.listClasses(); it.hasNext();)
-			this.classSet.add(it.next().getURI());
+		for (ExtendedIterator<OntClass> it = this.inf.listClasses(); it.hasNext();) {
+			String key = it.next().getURI();
+			this.classSignatures.put(key, new ClassSignature(key));
+		}
 	}
 
 	@Override

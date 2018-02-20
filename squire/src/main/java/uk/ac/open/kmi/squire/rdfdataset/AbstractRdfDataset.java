@@ -1,16 +1,18 @@
 package uk.ac.open.kmi.squire.rdfdataset;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * 
- * @author Alessandro Adamou<alexdma@apache.org>
+ * @author Alessandro Adamou <alexdma@apache.org>
  *
  */
 public abstract class AbstractRdfDataset implements IRDFDataset {
 
-	protected Set<String> classSet = new HashSet<>();
+	protected Map<String, ClassSignature> classSignatures = new HashMap<>();
 	protected Set<String> datatypePropertySet = new HashSet<>();
 	protected Set<String> individualSet = new HashSet<>();
 	protected Set<String> literalSet = new HashSet<>();
@@ -19,7 +21,7 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 
 	@Override
 	public void clear() {
-		this.classSet.clear();
+		this.classSignatures.clear();
 		this.objectPropertySet.clear();
 		this.datatypePropertySet.clear();
 		this.individualSet.clear();
@@ -29,7 +31,12 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 
 	@Override
 	public Set<String> getClassSet() {
-		return classSet;
+		return classSignatures.keySet();
+	}
+
+	@Override
+	public Map<String, ClassSignature> getClassSignatures() {
+		return this.classSignatures;
 	}
 
 	@Override
@@ -72,7 +79,7 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 
 	@Override
 	public boolean isInClassSet(String classUri) {
-		return classSet.contains(classUri);
+		return classSignatures.containsKey(classUri);
 	}
 
 	@Override
@@ -103,36 +110,6 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 	@Override
 	public boolean isInRDFVocabulary(String rdfEntity) {
 		return rdfVocabulary.contains(rdfEntity);
-	}
-
-	@Override
-	public void setClassSet(Set<String> classSet) {
-		this.classSet = classSet;
-	}
-
-	@Override
-	public void setDatatypePropertySet(Set<String> datatypePropertySet) {
-		this.datatypePropertySet = datatypePropertySet;
-	}
-
-	@Override
-	public void setIndividualSet(Set<String> individualSet) {
-		this.individualSet = individualSet;
-	}
-
-	@Override
-	public void setLiteralSet(Set<String> literalSet) {
-		this.literalSet = literalSet;
-	}
-
-	@Override
-	public void setObjectPropertySet(Set<String> objectPropertySet) {
-		this.objectPropertySet = objectPropertySet;
-	}
-
-	@Override
-	public void setRDFVocabulary(Set<String> rdfSet) {
-		this.rdfVocabulary = rdfSet;
 	}
 
 }
