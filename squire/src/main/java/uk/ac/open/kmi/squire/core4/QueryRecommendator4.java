@@ -28,23 +28,15 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  */
 public class QueryRecommendator4 extends AbstractQueryRecommendationObservable implements IQueryRecommendationObserver {
 
-	private static final String CLASS_TEMPLATE_VAR = "ct";
-	private static final String DT_PROP_TEMPLATE_VAR = "dpt";
-	private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
-
-	private static final String INSTANCE_OP = "I";
-	private static final String LITERAL_TEMPLATE_VAR = "lt";
-	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
-	private static final String REMOVE_TP_OP = "R";
-
 	private ClassVarMapping classVarTable;
-
 	private DatatypePropertyVarMapping datatypePropertyVarTable;
-
 	private IndividualVarMapping individualVarTable;
 	private LiteralVarMapping literalVarTable;
 	private ObjectPropertyVarMapping objectProperyVarTable;
+	private RDFVocVarMapping rdfVocVarTable;
+
 	private final Query q0;
+
 	/*
 	 * This is for storing the output of the specializer
 	 */
@@ -54,7 +46,6 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 	private final float queryRootDistanceDegree;
 	private final float querySpecificityDistanceDegree;
 	private final IRDFDataset rdfD1, rdfD2;
-	private RDFVocVarMapping rdfVocVarTable;
 	private final float resultSizeSimilarityDegree;
 
 	private final float resultTypeSimilarityDegree;
@@ -83,7 +74,7 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 	public void buildRecommendation() throws Exception {
 
 		// GENERALIZE...
-		QueryGeneralizer4 qG = new QueryGeneralizer4(this.q0, this.rdfD1, this.rdfD2);
+		Generalizer qG = new Generalizer(this.q0, this.rdfD1, this.rdfD2);
 		this.qTemplate = qG.generalize();
 		System.out.println(" ");
 		System.out.println("[QueryRecommendation, generalizeToQueryTemplate()] THE GENERALIZED QUERY: ");
@@ -97,8 +88,8 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 		this.rdfVocVarTable = qG.getRdfVocVarTable();
 
 		// SPECIALIZE...
-		QuerySpecializer4 qS = new QuerySpecializer4(this.q0, this.qTemplate, this.rdfD1, this.rdfD2,
-				this.classVarTable, this.objectProperyVarTable, this.datatypePropertyVarTable, this.individualVarTable,
+		Specializer qS = new Specializer(this.q0, this.qTemplate, this.rdfD1, this.rdfD2, this.classVarTable,
+				this.objectProperyVarTable, this.datatypePropertyVarTable, this.individualVarTable,
 				this.literalVarTable, this.rdfVocVarTable, this.resultTypeSimilarityDegree,
 				this.queryRootDistanceDegree, this.resultSizeSimilarityDegree, this.querySpecificityDistanceDegree,
 				this.token);
@@ -106,7 +97,7 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 		qS.specialize();
 
 		// RANKING...
-		this.qRList = qS.getRecommandedQueryList();
+		this.qRList = qS.getRecommendations();
 		applyRankingToRecommandedQueryList(qRList);
 
 		// for(QueryAndContextNode n:this.qRList){
@@ -127,12 +118,12 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 
 	@Override
 	public void updateQueryRecommendated(Query qR, float score, String token) {
-		this.notifyQueryRecommendation(qR, score);
+		this.notifyQueryRecommendation(qR, score); // Just propagate
 	}
 
 	@Override
 	public void updateQueryRecommendationCompletion(Boolean finished, String token) {
-		this.notifyQueryRecommendationCompletion(finished);
+		this.notifyQueryRecommendationCompletion(finished); // Just propagate
 	}
 
 	@Override
@@ -142,7 +133,7 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 
 	private void applyRankingToRecommandedQueryList(List<QueryAndContextNode> qRList) {
 		for (QueryAndContextNode qrRecom : qRList) {
-			QueryScorePair pair = new QueryScorePair(qrRecom.getqR(), qrRecom.getqRScore());
+			QueryScorePair pair = new QueryScorePair(qrRecom.getTransformedQuery(), qrRecom.getqRScore());
 			this.sortedRecomQueryList.add(pair);
 		}
 		Collections.sort(this.sortedRecomQueryList, QueryScorePair.queryScoreComp);

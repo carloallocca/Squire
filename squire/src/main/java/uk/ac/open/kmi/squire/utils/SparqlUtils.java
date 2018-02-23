@@ -60,8 +60,17 @@ public class SparqlUtils {
 
 	private static Logger log = LoggerFactory.getLogger(SparqlUtils.class);
 
+	/**
+	 * Equivalent to calling {@link SparqlUtils#doRawQuery(String, String, int)}
+	 * with a timeout of two minutes.
+	 * 
+	 * @param queryString
+	 * @param endpoint
+	 * @return
+	 * @throws SparqlException
+	 */
 	public static String doRawQuery(String queryString, String endpoint) throws SparqlException {
-		return doRawQuery(queryString, endpoint, 30);
+		return doRawQuery(queryString, endpoint, 120);
 	}
 
 	/**

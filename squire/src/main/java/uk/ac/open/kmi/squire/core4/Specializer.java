@@ -18,6 +18,7 @@ import org.apache.jena.arq.querybuilder.SelectBuilder;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
@@ -42,7 +43,8 @@ import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.ontologymatching.JaroWinklerSimilarity;
 import uk.ac.open.kmi.squire.operation.RemoveTriple;
 import uk.ac.open.kmi.squire.operation.SPARQLQueryInstantiation;
-import uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable;
+import uk.ac.open.kmi.squire.operation.StatefulSPARQLQuerySatisfiable;
+import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
@@ -52,44 +54,32 @@ import uk.ac.open.kmi.squire.utils.PowerSetFactory;
  *
  * @author carloallocca
  */
-public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
+public class Specializer extends QueryOperator {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-
-	private static int class_instanciation_number = 0;
-
-	private static final String CLASS_TEMPLATE_VAR = "ct";
-	private static final String DT_PROP_TEMPLATE_VAR = "dpt";
-	private static final String INDIVIDUAL_TEMPLATE_VAR = "it";
-	private static final String LITERAL_TEMPLATE_VAR = "lt";
-	private static final String OBJ_PROP_TEMPLATE_VAR = "opt";
 
 	private static String OPID_INSTANTIATE = "I";
 	private static String OPID_TP_REMOVE = "R";
 
-	private ClassVarMapping classVarTable;
-	private DatatypePropertyVarMapping datatypePropertyVarTable;
-	private IndividualVarMapping individualVarTable;
-	private LiteralVarMapping literalVarTable;
-	private ObjectPropertyVarMapping objectProperyVarTable;
-	private RDFVocVarMapping rdfVocVarTable;
-
 	private Query qO, qR;
 	private Map<String, Query> queryIndex = new HashMap<>();
 	private IRDFDataset rdfd1, rdfd2;
-	private final List<QueryAndContextNode> recommandedQueryList = new ArrayList<>();
+	private final List<QueryAndContextNode> recommendations = new ArrayList<>();
 	private float resultTypeSimilarityDegree, queryRootDistanceDegree, resultSizeSimilarityDegree,
 			querySpecificityDistanceDegree;
 
-	private final List<QueryAndContextNode> specializableQueryAndContextNodeList = new ArrayList<>();
+	/**
+	 * List of specializable query and context nodes
+	 */
+	private final List<QueryAndContextNode> specializables = new ArrayList<>();
 
-	public QuerySpecializer4(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, ClassVarMapping cVM,
+	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, ClassVarMapping cVM,
 			ObjectPropertyVarMapping opVM, DatatypePropertyVarMapping dpVM, IndividualVarMapping indVM,
 			LiteralVarMapping lVM, RDFVocVarMapping rdfVM, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree,
 			String token) {
 
-		QuerySpecializer4.class_instanciation_number = QuerySpecializer4.class_instanciation_number + 1;
+		super();
 
 		this.qO = QueryFactory.create(qo.toString());
 		this.qR = QueryFactory.create(qr.toString());
@@ -140,25 +130,35 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		// float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDist) +
 		// (resultTypeSimilarityDegree * resulttypeSim) +
 		// (querySpecificityDistanceDegree * (qSpecDistVar + qSpecDistTP)));
-		// float recommentedQueryScore = resulttypeSim + qSpecDistVar+qSpecDistTP;//This
-		// is working as it should but it does not consider the similarity distance
-		// between the replased entities
+		// float recommentedQueryScore = resulttypeSim + qSpecDistVar+qSpecDistTP;
+		/*
+		 * This is working as it should but it does not consider the similarity distance
+		 * between the replaced entities
+		 */
 		// log.debug("[QueryGeneralizer4::QuerySpecializer4] recommentedQueryScore " +
 		// recommentedQueryScore);
 		String op = ""; // It can be either R (for Removal) or I (Instanciation).
-		ArrayList<String> operationList = new ArrayList();
+		List<String> operationList = new ArrayList<>();
 
 		// B. Compute the qRTemplateVariableSet and qRTriplePatternSet
 		Set<Var> qRTemplateVariableSet = getQueryTemplateVariableSet(this.qR);
 		Set<TriplePath> qRTriplePatternSet = getQueryTriplePathSet(this.qR);
 
 		// C. Compute the QueryTempVarSolutionSpace
-		QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-		List<QuerySolution> qTsol = temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2);
+		List<QuerySolution> qTsol;
+		try {
+			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
+			qTsol = temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2);
 
-		// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
-		// <http://purl.org/dc/terms/title> ),
-		List<QuerySolution> qTsolCleaned = eliminateSolutionBindedToTheSameValue(qTsol);
+			// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
+			// <http://purl.org/dc/terms/title> ),
+			qTsol = eliminateSolutionBindedToTheSameValue(qTsol);
+		} catch (TooGeneralException gex) {
+			log.warn("Query is too general to execute safely. Assuming solution exists.");
+			log.warn(" * Query : '{}'", gex.getQuery());
+			qTsol = new ArrayList<>();
+			qTsol.add(new QuerySolutionMap());
+		}
 
 		// Map<Var, Set<RDFNode>>
 		// qTsolMap=temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2, null);
@@ -207,7 +207,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		// qAndcNode.setqRTemplateVariableSet(qRTemplateVariableSet);
 		// qAndcNode.setqRTriplePathSet(qRTriplePatternSet);
 		// ...set the QueryTempVarSolutionSpace
-		qAndcNode.setSolutionSpace(qTsolCleaned);
+		qAndcNode.setSolutionSpace(qTsol);
 		// qAndcNode.setQueryTempVarValueMap(qTsolMap);
 
 		// log.info("[QueryGeneralizer4::QuerySpecializer4] qTsol size = " +
@@ -215,31 +215,39 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		// E. Sorted Insert of the QueryAndContextNode into the
 		// specializableQueryAndContextNodeList
 		// if(qTsol.size()>=1){
-		addSpecializableQueryList(qAndcNode);
+
+		this.specializables.add(qAndcNode);
+		Collections.sort(this.specializables, new QueryAndContextNode.QRScoreComparator());
+
 		// this.recommandedQueryList.add(qAndcNode);
 	}
 
-	public List<QueryAndContextNode> getRecommandedQueryList() {
-		return recommandedQueryList;
+	public List<QueryAndContextNode> getRecommendations() {
+		return recommendations;
 	}
 
 	public List<QueryAndContextNode> specialize() throws Exception {
-		log.info("::template query space size "
-				+ this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().size());
-		if ((this.specializableQueryAndContextNodeList.size() == 1)
-				&& (this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().isEmpty())
-				&& (isIProcessable(this.specializableQueryAndContextNodeList.get(0)))) {
+		log.debug(" - {} specializable query templates", this.specializables.size());
+		for (QueryAndContextNode qctx : this.specializables) {
+			log.debug("   - qO = {}", qctx.getOriginalQuery());
+			log.debug("   - qR = {}", qctx.getTransformedQuery());
+		}
+
+		StatefulSPARQLQuerySatisfiable satisfiability = new StatefulSPARQLQuerySatisfiable(this.rdfd2);
+
+		if ((this.specializables.size() == 1) && (this.specializables.get(0).getQueryTempVarSolutionSpace().isEmpty())
+				&& (isIProcessable(this.specializables.get(0)))) {
 
 			// log.info("WE WILL START THE SUB PROCESS SPECIALIZATION...");
 			// 1. Get and Remove the QueryAndContextNode with qRScore max
-			QueryAndContextNode parentQueryAndContextNode = getMaxQueryAndContextNode();
-			// log.info("getqO "+parentQueryAndContextNode.getqO());
-			// log.info("getqR "+parentQueryAndContextNode.getqR());
+			QueryAndContextNode parentQctx = popTopScoredQueryCtx();
+			// log.info("getqO "+parentQctx.getqO());
+			// log.info("getqR "+parentQctx.getqR());
 			// ADD the code for generating the subqueries with removed triple patterns
 			// (QueryAndContextNode)
 			// The power set of the triple pattern set.
 			// P.S. Look at the code down in the section 3.
-			Query parentqRCopy = QueryFactory.create(parentQueryAndContextNode.getqR());
+			Query parentqRCopy = QueryFactory.create(parentQctx.getTransformedQuery());
 			Set<TriplePath> triplePathSet = getQueryTriplePathSet(parentqRCopy);
 			// List<Var> qRTemplateVariableSet=parentqRCopy.getProjectVars();
 			List<String> qRTemplateVariableSet = parentqRCopy.getResultVars();
@@ -274,12 +282,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 					if (!(isQueryIndexed(subQuery))) {
 						// ...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 
-						SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-
 						boolean b = false;
 
 						try {
-							b = qs.isSatisfiableWrtResults(subQuery, rdfd2);
+							b = satisfiability.isSatisfiableWrtResults(subQuery);
 							log.info("isSatisfiableWRTResultsWithToken :: " + b);
 						} catch (Exception ex) {
 							log.info(ex.getMessage());
@@ -288,61 +294,64 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 						if (b) {
 							log.info("subQuery Remove operation::: " + subQuery);
 							QueryAndContextNode childNode = createNewQueryAndContextNodeForRemovalOp(subQuery,
-									parentQueryAndContextNode);
+									parentQctx);
 							log.info("childNode Solution List... " + childNode.getQueryTempVarSolutionSpace().size());
 
-							addSpecializableQueryList(childNode);
+							this.specializables.add(childNode);
+
 							// this.specializableQueryAndContextNodeList.add(childNode);
 
 							// add qWithoutTriple to the index
 							addQueryToIndexIFAbsent(subQuery);
 							// printQuerySolutionSpaceMap(parentQueryAndContextNode);
 
-						} else {
-							addQueryToIndexIFAbsent(subQuery);
-						}
+						} else addQueryToIndexIFAbsent(subQuery);
 					}
 				}
 			}
+			Collections.sort(this.specializables, new QueryAndContextNode.QRScoreComparator());
 		}
-		// The trivial case:
-		SPARQLQuerySatisfiable qs1 = new SPARQLQuerySatisfiable();
-		if ((this.specializableQueryAndContextNodeList.size() == 1)
-				&& (this.specializableQueryAndContextNodeList.get(0).getQueryTempVarSolutionSpace().isEmpty())
-				&& (qs1.isSatisfiableWrtResults(this.specializableQueryAndContextNodeList.get(0).getqO(), rdfd2))) {
 
-			QueryAndContextNode childNode = createEmptyQueryAndContextNode(
-					this.specializableQueryAndContextNodeList.get(0).getqO());
-			addSpecializableQueryList(childNode);
-			this.recommandedQueryList.add(childNode);
-			notifyQueryRecommendation(this.specializableQueryAndContextNodeList.get(0).getqO(), 1);
-			notifyQueryRecommendationCompletion(true);
-			return this.recommandedQueryList;
+		// The trivial case: there is only one specializable node and its query is
+		// satisfiable wrt. the target dataset.
+		if (this.specializables.size() == 1) {
+			QueryAndContextNode spec = this.specializables.get(0);
+			if (spec.getQueryTempVarSolutionSpace().isEmpty()
+					&& satisfiability.isSatisfiableWrtResults(spec.getOriginalQuery())) {
+				QueryAndContextNode childNode = createEmptyQueryAndContextNode(spec.getOriginalQuery());
+				this.specializables.add(childNode);
+				Collections.sort(this.specializables, new QueryAndContextNode.QRScoreComparator());
+				this.recommendations.add(childNode);
+				notifyQueryRecommendation(spec.getOriginalQuery(), 1);
+				notifyQueryRecommendationCompletion(true);
+				return this.recommendations;
+			}
 		}
 
 		// log.info("WE WILL START THE SPECIALIZATION PROCESS...");
-		// log.info("this.specializableQueryAndContextNodeList.size() " +
-		// this.specializableQueryAndContextNodeList.size());
-		while (this.specializableQueryAndContextNodeList.size() > 0) {
+
+		// XXX Scary conditioned loop : specializables is reduced in another method...
+		while (!this.specializables.isEmpty()) {
 
 			// 1. Get and Remove the QueryAndContextNode with qRScore max
-			QueryAndContextNode parentQueryAndContextNode = getMaxQueryAndContextNode();
-			if (parentQueryAndContextNode != null) {
+			// XXX ... below, precisely.
+			QueryAndContextNode parentNode = popTopScoredQueryCtx();
+			if (parentNode != null) {
 				// 2. Store the QueryAndContextNode with qRScore max into the
 				// recommandedQueryList as it could be one of the recommendated query
-				this.recommandedQueryList.add(parentQueryAndContextNode);
+				this.recommendations.add(parentNode);
 				// this.notifyQueryRecommendation(parentQueryAndContextNode.getqR(),
 				// parentQueryAndContextNode.getqRScore());
 
 				// 4. check if we can apply a instanciation operation;
-				if (isIProcessable(parentQueryAndContextNode)) {
-					Query queryChild = QueryFactory.create(parentQueryAndContextNode.getqR());
-					List<QuerySolution> qSolList = parentQueryAndContextNode.getQueryTempVarSolutionSpace();
+				if (isIProcessable(parentNode)) {
+					Query queryChild = QueryFactory.create(parentNode.getTransformedQuery());
+					log.debug("Child query: {}", queryChild);
+					List<QuerySolution> qSolList = parentNode.getQueryTempVarSolutionSpace();
 					log.info("queryChild Instanciation step: " + queryChild.toString());
 					log.info("qSolList size: " + qSolList.size());
-					int solProgressNumber = 0;
+
 					for (QuerySolution sol : qSolList) {
-						solProgressNumber = solProgressNumber + 1;
 
 						// for (int i = 0; i < 10; i++) {
 						// // calling repeatedly to increase chances of a clean-up
@@ -357,7 +366,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
 						// this contains all the tuples <varName, entityQo, entityQr> for each varName
 						// that is going to be instantiated
-						ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList = new ArrayList();
+						List<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList = new ArrayList<>();
 						for (Var tv : qTempVarSet) {
 							// log.info("Var tv: " +tv.getVarName());
 							// log.info("Var tv: " +tv.getName());
@@ -381,11 +390,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 								addQueryToIndexIFAbsent(childQueryCopyInstanciated);
 
 								// ...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
-								SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable();
-								if (qs.isSatisfiableWrtResults(childQueryCopyInstanciated, rdfd2)) {
+
+								if (satisfiability.isSatisfiableWrtResults(childQueryCopyInstanciated)) {
 									QueryAndContextNode childNode = createNewQueryAndContextNodeForInstanciateOp(
-											childQueryCopyInstanciated, parentQueryAndContextNode,
-											templVarEntityQoQrInstanciatedList);
+											childQueryCopyInstanciated, parentNode, templVarEntityQoQrInstanciatedList);
 
 									// ======
 									// Ho commentato questa riga perche non ha un senso logico. Non c'e' motivo
@@ -394,14 +402,14 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 									// addSpecializableQueryList(childNode);
 									// invece, ho aggiunto questa in quanto la query e' pronta per essere
 									// raccomandata e non avra piu :
-									this.recommandedQueryList.add(childNode);
+									this.recommendations.add(childNode);
 
 									// =====
 
 									log.info("qR score ======" + childNode.getqRScore());
-									log.info("qR " + childNode.getqR());
+									log.info("qR " + childNode.getTransformedQuery());
 
-									notifyQueryRecommendation(childNode.getqR(), childNode.getqRScore());
+									notifyQueryRecommendation(childNode.getTransformedQuery(), childNode.getqRScore());
 
 									// add qWithoutTriple to the index
 									addQueryToIndexIFAbsent(childQueryCopyInstanciated);
@@ -411,13 +419,13 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 								}
 							}
 						}
-					} // for
+					} // end for
 				}
 			}
 
 		} // end while
 		this.notifyQueryRecommendationCompletion(true);
-		return this.recommandedQueryList;
+		return this.recommendations;
 	}
 
 	private void addQueryToIndexIFAbsent(Query qWithoutTriple) {
@@ -426,11 +434,6 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		for (TriplePath tp : triplePathCollection)
 			s.add(tp.toString());
 		queryIndex.putIfAbsent(s.toString(), qWithoutTriple);
-	}
-
-	private void addSpecializableQueryList(QueryAndContextNode d1) {
-		this.specializableQueryAndContextNodeList.add(d1);
-		Collections.sort(this.specializableQueryAndContextNodeList, new QueryAndContextNode.QRScoreComparator());
 	}
 
 	private Query applyInstanciationOP(Query queryChild, QuerySolution sol) {
@@ -455,7 +458,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
 	private void applyRemovalOp(QueryAndContextNode qRScoreMaxNode) {
 
-		Query qRCopy = qRScoreMaxNode.getqR();
+		Query qRCopy = qRScoreMaxNode.getTransformedQuery();
 		Set<TriplePath> triplePathSet = getQueryTriplePathSet(qRCopy);
 
 		for (TriplePath tp : triplePathSet) {
@@ -553,10 +556,10 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 
 	private QueryAndContextNode createNewQueryAndContextNodeForInstanciateOp(Query childQueryCopyInstanciated,
 			QueryAndContextNode parentQueryAndContextNode,
-			ArrayList<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
+			List<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
 		QueryAndContextNode childQueryAndContextNode = new QueryAndContextNode();
 		// ...set the original query and the recommendated query;
-		Query clonedqO = QueryFactory.create(parentQueryAndContextNode.getqO());
+		Query clonedqO = QueryFactory.create(parentQueryAndContextNode.getOriginalQuery());
 		childQueryAndContextNode.setqO(clonedqO);
 
 		Query clonedqR = QueryFactory.create(childQueryCopyInstanciated.toString());
@@ -645,8 +648,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		// log.info("newQueryRootDistI " +newQueryRootDist);
 		// 3)...QueryResultTypeSimilarity
 		QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
-		float newResulttypeSim = qRTS.computeQueryResultTypeDistance(childQueryAndContextNode.getqO(), this.rdfd1,
-				childQueryAndContextNode.getqR(), this.rdfd2);
+		float newResulttypeSim = qRTS.computeQueryResultTypeDistance(childQueryAndContextNode.getOriginalQuery(),
+				this.rdfd1, childQueryAndContextNode.getTransformedQuery(), this.rdfd2);
 		// log.info("newQueryRootDistI " +newQueryRootDist);
 		log.info("newResulttypeSimI " + newResulttypeSim);
 		childQueryAndContextNode.setQueryResultTypeSimilarity(newResulttypeSim);
@@ -691,7 +694,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 			QueryAndContextNode parentQueryAndContextNode) throws Exception {
 		QueryAndContextNode childQueryAndContextNode = new QueryAndContextNode();
 		// ...set the original query and the recommendated query;
-		Query clonedqO = QueryFactory.create(parentQueryAndContextNode.getqO());
+		Query clonedqO = QueryFactory.create(parentQueryAndContextNode.getOriginalQuery());
 		childQueryAndContextNode.setqO(clonedqO);
 
 		Query clonedqR = QueryFactory.create(qWithoutTriple.toString());
@@ -780,8 +783,8 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		/*
 		 * Compute the query recommentedQueryScore: 1)QueryRootDistance
 		 */
-		float newQueryRootDist = parentQueryAndContextNode.getQueryRootDistance()
-				+ computeRemoveOperationCost(childQueryAndContextNode.getqO(), childQueryAndContextNode.getqR());
+		float newQueryRootDist = parentQueryAndContextNode.getQueryRootDistance() + computeRemoveOperationCost(
+				childQueryAndContextNode.getOriginalQuery(), childQueryAndContextNode.getTransformedQuery());
 		childQueryAndContextNode.setQueryRootDistance(newQueryRootDist);
 		float queryRootDistSim = 1 - newQueryRootDist;
 		childQueryAndContextNode.setQueryRootDistanceSimilarity(queryRootDistSim);
@@ -906,13 +909,13 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 		}
 	}
 
-	private QueryAndContextNode getMaxQueryAndContextNode() {
+	private QueryAndContextNode popTopScoredQueryCtx() {
 
 		// Collections.sort(this.specializableQueryAndContextNodeList, new
 		// QueryAndContextNode.QRScoreComparator());
-		if (this.specializableQueryAndContextNodeList.size() > 0) {
-			QueryAndContextNode maxNode = this.specializableQueryAndContextNodeList.get(0);
-			this.specializableQueryAndContextNodeList.remove(maxNode);
+		if (this.specializables.size() > 0) {
+			QueryAndContextNode maxNode = this.specializables.get(0);
+			this.specializables.remove(maxNode);
 			return maxNode;
 		}
 		return null;
@@ -948,7 +951,7 @@ public class QuerySpecializer4 extends AbstractQueryRecommendationObservable {
 	}
 
 	private boolean isIProcessable(QueryAndContextNode qRScoreMaxNodeCloned) {
-		Set<Var> tempVarSet = getQueryTemplateVariableSet(qRScoreMaxNodeCloned.getqR());
+		Set<Var> tempVarSet = getQueryTemplateVariableSet(qRScoreMaxNodeCloned.getTransformedQuery());
 		return tempVarSet.size() > 0;
 	}
 

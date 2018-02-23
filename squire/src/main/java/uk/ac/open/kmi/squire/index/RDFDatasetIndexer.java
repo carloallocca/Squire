@@ -5,13 +5,16 @@
  */
 package uk.ac.open.kmi.squire.index;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map.Entry;
 
+import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -47,7 +50,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 public class RDFDatasetIndexer {
 
 	public static enum Fieldd {
-		CLASS_SIGNATURES;
+		ClassSet, CLASS_SIGNATURES;
 	}
 
 	private static RDFDatasetIndexer me;
@@ -131,7 +134,8 @@ public class RDFDatasetIndexer {
 		// prints [ one, two, ... ] but can it be trusted?
 		doc.add(new Field("URL", urlAddress, Field.Store.YES, Field.Index.NOT_ANALYZED));
 		doc.add(new Field("GraphName", graphName, Field.Store.YES, Field.Index.NOT_ANALYZED));
-		doc.add(new Field("ClassSet", indexand.getClassSet().toString(), Field.Store.YES, Field.Index.NO));
+		// doc.add(new Field("ClassSet", indexand.getClassSet().toString(),
+		// Field.Store.YES, Field.Index.NO));
 		doc.add(new Field("ObjectPropertySet", indexand.getObjectPropertySet().toString(), Field.Store.YES,
 				Field.Index.NO));
 		doc.add(new Field("DatatypePropertySet", indexand.getDatatypePropertySet().toString(), Field.Store.YES,
@@ -142,12 +146,21 @@ public class RDFDatasetIndexer {
 		if (propertySet != null && !propertySet.isEmpty())
 			doc.add(new Field("PropertySet", propertySet.toString(), Field.Store.YES, Field.Index.NO));
 
-		// TODO handle serialization elsewhere
+		// TODO the new way of using Lucene, apply to rest
+
+		doc.add(new StoredField(Fieldd.ClassSet.toString(), indexand.getClassSet().toString()));
 		JsonObject jSign = new JsonObject();
 		for (Entry<String, ClassSignature> entry : indexand.getClassSignatures().entrySet())
 			jSign.put(entry.getKey(), entry.getValue().jsonifyPaths());
 
-		doc.add(new StoredField(Fieldd.CLASS_SIGNATURES.toString(), jSign.toString()));
+		try {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			JSON.write(os, jSign);
+			doc.add(new StoredField(Fieldd.CLASS_SIGNATURES.toString(), new String(os.toByteArray(), "UTF-8")));
+		} catch (UnsupportedEncodingException e1) {
+			shutdown(indexWriter);
+			throw new RuntimeException("UTF-8 not supported. Seriously?", e1);
+		}
 
 		// Remove the old one(s) if any
 		Builder queryBuilder = new Builder();
@@ -160,12 +173,7 @@ public class RDFDatasetIndexer {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
-			try {
-				indexWriter.close();
-			} catch (IOException e) {
-				log.warn("Failed to close index writer."
-						+ " This is often recoverable, but you may want to check what happened.", e);
-			}
+			shutdown(indexWriter);
 		}
 		return doc;
 	}
@@ -212,6 +220,15 @@ public class RDFDatasetIndexer {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	private void shutdown(IndexWriter indexWriter) {
+		try {
+			indexWriter.close();
+		} catch (IOException e) {
+			log.warn("Failed to close index writer."
+					+ " This is often recoverable, but you may want to check what happened.", e);
 		}
 	}
 

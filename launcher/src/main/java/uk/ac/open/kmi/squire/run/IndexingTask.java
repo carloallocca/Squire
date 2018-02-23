@@ -58,7 +58,7 @@ public class IndexingTask {
 					continue;
 				}
 			} else log.info(" ... NOT indexed. Will index now.");
-			log.info("Computing classes...");
+			log.info("Computing classes (and their signatures)...");
 			indexed.computeClassSet();
 			try {
 				log.info("Computing object properties...");
@@ -73,16 +73,15 @@ public class IndexingTask {
 			log.info("Computing RDF vocabulary...");
 			indexed.computeRDFVocabularySet();
 
-			log.debug(" - #classes = {}", indexed.getClassSet().size());
-			log.debug(" - #OPs = {}", indexed.getObjectPropertySet().size());
-			log.debug(" - #DPs = {}", indexed.getDatatypePropertySet().size());
-			log.debug(" - #Ps = {}", indexed.getPropertySet().size());
+			log.info(" - #classes = {}", indexed.getClassSet().size());
+			log.info(" - #OPs = {}", indexed.getObjectPropertySet().size());
+			log.info(" - #DPs = {}", indexed.getDatatypePropertySet().size());
+			log.info(" - #Ps = {}", indexed.getPropertySet().size());
 
-			log.debug("Indexing signature...");
+			log.info("Indexing signature...");
 			RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 			instance.indexSignature(url.toString(), "", indexed, indexed.getPropertySet(), force);
 			log.info("<== DONE");
-
 		}
 		log.info("Nothing left to do for this task.");
 	}

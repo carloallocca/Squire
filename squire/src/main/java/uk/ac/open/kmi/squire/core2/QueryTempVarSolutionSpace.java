@@ -6,18 +6,23 @@
 package uk.ac.open.kmi.squire.core2;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
 import uk.ac.open.kmi.squire.utils.SparqlUtils;
@@ -40,7 +45,7 @@ public class QueryTempVarSolutionSpace {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2) {
+	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2) throws TooGeneralException {
 		// 0. Check if the input query has any template variable, otherwise qTsol is
 		// empty
 		Set<Var> templateVarSet = getQueryTemplateVariableSet(qChild);
@@ -49,6 +54,9 @@ public class QueryTempVarSolutionSpace {
 				// 1. Transform the the query qChild into a query containing the template
 				// variable only.
 				Query qT = rewriteQueryWithTemplateVar(qChild);
+
+				checkGenerality(qT);
+
 				// 2. Compute the QuerySolution for qT;
 				log.debug("Computing solution space for subquery:");
 				log.debug("{}", qT);
@@ -63,6 +71,24 @@ public class QueryTempVarSolutionSpace {
 			}
 		}
 		return new ArrayList<>();
+	}
+
+	private void checkGenerality(Query q) throws TooGeneralException {
+		final boolean[] throwIt = new boolean[] { true };
+		ElementWalker.walk(q.getQueryPattern(), new ElementVisitorBase() {
+			@Override
+			public void visit(ElementPathBlock el) {
+				for (Iterator<TriplePath> it = el.patternElts(); it.hasNext();) {
+					TriplePath tp = it.next();
+					if (!tp.getSubject().isVariable() || !tp.getPredicate().isVariable()
+							|| !tp.getObject().isVariable()) {
+						throwIt[0] = false;
+						break;
+					}
+				}
+			}
+		});
+		if (throwIt[0]) throw new TooGeneralException(q);
 	}
 
 	private Set<Var> getQueryTemplateVariableSet(Query qR) {

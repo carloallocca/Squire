@@ -272,7 +272,7 @@ public class QueryRecommendation<T> {
 				if (templateVarSub != null) {
 					// Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQuery, subj,
 					// templateVarSub);
-					Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, subj, templateVarSub);
+					Query genQuery = qg.perform(this.originalQueryCopy, subj, templateVarSub);
 					this.originalQueryCopy = genQuery;
 				}
 			}
@@ -294,7 +294,7 @@ public class QueryRecommendation<T> {
 				if (templateVarPred != null) {
 					// Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQuery, pred,
 					// templateVarPred);
-					Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, pred, templateVarPred);
+					Query genQuery = qg.perform(this.originalQueryCopy, pred, templateVarPred);
 					this.originalQueryCopy = genQuery;
 				}
 			}
@@ -313,7 +313,7 @@ public class QueryRecommendation<T> {
 				if (templateVarObj != null) {
 					// Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQuery, obj,
 					// templateVarObj);
-					Query genQuery = qg.generalizeFromNodeToVarTemplate(this.originalQueryCopy, obj, templateVarObj);
+					Query genQuery = qg.perform(this.originalQueryCopy, obj, templateVarObj);
 					this.originalQueryCopy = genQuery;
 				}
 			}

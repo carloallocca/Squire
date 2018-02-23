@@ -171,6 +171,7 @@ public class Squire {
 			} else new RecommendationTask(query, sourceEndpoint, new HashSet<>(Arrays.asList(targetEndpoints)), null,
 					tracing).execute();
 		}
+		log.info("All done.");
 		System.exit(0);
 	}
 

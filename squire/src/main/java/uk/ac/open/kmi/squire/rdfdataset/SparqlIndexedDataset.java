@@ -94,18 +94,23 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	public void computeClassSet() {
 		StringBuilder qS = new StringBuilder();
 		// qS.append("SELECT DISTINCT ?x WHERE { [] a ?x");
-		qS.append("SELECT DISTINCT ?x ?p1 WHERE { [] a ?x OPTIONAL { ?x ?p1 [] }");
-		qS.append(" FILTER ( ?p1 != <" + RDF.type.getURI() + ">"); // unclosed FILTER
+		qS.append("SELECT DISTINCT ?x ?p1 WHERE { ?s a ?x OPTIONAL { ?s ?p1 [] }");
+		qS.append(" FILTER ( TRUE ");
+		// qS.append(" FILTER ( ! (");
+		// qS.append(" STRSTARTS( str(?x), \"" + RDFS.uri + "\" ) ");
+		// qS.append(" || STRSTARTS( str(?x), \"" + RDF.uri + "\" ) ");
+		// qS.append(" || STRSTARTS( str(?x), \"" + OWL.NS + "\" ) ");
+		// qS.append(")");
 
-		/*
-		 * To mimic the original behaviour, call iterativeComputation(qS.toString(),
-		 * getClassSet(),-1, 0, null)
-		 */
 		// No exclusions, creates excessively long queries
+		boolean complete;
 		try {
 			Map<String, Set<String>> tempClasses = new HashMap<>();
-			iterativeComputation(qS.toString(), tempClasses, 100, 0, null);
-			System.out.println(tempClasses.size());
+			/*
+			 * To mimic the original behaviour, call iterativeComputation(qS.toString(),
+			 * getClassSet(),-1, 0, null)
+			 */
+			complete = iterativeComputation(qS.toString(), tempClasses, 100, 0, null);
 			for (Entry<String, Set<String>> e : tempClasses.entrySet()) {
 				String k = e.getKey();
 				if (!classSignatures.containsKey(k)) classSignatures.put(k, new ClassSignature(k));
@@ -114,9 +119,17 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 					if (prop != null && !cs.hasProperty(prop)) cs.addProperty(prop);
 			}
 		} catch (BootedException e) {
+			// TODO fall back to computing plain classes.
 			log.error("We were kicked out immediately while trying to compute classes."
-					+ " Have no fallback strategy for that.");
+					+ " Falling back to per-class startegy.");
+			complete = false;
 		}
+		if (!complete) fallbackClassSet();
+		int assoc = 0;
+		for (Entry<String, ClassSignature> e : classSignatures.entrySet())
+			assoc += e.getValue().listPathOrigins().size();
+		log.info("Class indexing complete: indexed {} classes and a total of {} property associations.",
+				classSignatures.size(), assoc);
 	}
 
 	@Override
@@ -124,7 +137,6 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		StringBuilder qS = new StringBuilder();
 		qS.append("SELECT DISTINCT ?x WHERE { [] ?x ?o");
 		qS.append(" FILTER ( isLiteral(?o)"); // handle property filtering
-		// iterateObjectPropertySet(50, 0, null);
 
 		/*
 		 * To mimic the original behaviour, call iterativeComputation(qS.toString(),
@@ -232,8 +244,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 
 	@Override
 	public Object getEndPointURL() {
-		return this.endpointURL;// throw new UnsupportedOperationException("Not supported yet."); //To change
-		// body of generated methods, choose Tools | Templates.
+		return this.endpointURL;
 	}
 
 	@Override
@@ -294,27 +305,18 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		// choose Tools | Templates.
 	}
 
-	private void createSPARQLEndPoint(boolean overwrite) throws IOException, LockObtainFailedException {
-		if (this.signatureDoc == null) {
-			computeClassSet();
-			try {
-				computeObjectPropertySet();
-				computeDataTypePropertySet();
-			} catch (BootedException e) {
-				// Fall back to computing properties in general
-				// if failing to compute them by type.
-				computePropertySet();
+	@Override
+	public String toString() {
+		if (!(endpointURL == null || endpointURL.isEmpty()) || !(graphName == null || graphName.isEmpty())) {
+			StringBuilder s = new StringBuilder();
+			if (endpointURL != null) {
+				s.append(endpointURL);
+				if (graphName != null && !graphName.isEmpty()) s.append("::");
 			}
-			computeRDFVocabularySet();
-			// XXX Ugly call.
-			this.signatureDoc = RDFDatasetIndexer.getInstance().indexSignature(this.endpointURL, graphName, this,
-					overwrite);
+			if (graphName != null && !graphName.isEmpty()) s.append(graphName);
+			return s.toString();
 		}
-	}
-
-	private Set<String> loadSingle(String field) {
-		String val = signatureDoc.get(field);
-		return val == null ? new HashSet<>() : StringUtils.commaSeparated2List(val);
+		return super.toString();
 	}
 
 	private String buildQuery(String partialQuery, int stepLength, int iteration, Set<Property> exclusions) {
@@ -341,6 +343,174 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			}
 		}
 		return qS.toString();
+	}
+
+	private void createSPARQLEndPoint(boolean overwrite) throws IOException, LockObtainFailedException {
+		if (this.signatureDoc == null) {
+			computeClassSet();
+			try {
+				computeObjectPropertySet();
+				computeDataTypePropertySet();
+			} catch (BootedException e) {
+				// Fall back to computing properties in general
+				// if failing to compute them by type.
+				computePropertySet();
+			}
+			computeRDFVocabularySet();
+			// XXX Ugly call.
+			this.signatureDoc = RDFDatasetIndexer.getInstance().indexSignature(this.endpointURL, graphName, this,
+					overwrite);
+		}
+	}
+
+	/**
+	 * Called after computing class signatures altogether with pagination has
+	 * failed. This strategy gets all the classes first, then queries piecemeal for
+	 * the signatures of each. This results in more queries, but of the type that
+	 * endpoints are more likely to answer in reasonable time, if they don't ban us
+	 * for too many queries.
+	 */
+	private void fallbackClassSet() {
+		log.warn("Got request to compute signatures per class."
+				+ " This is a polling strategy that should only be used when the aggressive approach fails.");
+		StringBuilder qS = new StringBuilder();
+		qS.append("SELECT DISTINCT ?x WHERE { [] a ?x");
+		qS.append(" FILTER ( TRUE ");
+		// qS.append(" FILTER ( ! (");
+		// qS.append(" STRSTARTS( str(?x), \"" + RDFS.uri + "\" ) ");
+		// qS.append(" || STRSTARTS( str(?x), \"" + RDF.uri + "\" ) ");
+		// qS.append(" || STRSTARTS( str(?x), \"" + OWL.NS + "\" ) ");
+		// qS.append(")");
+		Set<String> plainClasses = new HashSet<>();
+		try {
+			iterativeComputation(qS.toString(), plainClasses, 50, 0, null);
+		} catch (BootedException e) {
+			log.error("We were kicked out immediately while trying to compute classes.");
+			log.error(" ... Have no fallback strategy for that. Giving up.");
+		}
+		for (String clazz : plainClasses) {
+			log.info("Indexing signature for class <{}>", clazz);
+			if (!classSignatures.containsKey(clazz)) classSignatures.put(clazz, new ClassSignature(clazz));
+			ClassSignature cs = classSignatures.get(clazz);
+			qS = new StringBuilder();
+			qS.append("SELECT DISTINCT ?x WHERE { ?s a <" + clazz + "> OPTIONAL { ?s ?x [] }");
+			qS.append(" FILTER ( TRUE ");
+			Set<String> props = new HashSet<>();
+			try {
+				iterativeComputation(qS.toString(), props, 50, 0, null);
+			} catch (BootedException e) {
+				log.error("We were kicked out immediately while trying to compute properties.");
+				log.error(" ... class was <{}>", clazz);
+				log.error(" ... Have no fallback strategy for that. Giving up on this class.");
+			} finally {
+				// Let's use whatever we managed to obtain...
+				for (String prop : props)
+					if (prop != null && !cs.hasProperty(prop)) cs.addProperty(prop);
+			}
+		}
+	}
+
+	private void loadClassSignatures() {
+		String val = signatureDoc.get(Fieldd.CLASS_SIGNATURES.toString());
+		if (val != null) {
+			JsonObject o = JSON.parse(val);
+			for (String className : o.keys()) {
+				ClassSignature sign = new ClassSignature(className);
+				for (String prop : o.get(className).getAsObject().keys())
+					sign.addProperty(prop);
+				classSignatures.put(className, sign);
+			}
+		} else {
+			// Fall back to legacy method, for older indices
+			log.warn("No class signature field found. Falling back to legacy method.");
+			val = signatureDoc.get(Fieldd.ClassSet.toString());
+			if (val != null) for (String className : StringUtils.commaSeparated2List(val)) {
+				classSignatures.put(className, new ClassSignature(className));
+			}
+		}
+	}
+
+	private Set<String> loadSingle(String field) {
+		String val = signatureDoc.get(field);
+		return val == null ? new HashSet<>() : StringUtils.commaSeparated2List(val);
+	}
+
+	/**
+	 * This is the variant that uses a Map as a container.
+	 * 
+	 * @param partialQuery
+	 *            the partial query is expected to do a "SELECT ?x ?p1" and to end
+	 *            with an unclosed FILTER in the WHERE clause. Other variables can
+	 *            be projected, though support for them will depend on
+	 *            implementation.
+	 * @param stepLength
+	 *            how many items it should try to fetch on every step
+	 * @param iteration
+	 *            what number of step this is (starts at 0)
+	 * @param exclusions
+	 *            the properties that should be excluded from the counting, e.g.
+	 *            because they have already been indexed. If NULL, the method will
+	 *            do pure pagination.
+	 * @return true iff the computation is deemed complete.
+	 */
+	protected boolean iterativeComputation(final String partialQuery, final Map<String, Set<String>> targetContainer,
+			int stepLength, int iteration, Set<Property> exclusions) throws BootedException {
+		long before = System.currentTimeMillis();
+		boolean complete = true;
+		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
+		String q = buildQuery(partialQuery, stepLength, iteration, exclusions);
+		log.debug("Sending query: {}", q);
+		String[][] items;
+		try {
+			String res = SparqlUtils.doRawQuery(q, this.endpointURL);
+			items = SparqlUtils.extractSelectValuePairs(res, "x", "p1");
+		} catch (SparqlException e1) {
+			// Don't die. Keep whatever was indexed so far.
+			log.warn("Got remote response : {}", e1.getMessage());
+			// If it was the first attempt though, give up and raise an exception.
+			if (iteration == 0) throw new BootedException();
+			log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
+					iteration);
+			items = new String[0][0];
+			complete = false; // However do mark the computation as incomplete.
+		}
+
+		/*
+		 * Stop iterating if you received fewer results than the limit or if you already
+		 * have all the RDF resources in the result (the latter means there's something
+		 * wrong with the order in which results are given, therefore one should sort
+		 * but it's costly).
+		 */
+		boolean doRepeat = false;
+		if (items.length > 0)
+			// Inspect for new bindings: if at least one is found, do another round
+			for (int i = 0; i < items.length; i++) {
+			String k = items[i][0];
+			if (!targetContainer.containsKey(k)) {
+			targetContainer.put(k, new HashSet<>());
+			doRepeat = true;
+			}
+			if (!targetContainer.get(k).contains(items[i][1])) {
+			targetContainer.get(k).add(items[i][1]);
+			doRepeat = true;
+			}
+			}
+		int assoc = 0;
+		for (Entry<String, Set<String>> e : targetContainer.entrySet())
+			assoc += e.getValue().size();
+		if (!doRepeat) {
+			log.debug("All {} unique associations already present, closing loop.", items.length);
+			log.info("DONE. {} total associations indexed.", assoc);
+		} else { // the recursive call.
+			log.info(" ... {} associations indexed so far (last {} in {} ms)", assoc, items.length,
+					(System.currentTimeMillis() - before));
+			if (stepLength == items.length) {
+				if (exclusions != null) for (int i = 0; i < items.length; i++)
+					exclusions.add(ResourceFactory.createProperty(items[i][1]));
+				complete = iterativeComputation(partialQuery, targetContainer, stepLength, iteration + 1, exclusions);
+			} else log.info("DONE. {} total associations indexed for this category.", assoc);
+		}
+		return complete;
 	}
 
 	/**
@@ -396,103 +566,6 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			} else log.info("DONE. {} total resources indexed for this category.", targetContainer.size());
 		}
 
-	}
-
-	/**
-	 * @param partialQuery
-	 *            the partial query is expected to do a "SELECT ?x ?p1" and to end
-	 *            with an unclosed FILTER in the WHERE clause. Other variables can
-	 *            be projected, though support for them will depend on
-	 *            implementation.
-	 * @param stepLength
-	 *            how many items it should try to fetch on every step
-	 * @param iteration
-	 *            what number of step this is (starts at 0)
-	 * @param exclusions
-	 *            the properties that should be excluded from the counting, e.g.
-	 *            because they have already been indexed. If NULL, the method will
-	 *            do pure pagination.
-	 */
-	protected void iterativeComputation(final String partialQuery, final Map<String, Set<String>> targetContainer,
-			int stepLength, int iteration, Set<Property> exclusions) throws BootedException {
-		long before = System.currentTimeMillis();
-		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
-		String q = buildQuery(partialQuery, stepLength, iteration, exclusions);
-		log.debug("Sending query: {}", q);
-		String[][] items;
-		try {
-			String res = SparqlUtils.doRawQuery(q, this.endpointURL);
-			items = SparqlUtils.extractSelectValuePairs(res, "x", "p1");
-		} catch (SparqlException e1) {
-			// Don't die. Keep whatever was indexed so far.
-			log.warn("Got remote response : {}", e1.getMessage());
-			// If it was the first attempt though, give up and raise an exception.
-			if (iteration == 0) throw new BootedException();
-			log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
-					iteration);
-			items = new String[0][0];
-		}
-
-		/*
-		 * Stop iterating if you received fewer results than the limit or if you already
-		 * have all the RDF resources in the result (the latter means there's something
-		 * wrong with the order in which results are given, therefore one should sort
-		 * but it's costly).
-		 */
-		boolean doRepeat = false;
-		if (items.length > 0)
-			// Inspect for new bindings: if at least one is found, do another round
-			for (int i = 0; i < items.length; i++) {
-			String k = items[i][0];
-			if (!targetContainer.containsKey(k)) {
-			targetContainer.put(k, new HashSet<>());
-			doRepeat = true;
-			}
-			if (!targetContainer.get(k).contains(items[i][1])) {
-			targetContainer.get(k).add(items[i][1]);
-			doRepeat = true;
-			}
-			}
-		if (!doRepeat) {
-			log.debug("All {} RDF unique resources already present, closing loop.", items.length);
-			log.info("DONE. {} total key resources indexed.", targetContainer.size());
-		} else { // the recursive call.
-			log.info(" ... {} resources indexed so far (last {} in {} ms)", targetContainer.size(), items.length,
-					(System.currentTimeMillis() - before));
-			if (stepLength == items.length) {
-				if (exclusions != null) for (int i = 0; i < items.length; i++)
-					exclusions.add(ResourceFactory.createProperty(items[i][1]));
-				iterativeComputation(partialQuery, targetContainer, stepLength, iteration + 1, exclusions);
-			} else log.info("DONE. {} total resources indexed for this category.", targetContainer.size());
-		}
-
-	}
-
-	@Override
-	public String toString() {
-		if (!(endpointURL == null || endpointURL.isEmpty()) || !(graphName == null || graphName.isEmpty())) {
-			StringBuilder s = new StringBuilder();
-			if (endpointURL != null) {
-				s.append(endpointURL);
-				if (graphName != null) s.append("::");
-			}
-			if (graphName != null) s.append(graphName);
-			return s.toString();
-		}
-		return super.toString();
-	}
-
-	private void loadClassSignatures() {
-		String val = signatureDoc.get(Fieldd.CLASS_SIGNATURES.toString());
-		if (val != null) {
-			JsonObject o = JSON.parse(val);
-			for (String className : o.keys()) {
-				ClassSignature sign = new ClassSignature(className);
-				for (String prop : o.get(className).getAsObject().keys())
-					sign.addProperty(prop);
-				classSignatures.put(className, sign);
-			}
-		}
 	}
 
 	protected void loadAll() {

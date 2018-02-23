@@ -5,12 +5,16 @@
  */
 package uk.ac.open.kmi.squire.operation;
 
-import org.apache.jena.graph.Node;
-import org.apache.jena.query.Query;
-import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.syntax.ElementWalker;
+import java.util.ListIterator;
 
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGeneralizationVisitor;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.sparql.core.TriplePath;
+import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
+import org.apache.jena.sparql.syntax.ElementVisitorBase;
+import org.apache.jena.sparql.syntax.ElementWalker;
 
 /**
  *
@@ -18,35 +22,107 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGeneralizationVisitor;
  */
 public class SPARQLQueryGeneralization {
 
-	private Query originalQuery;
-	private Query generalizedQuery;
+	private class SQGeneralizationVisitor extends ElementVisitorBase {
 
-	private Node node;
-	private Var varTemplate;
+		private Node node;
+		private Var varTemplate;
 
-	public SPARQLQueryGeneralization() {
-		super();
-	}
-
-	public SPARQLQueryGeneralization(Query q, Node n, Var varTemplate) {
-		this.originalQuery = q;
-		this.node = n;
-		this.varTemplate = varTemplate;
-	}
-
-	public void generalizeFromNodeToVarTemplate() {
-		if (originalQuery == null) {
-			throw new IllegalArgumentException(
-					"[SPARQLQueryGeneralization::generalize()]The Query to Generalize is null!!");
+		public SQGeneralizationVisitor(Node n, Var varTemplate) {
+			// System.out.println("The triple ==> " + tp.toString());
+			if (n == null || varTemplate == null) {
+				throw new IllegalStateException("[SQGeneralizationVisitor]The Node or the varTemplate is null!!");
+			}
+			this.node = n;
+			this.varTemplate = varTemplate;
 		}
-		SQGeneralizationVisitor genVisitor = new SQGeneralizationVisitor(node, varTemplate);
-		ElementWalker.walk(this.originalQuery.getQueryPattern(), genVisitor);
-		this.generalizedQuery = this.originalQuery;
-		System.out.println("[SPARQLQueryGeneralization::generalizeFromNodeToVarTemplate()]");
-		System.out.println(this.generalizedQuery.toString());
+
+		@Override
+		public void visit(ElementPathBlock el) {
+			// System.out.println("[SQGeneralizationVisitor::visit(ElementPathBlock el)] ");
+			if (el == null) {
+				throw new IllegalStateException(
+						"[SQGeneralizationVisitor::visit(ElementPathBlock el)] The ElementPathBlock is null!!");
+			}
+			ListIterator<TriplePath> it = el.getPattern().iterator();
+			while (it.hasNext()) {
+				final TriplePath tp = it.next();
+				// System.out.println("The triple ==> " + tp.toString());
+
+				Node oldSubject = tp.getSubject();
+				final Node newSubject;
+				// SUBJECT
+				if (!oldSubject.isVariable()) {
+					if (oldSubject.isURI() && node.isURI()) {
+						if (oldSubject.getURI().equals(node.getURI())) {
+							newSubject = Var.alloc(varTemplate);
+						} else {
+							newSubject = oldSubject;
+						}
+					} else {
+						if (oldSubject.isLiteral() && node.isLiteral()) {
+							if (oldSubject.getLiteral().toString().equals(node.getLiteral().toString())) {
+								newSubject = Var.alloc(varTemplate);
+							} else {
+								newSubject = oldSubject;
+							}
+						} else {
+							newSubject = oldSubject;
+						}
+					}
+				} else {
+					newSubject = oldSubject;
+				}
+
+				Node oldPredicate = tp.getPredicate();
+				final Node newPredicate;
+				// PREDICATE
+				if (!oldPredicate.isVariable()) {
+					if (oldPredicate.isURI() && node.isURI()) {
+						if (oldPredicate.getURI().equals(node.getURI())) {
+							newPredicate = Var.alloc(varTemplate);
+						} else {
+							newPredicate = oldPredicate;
+						}
+					} else {
+						newPredicate = oldPredicate;
+					}
+
+				} else {
+					newPredicate = oldPredicate;
+				}
+
+				// OBJECT
+				Node oldObject = tp.getObject();
+				final Node newObject;
+				if (!oldObject.isVariable()) {
+					if (oldObject.isURI() && node.isURI()) {
+						if (oldObject.getURI().equals(node.getURI())) {
+							newObject = Var.alloc(varTemplate);
+						} else {
+							newObject = oldObject;
+						}
+					} else {
+						if (oldObject.isLiteral() && node.isLiteral()) {
+							if (oldObject.getLiteral().toString().equals(node.getLiteral().toString())) {
+								newObject = Var.alloc(varTemplate);
+							} else {
+								newObject = oldObject;
+							}
+						} else {
+							newObject = oldObject;
+						}
+					}
+				} else {
+					newObject = oldObject;
+				}
+				TriplePath newTriplePattern = new TriplePath(new Triple(newSubject, newPredicate, newObject));
+				it.set(newTriplePattern);
+			}
+		}
+
 	}
 
-	public Query generalizeFromNodeToVarTemplate(Query q, Node n, Var varTemplate) {
+	public Query perform(Query q, Node n, Var varTemplate) {
 		if (q == null || n == null || varTemplate == null) {
 			throw new IllegalArgumentException(
 					"[SPARQLQueryGeneralization::generalize()]The Query or the Node or the Var is null!!");
@@ -56,34 +132,6 @@ public class SPARQLQueryGeneralization {
 		ElementWalker.walk(q.getQueryPattern(), genVisitor);
 		// this.generalizedQuery=this.originalQuery;
 		return q;
-	}
-
-	public void setOriginalQuery(Query originalQuery) {
-		this.originalQuery = originalQuery;
-	}
-
-	public void setGeneralizedQuery(Query generalizedQuery) {
-		this.generalizedQuery = generalizedQuery;
-	}
-
-	public void setNode(Node node) {
-		this.node = node;
-	}
-
-	public void setVarTemplate(Var varTemplate) {
-		this.varTemplate = varTemplate;
-	}
-
-	public Query getOriginalQuery() {
-		return originalQuery;
-	}
-
-	public Query getGeneralizedQuery() {
-		return generalizedQuery;
-	}
-
-	public Var getVarTemplate() {
-		return varTemplate;
 	}
 
 }
