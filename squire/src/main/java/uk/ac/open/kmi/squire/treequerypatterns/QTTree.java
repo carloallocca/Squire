@@ -136,7 +136,7 @@ public class QTTree<T> {
 				// s= classURI
 				if (rdfd1.getClassSet().contains(tp.getSubject().getURI())) {
 					// System.out.println("[QTTree::generateQTTree] subject is an class uri");
-					Var classVar = Var.alloc(classVarTable.generateIFAbsentClassVar(tp.getSubject().getURI()));
+					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(tp.getSubject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(classVar, tp.getPredicate(), tp.getObject())));
 					System.out.println("[QTTree::generateQTTree] subject is an class == BEFORE");
 					System.out.println(tpSet.toString());
@@ -150,7 +150,7 @@ public class QTTree<T> {
 					}
 					// s= individualURI
 				} else if (rdfd1.isInIndividualSet(tp.getSubject().getURI())) {
-					Var indVar = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(tp.getSubject().getURI()));
+					Var indVar = Var.alloc(individualVarTable.generateVarIfAbsent(tp.getSubject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(indVar, tp.getPredicate(), tp.getObject())));
 					System.out.println("[QTTree::generateQTTree] subject is a individual uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -163,8 +163,7 @@ public class QTTree<T> {
 					}
 					// s = objectPropertyURI
 				} else if (rdfd1.isInObjectPropertySet(tp.getSubject().getURI())) {
-					Var obpVar = Var
-							.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(tp.getSubject().getURI()));
+					Var obpVar = Var.alloc(objectProperyVarTable.generateVarIfAbsent(tp.getSubject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(obpVar, tp.getPredicate(), tp.getObject())));
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is a objectproperty uri == BEFORE");
@@ -178,8 +177,7 @@ public class QTTree<T> {
 					}
 					// s = datatypePropertyURI
 				} else if (rdfd1.isInDatatypePropertySet(tp.getSubject().getURI())) {
-					Var dtpVar = Var.alloc(
-							datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(tp.getSubject().getURI()));
+					Var dtpVar = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(tp.getSubject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(dtpVar, tp.getPredicate(), tp.getObject())));
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is a datatypeProperty uri == BEFORE");
@@ -193,7 +191,7 @@ public class QTTree<T> {
 					}
 					// s = RDFVocabularyURI
 				} else if (rdfd1.isInRDFVocabulary(tp.getSubject().getURI())) {
-					Var rdfVar = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(tp.getSubject().getURI()));
+					Var rdfVar = Var.alloc(rdfVocVarTable.generateVarIfAbsent(tp.getSubject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(rdfVar, tp.getPredicate(), tp.getObject())));
 					System.out.println(tpSet.toString());
 					System.out.println("[QTTree::generateQTTree] subject is a RDFVocabulary uri == BEFORE");
@@ -228,8 +226,8 @@ public class QTTree<T> {
 						childTPSet.add(tp1);
 					}
 				}
-				Var litVar = Var.alloc(
-						literalVarTable.generateIFAbsentLiteralVar(tp.getSubject().getLiteral().getValue().toString()));
+				Var litVar = Var
+						.alloc(literalVarTable.generateVarIfAbsent(tp.getSubject().getLiteral().getValue().toString()));
 				childTPSet.add(new TriplePath(new Triple(litVar, tp.getPredicate(), tp.getObject())));
 				System.out.println("[QTTree::generateQTTree] subject is a literal == BEFORE");
 				System.out.println(tpSet.toString());
@@ -258,7 +256,7 @@ public class QTTree<T> {
 				}
 				// s= RDFVocabulary
 				if (rdfd1.isInRDFVocabulary(tp.getPredicate().getURI())) {
-					Var rdfVar = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(tp.getPredicate().getURI()));
+					Var rdfVar = Var.alloc(rdfVocVarTable.generateVarIfAbsent(tp.getPredicate().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), rdfVar, tp.getObject())));
 					System.out.println("[QTTree::generateQTTree] predicate is an rdfvoc uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -271,8 +269,7 @@ public class QTTree<T> {
 					}
 					// p= ObjPropertyURI or datatypePropertyURI
 				} else if (rdfd1.isInObjectPropertySet(tp.getPredicate().getURI())) {
-					Var predVar = Var
-							.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(tp.getPredicate().getURI()));
+					Var predVar = Var.alloc(objectProperyVarTable.generateVarIfAbsent(tp.getPredicate().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), predVar, tp.getObject())));
 
 					System.out.println("[QTTree::generateQTTree] predicate is a object property uri == BEFORE");
@@ -287,8 +284,7 @@ public class QTTree<T> {
 					}
 					// p = datatypePropertyURI
 				} else if (rdfd1.isInDatatypePropertySet(tp.getPredicate().getURI())) {
-					Var predVar = Var.alloc(
-							datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(tp.getPredicate().getURI()));
+					Var predVar = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(tp.getPredicate().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), predVar, tp.getObject())));
 					System.out.println("[QTTree::generateQTTree] predicate is a object property uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -324,7 +320,7 @@ public class QTTree<T> {
 				}
 				// o = classURI
 				if (rdfd1.getClassSet().contains(tp.getObject().getURI())) {
-					Var classVar = Var.alloc(classVarTable.generateIFAbsentClassVar(tp.getObject().getURI()));
+					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(tp.getObject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), classVar)));
 					System.out.println("[QTTree::generateQTTree] object is a class uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -337,7 +333,7 @@ public class QTTree<T> {
 					}
 					// o = individualURI
 				} else if (rdfd1.isInIndividualSet(tp.getObject().getURI())) {
-					Var indVar = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(tp.getObject().getURI()));
+					Var indVar = Var.alloc(individualVarTable.generateVarIfAbsent(tp.getObject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), indVar)));
 					System.out.println("[QTTree::generateQTTree] object is an individual uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -350,8 +346,7 @@ public class QTTree<T> {
 					}
 					// o = objectpropertyURI
 				} else if (rdfd1.isInObjectPropertySet(tp.getObject().getURI())) {
-					Var obpVar = Var
-							.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(tp.getObject().getURI()));
+					Var obpVar = Var.alloc(objectProperyVarTable.generateVarIfAbsent(tp.getObject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), obpVar)));
 					System.out.println("[QTTree::generateQTTree] object is an object property uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -364,8 +359,7 @@ public class QTTree<T> {
 					}
 					// o = datatypepropertyURI
 				} else if (rdfd1.isInDatatypePropertySet(tp.getObject().getURI())) {
-					Var dtpVar = Var.alloc(
-							datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(tp.getObject().getURI()));
+					Var dtpVar = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(tp.getObject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), dtpVar)));
 					System.out.println("[QTTree::generateQTTree] object is an object property uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -378,8 +372,7 @@ public class QTTree<T> {
 					}
 				} // o = RDFVocabularyURI
 				else if (rdfd1.isInRDFVocabulary(tp.getObject().getURI())) {
-					Var rdfVar = Var.alloc(
-							datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(tp.getObject().getURI()));
+					Var rdfVar = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(tp.getObject().getURI()));
 					childTPSet.add(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), rdfVar)));
 					System.out.println("[QTTree::generateQTTree] object is an object property uri == BEFORE");
 					System.out.println(tpSet.toString());
@@ -412,8 +405,8 @@ public class QTTree<T> {
 						childTPSet.add(tp1);
 					}
 				}
-				Var litVar = Var.alloc(
-						literalVarTable.generateIFAbsentLiteralVar(tp.getObject().getLiteral().getValue().toString()));
+				Var litVar = Var
+						.alloc(literalVarTable.generateVarIfAbsent(tp.getObject().getLiteral().getValue().toString()));
 				childTPSet.add(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), litVar)));
 				System.out.println("[QTTree::generateQTTree] subject is a literal == BEFORE");
 				System.out.println(tpSet.toString());
@@ -572,20 +565,20 @@ public class QTTree<T> {
 			String subj = tp.getSubject().getURI();
 			// System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
 			if ((rdfd1.getClassSet().contains(subj)) && !(rdfd2.getClassSet().contains(subj))) {
-				subject = Var.alloc(classVarTable.generateIFAbsentClassVar(subj));
+				subject = Var.alloc(classVarTable.generateVarIfAbsent(subj));
 				// System.out.println("[QTTree::generalize] The Sub is a class URI");
 			} else if (rdfd1.isInIndividualSet(subj) && !(rdfd2.isInIndividualSet(subj))) {
-				subject = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(subj));
+				subject = Var.alloc(individualVarTable.generateVarIfAbsent(subj));
 				// System.out.println("[QTTree::generalize] The Sub is an individual URI");
 			} else if (rdfd1.isInObjectPropertySet(subj) && !(rdfd2.isInObjectPropertySet(subj))) {
-				subject = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(subj));
+				subject = Var.alloc(objectProperyVarTable.generateVarIfAbsent(subj));
 				// System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
 			} else if (rdfd1.isInDatatypePropertySet(subj) && !(rdfd2.isInDatatypePropertySet(subj))) {
-				subject = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(subj));
+				subject = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(subj));
 				// System.out.println("[QTTree::generalize] The Sub is an datatype Property
 				// URI");
 			} else if (rdfd1.isInRDFVocabulary(subj) && !(rdfd2.isInRDFVocabulary(subj))) {
-				subject = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(subj));
+				subject = Var.alloc(rdfVocVarTable.generateVarIfAbsent(subj));
 				// System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
 			} else {
 				subject = tp.getSubject();
@@ -594,7 +587,7 @@ public class QTTree<T> {
 			if (tp.getSubject().isLiteral()) {
 				String subjAsString = tp.getSubject().getLiteralValue().toString();
 				if (rdfd1.isInLiteralSet(subjAsString) && !(rdfd2.isInLiteralSet(subjAsString))) {
-					subject = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(subjAsString));
+					subject = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString));
 				} else {
 					subject = tp.getSubject();
 				}
@@ -614,11 +607,11 @@ public class QTTree<T> {
 			// System.out.println("[QTTree::generalize] The predicate is an URI 111111111 "
 			// + pred);
 			if (rdfd1.isInObjectPropertySet(pred) && !(rdfd2.isInObjectPropertySet(pred))) {
-				predicate = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(pred));
+				predicate = Var.alloc(objectProperyVarTable.generateVarIfAbsent(pred));
 			} else if (rdfd1.isInDatatypePropertySet(pred) && !(rdfd2.isInDatatypePropertySet(pred))) {
-				predicate = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(pred));
+				predicate = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(pred));
 			} else if (rdfd1.isInRDFVocabulary(pred) && !(rdfd2.isInRDFVocabulary(pred))) {
-				predicate = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(pred));
+				predicate = Var.alloc(rdfVocVarTable.generateVarIfAbsent(pred));
 			} else {
 				// System.out.println("[QTTree::generalize] The predicate is an URI 22222222 " +
 				// pred);
@@ -636,15 +629,15 @@ public class QTTree<T> {
 			String obj = tp.getObject().getURI();
 			// System.out.println("[QTTree::generalize] The Object is " + obj);
 			if (rdfd1.getClassSet().contains(obj) && !(rdfd2.getClassSet().contains(obj))) {
-				object = Var.alloc(classVarTable.generateIFAbsentClassVar(obj));
+				object = Var.alloc(classVarTable.generateVarIfAbsent(obj));
 			} else if (rdfd1.isInIndividualSet(obj) && !(rdfd2.isInIndividualSet(obj))) {
-				object = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(obj));
+				object = Var.alloc(individualVarTable.generateVarIfAbsent(obj));
 			} else if (rdfd1.isInObjectPropertySet(obj) && !(rdfd2.isInObjectPropertySet(obj))) {
-				object = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(obj));
+				object = Var.alloc(objectProperyVarTable.generateVarIfAbsent(obj));
 			} else if (rdfd1.isInDatatypePropertySet(obj) && !(rdfd2.isInDatatypePropertySet(obj))) {
-				object = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(obj));
+				object = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(obj));
 			} else if (rdfd1.isInRDFVocabulary(obj) && !(rdfd2.isInRDFVocabulary(obj))) {
-				object = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(obj));
+				object = Var.alloc(rdfVocVarTable.generateVarIfAbsent(obj));
 			} else {
 				object = tp.getObject();
 			}
@@ -656,7 +649,7 @@ public class QTTree<T> {
 				// "+rdfd2.getLiteralSet().toString());
 
 				if (rdfd1.isInLiteralSet(objAsString) && !(rdfd2.isInLiteralSet(objAsString))) {
-					object = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(objAsString));
+					object = Var.alloc(literalVarTable.generateVarIfAbsent(objAsString));
 				} else {
 					object = tp.getObject();
 				}
@@ -1364,11 +1357,11 @@ public class QTTree<T> {
 		// if
 		// (objectProperyVarTable.getVarObjectProperyTable().containsKey(entity.substring(1,
 		// entity.length()))) {
-		if (objectProperyVarTable.getVarObjectProperyTable().containsKey(entity)) {
+		if (objectProperyVarTable.getVarToValueTable().containsKey(entity)) {
 			return true;
-		} else if (classVarTable.getVarClassTable().containsKey(entity)) {
+		} else if (classVarTable.getVarToValueTable().containsKey(entity)) {
 			return true;
-		} else if (datatypePropertyVarTable.getVarDatatypeProperyTable().containsKey(entity)) {
+		} else if (datatypePropertyVarTable.getVarToValueTable().containsKey(entity)) {
 			return true;
 		}
 

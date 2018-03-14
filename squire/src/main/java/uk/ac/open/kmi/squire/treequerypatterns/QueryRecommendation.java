@@ -464,28 +464,28 @@ public class QueryRecommendation<T> {
 			// System.out.println("[QTTree::generalize] The Object is " + obj);
 			// if (rdfd1.getClassSet().contains(o) && !(rdfd2.getClassSet().contains(o))) {
 			if (!(rdfd2.getClassSet().contains(o))) {
-				result = Var.alloc(classVarTable.generateIFAbsentClassVar(o));
+				result = Var.alloc(classVarTable.generateVarIfAbsent(o));
 				return result;
 			} else // if (rdfd1.isInIndividualSet(o) && !(rdfd2.isInIndividualSet(o))) {
 			{
 				if (!(rdfd2.isInIndividualSet(o))) {
-					result = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(o));
+					result = Var.alloc(individualVarTable.generateVarIfAbsent(o));
 					return result;
 				} else // if (rdfd1.isInObjectPropertySet(o) && !(rdfd2.isInObjectPropertySet(o))) {
 				{
 					if (!(rdfd2.isInObjectPropertySet(o))) {
-						result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(o));
+						result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(o));
 						return result;
 					} else // if (rdfd1.isInDatatypePropertySet(o) && !(rdfd2.isInDatatypePropertySet(o)))
 							// {
 					{
 						if (!(rdfd2.isInDatatypePropertySet(o))) {
-							result = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(o));
+							result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(o));
 							return result;
 						} else // if (rdfd1.isInRDFVocabulary(o) && !(rdfd2.isInRDFVocabulary(o))) {
 						{
 							if (!(rdfd2.isInRDFVocabulary(o))) {
-								result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(o));
+								result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(o));
 								return result;
 							} else {
 								result = null;
@@ -502,7 +502,7 @@ public class QueryRecommendation<T> {
 			// "+rdfd2.getLiteralSet().toString());
 
 			if (rdfd1.isInLiteralSet(objAsString) && !(rdfd2.isInLiteralSet(objAsString))) {
-				result = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(objAsString));
+				result = Var.alloc(literalVarTable.generateVarIfAbsent(objAsString));
 				return result;
 			} else {
 				result = null;
@@ -530,34 +530,34 @@ public class QueryRecommendation<T> {
 			String o = obj.getURI();
 			// System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
 			if ((rdfd1.getClassSet().contains(o)) && !(rdfd2.getClassSet().contains(o))) {
-				result = Var.alloc(classVarTable.generateIFAbsentClassVar(o));
+				result = Var.alloc(classVarTable.generateVarIfAbsent(o));
 				return result;
 			} else if (rdfd1.isInObjectPropertySet(o) && !(rdfd2.isInObjectPropertySet(o))) {
 				// if (!(rdfd2.isInObjectPropertySet(o))) {
-				result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(o));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(o));
 				// System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(o) && !(rdfd2.isInDatatypePropertySet(o))) {
 				// if (!(rdfd2.isInDatatypePropertySet(o))) {
 
-				result = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(o));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(o));
 				// System.out.println("[QTTree::generalize] The Sub is an datatype Property
 				// URI");
 				return result;
 			} else if (rdfd1.isInRDFVocabulary(o) && !(rdfd2.isInRDFVocabulary(o))) {
 				// if (!(rdfd2.isInRDFVocabulary(o))) {
 
-				result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(o));
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(o));
 				// System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
 				return result;
 			} else {
 				// this means that it is an individual
-				result = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(o));
+				result = Var.alloc(individualVarTable.generateVarIfAbsent(o));
 				return result;
 			}
 		} else if (obj.isLiteral()) {
 			String subjAsString = obj.getLiteralValue().toString();
-			result = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(subjAsString));
+			result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString));
 			return result;
 		} else {
 			// subject = tp.getSubject();
@@ -595,7 +595,7 @@ public class QueryRecommendation<T> {
 			if (rdfd1.isInObjectPropertySet(pre) && !(rdfd2.isInObjectPropertySet(pre))) {
 				// if (!(rdfd2.isInObjectPropertySet(pre)) && !(rdfd2.isInRDFVocabulary(pre)) &&
 				// !(rdfd1.isInDatatypePropertySet(pre))) {
-				result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(pre));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(pre));
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(pre) && !(rdfd2.isInDatatypePropertySet(pre))) {
 				// {
@@ -609,7 +609,7 @@ public class QueryRecommendation<T> {
 				// rdfd2.isInObjectPropertySet(pre) "
 				// + rdfd1.isInObjectPropertySet(pre));
 
-				result = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(pre));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(pre));
 				return result;
 
 				// if (!(rdfd2.isInDatatypePropertySet(pre)) && !(rdfd2.isInRDFVocabulary(pre)))
@@ -620,7 +620,7 @@ public class QueryRecommendation<T> {
 				// }
 			} else if (rdfd1.isInRDFVocabulary(pre) && !(rdfd2.isInRDFVocabulary(pre))) {
 				// if ((rdfd2.isInRDFVocabulary(pre))) {
-				result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(pre));
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(pre));
 				return result;
 			} else {
 				// System.out.println("[QTTree::ifPredicateIsNotD2ThenGenerateVariable(Node
@@ -652,10 +652,10 @@ public class QueryRecommendation<T> {
 		if (pred.isURI()) {
 			String pre = pred.getURI();
 			if (rdfd1.isInObjectPropertySet(pre) && !(rdfd2.isInObjectPropertySet(pre))) {
-				result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(pre));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(pre));
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(pre) && !(rdfd2.isInDatatypePropertySet(pre))) {
-				result = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(pre));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(pre));
 				return result;
 			} // else if (rdfd1.isInRDFVocabulary(pre) && !(rdfd2.isInRDFVocabulary(pre))) {
 				// result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(pre));
@@ -686,28 +686,28 @@ public class QueryRecommendation<T> {
 			if ((rdfd1.getClassSet().contains(subj)) && !(rdfd2.getClassSet().contains(subj))) {
 				// if (!rdfd2.getClassSet().contains(o)) {
 
-				result = Var.alloc(classVarTable.generateIFAbsentClassVar(sub));
+				result = Var.alloc(classVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is a class URI");
 				return result;
 			} else if (rdfd1.isInIndividualSet(sub) && !(rdfd2.isInIndividualSet(sub))) {
 				// if (!(rdfd2.isInIndividualSet(o))) {
-				result = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(sub));
+				result = Var.alloc(individualVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is an individual URI");
 				return result;
 			} else if (rdfd1.isInObjectPropertySet(sub) && !(rdfd2.isInObjectPropertySet(sub))) {
 				// if (!(rdfd2.isInObjectPropertySet(o))) {
-				result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(sub));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(sub) && !(rdfd2.isInDatatypePropertySet(sub))) {
 				// if (!(rdfd2.isInDatatypePropertySet(o))) {
-				result = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(sub));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is an datatype Property
 				// URI");
 				return result;
 			} else if (rdfd1.isInRDFVocabulary(sub) && !(rdfd2.isInRDFVocabulary(sub))) {
 				// if (!(rdfd2.isInRDFVocabulary(o))) {
-				result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(sub));
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
 				return result;
 			} else {
@@ -718,7 +718,7 @@ public class QueryRecommendation<T> {
 		} else if (subj.isLiteral()) {
 			String subjAsString = subj.getLiteralValue().toString();
 			if (rdfd1.isInLiteralSet(subjAsString) && !(rdfd2.isInLiteralSet(subjAsString))) {
-				result = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(subjAsString));
+				result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString));
 				return result;
 			} else {
 				// subject = tp.getSubject();
@@ -745,32 +745,32 @@ public class QueryRecommendation<T> {
 			String sub = subj.getURI();
 			// System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
 			if ((rdfd1.getClassSet().contains(subj)) && !(rdfd2.getClassSet().contains(subj))) {
-				result = Var.alloc(classVarTable.generateIFAbsentClassVar(sub));
+				result = Var.alloc(classVarTable.generateVarIfAbsent(sub));
 				return result;
 			} else if (rdfd1.isInObjectPropertySet(sub) && !(rdfd2.isInObjectPropertySet(sub))) {
 				// if (!(rdfd2.isInObjectPropertySet(o))) {
-				result = Var.alloc(objectProperyVarTable.generateIFAbsentObjectPropertyVar(sub));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(sub) && !(rdfd2.isInDatatypePropertySet(sub))) {
 				// if (!(rdfd2.isInDatatypePropertySet(o))) {
-				result = Var.alloc(datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(sub));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is an datatype Property
 				// URI");
 				return result;
 			} else if (rdfd1.isInRDFVocabulary(sub) && !(rdfd2.isInRDFVocabulary(sub))) {
 				// if (!(rdfd2.isInRDFVocabulary(o))) {
-				result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(sub));
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(sub));
 				// System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
 				return result;
 			} else {
 				// this means that it is an individual
-				result = Var.alloc(individualVarTable.generateIFAbsentIndividualVar(sub));
+				result = Var.alloc(individualVarTable.generateVarIfAbsent(sub));
 				return result;
 			}
 		} else if (subj.isLiteral()) {
 			String subjAsString = subj.getLiteralValue().toString();
-			result = Var.alloc(literalVarTable.generateIFAbsentLiteralVar(subjAsString));
+			result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString));
 			return result;
 		} else {
 			// subject = tp.getSubject();
@@ -858,13 +858,13 @@ public class QueryRecommendation<T> {
 		// if
 		// (objectProperyVarTable.getVarObjectProperyTable().containsKey(entity.substring(1,
 		// entity.length()))) {
-		if (objectProperyVarTable.getVarObjectProperyTable().containsKey(entity)) {
+		if (objectProperyVarTable.getVarToValueTable().containsKey(entity)) {
 			return true;
-		} else if (classVarTable.getVarClassTable().containsKey(entity)) {
+		} else if (classVarTable.getVarToValueTable().containsKey(entity)) {
 			return true;
-		} else if (datatypePropertyVarTable.getVarDatatypeProperyTable().containsKey(entity)) {
+		} else if (datatypePropertyVarTable.getVarToValueTable().containsKey(entity)) {
 			return true;
-		} else if (individualVarTable.getVarIndividualURITable().containsKey(entity)) {
+		} else if (individualVarTable.getVarToValueTable().containsKey(entity)) {
 			return true;
 		}
 

@@ -5,71 +5,29 @@
  */
 package uk.ac.open.kmi.squire.entityvariablemapping;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  *
  * @author callocca
  */
-public class ObjectPropertyVarMapping {
+public class ObjectPropertyVarMapping extends AbstractVarMapping {
 
-    private Map<String, String> objectProperyURIVarTable = null;// = new HashMap<String, String>();
-    private Map<String, String> varObjectProperyTable = null;// = new HashMap<String, String>();
-    private int succ = 0;
+	public String generateVarIfAbsent(String uri) {
+		if (valueToVar == null || succ == 0) throw new IllegalStateException(
+				"The objectProperyVarTable needs to be created. Pls, use the class constructor first.");
+		if (!(valueToVar.containsKey(uri))) {
+			// this.classVar = "ct"+Integer.toString(++succ);
+			String tmp = "opt" + Integer.toString(succ++);
+			valueToVar.put(uri, tmp);
+			varToValue.put(tmp, uri);
+			return tmp;
+		} else return valueToVar.get(uri);
+	}
 
-    public ObjectPropertyVarMapping() {
-        objectProperyURIVarTable = new HashMap<String, String>();
-        varObjectProperyTable = new HashMap<String, String>();
-        succ = 1;
-    }
-
-    public void initializeObjectPropertyURIVarTable() {
-        if (objectProperyURIVarTable == null && varObjectProperyTable == null && succ == 0) {
-            objectProperyURIVarTable = new HashMap<String, String>();
-            varObjectProperyTable = new HashMap<String, String>();
-            succ = 1;
-        }
-    }
-
-    public void cancelObjectProperyVarTable() {
-        objectProperyURIVarTable = null;
-        varObjectProperyTable = null;
-        succ = 0;
-    }
-
-    public String generateIFAbsentObjectPropertyVar(String objpropURI) throws NullPointerException {
-        if (objectProperyURIVarTable == null || succ == 0) {
-            throw new NullPointerException("The objectProperyVarTable needs to be created. Pls, use the class constructor first.");
-        }
-        if (!(objectProperyURIVarTable.containsKey(objpropURI))) {
-            //this.classVar = "ct"+Integer.toString(++succ);
-            String tmp = "opt" + Integer.toString(succ++);
-            objectProperyURIVarTable.put(objpropURI, tmp);
-            varObjectProperyTable.put(tmp, objpropURI);
-            return tmp;
-        } else {
-            return objectProperyURIVarTable.get(objpropURI);
-        }
-    }
-
-    public String getObjectProperyFromVar(String varString) throws NullPointerException {
-        if (varObjectProperyTable == null) {
-            throw new NullPointerException("The ClassURIVarTable needs to be initialized. You cannot use it otherwise.");
-        }
-        if (!(varObjectProperyTable.containsKey(varString))) {
-            return null;
-        } else {
-            return varObjectProperyTable.get(varString);
-        }
-    }
-
-    public Map<String, String> getObjectProperyVarTable() {
-        return objectProperyURIVarTable;
-    }
-
-    public Map<String, String> getVarObjectProperyTable() {
-        return varObjectProperyTable;
-    }
+	public String getObjectProperyFromVar(String varString) {
+		if (varToValue == null) throw new IllegalStateException(
+				"The ClassURIVarTable needs to be initialized. You cannot use it otherwise.");
+		if (!(varToValue.containsKey(varString))) return null;
+		else return varToValue.get(varString);
+	}
 
 }

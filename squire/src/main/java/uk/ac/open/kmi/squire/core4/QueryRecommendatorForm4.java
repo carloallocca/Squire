@@ -98,16 +98,15 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 
 	private List<QueryStringScorePair> recommendWithToken(String token) {
 		Query query;
+		log.info("Started recommendation process.");
+		log.debug(" (token={})", token);
 		try {
-			System.out.println(queryString);
 			query = QueryFactory.create(queryString);
-			System.out.println("");
-			System.out.println("[QueryRecommendatorForm4::recommend] THE SOURCE QUERY ");
-			System.out.println("");
-			System.out.println(query.toString());
+			log.info(" === Original query follows === ");
+			log.info("{}", query);
+			log.info(" ============================== ");
 		} catch (QueryParseException ex) { // QueryParseException
-			throw new QueryParseException(
-					"[QueryRecommendatorForm4::recommendWithToken] THE SOURCE QUERY is not parsable!!!", -1, -1);
+			throw new QueryParseException("Failed to parse source query as SPARQL.", -1, -1);
 		}
 
 		// Phase 1 : check query satisfiability
@@ -115,9 +114,9 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		qs.register(this);
 		boolean satisfiable = false;
 		try {
-			log.debug("Checking satisfiability against source dataset <{}>", rdfd1.getEndPointURL());
+			log.info("Checking satisfiability against source dataset <{}>", rdfd1.getEndPointURL());
 			satisfiable = qs.isSatisfiableWrtResults(query, rdfd1);
-			log.debug(" ... is satisfiable? {}", satisfiable);
+			log.info(" ... is satisfiable? {}", satisfiable);
 		} catch (ConnectException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -132,6 +131,8 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 			querySim.register(this);
 			float score = querySim.computeSim(rdfd1, rdfd2);
 			qR.register(this);
+
+			log.info("Building recommended query tree");
 			qR.buildRecommendation();
 		} catch (Exception ex) {
 			log.error("", ex);

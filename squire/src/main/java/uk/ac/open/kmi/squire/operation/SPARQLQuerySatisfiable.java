@@ -137,7 +137,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 			String raw = SparqlUtils.doRawQuery(qTMP.toString(), datasetPath);
 			List<QuerySolution> resultList = SparqlUtils.extractProjectedValues(raw, q.getProjectVars());
 			boolean cond = resultList.size() > 0;
-			log.info("Satisfiable? {}", cond ? "YES" : "NO");
+			log.debug("Satisfiable? {}", cond ? "YES" : "NO");
 			notifyQuerySatisfiableValue(q, cond);
 			return cond;
 		} catch (SparqlException e) {

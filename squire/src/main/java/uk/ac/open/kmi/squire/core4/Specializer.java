@@ -165,7 +165,7 @@ public class Specializer extends QueryOperator {
 		// D. Build the QueryAndContextNode from the query
 		QueryAndContextNode qAndcNode = new QueryAndContextNode();
 
-		// ...set the original query and the recommendated query;
+		// ...set the original query and the recommended query;
 		qAndcNode.setqO(qo);
 		qAndcNode.setqR(qr);
 
@@ -255,7 +255,6 @@ public class Specializer extends QueryOperator {
 			List<List<TriplePath>> triplePathPowerSet = PowerSetFactory.powerset(triplePathSet);
 			List<List<TriplePath>> triplePathPowerSetOrdered = PowerSetFactory.order(triplePathPowerSet);
 
-			// log.info("triplePathPowerSetOrdered" + triplePathPowerSetOrdered.toString());
 			for (List<TriplePath> triplePathSubSet : triplePathPowerSetOrdered) {
 				// for (int i=0; i<15; i++) {
 				// List<TriplePath> triplePathSubSet = triplePathPowerSetOrdered.get(i);
@@ -263,14 +262,11 @@ public class Specializer extends QueryOperator {
 				if (!triplePathSubSet.isEmpty()) {
 					SelectBuilder sb = new SelectBuilder();
 					// adding the triple patters
-					for (TriplePath tp : triplePathSubSet) {
-						// apply the removal operation:
-						sb.addWhere(tp.asTriple());
-					}
+					for (TriplePath tp : triplePathSubSet)
+						sb.addWhere(tp.asTriple()); // apply the removal operation
 					// adding the output variable
-					for (String var : qRTemplateVariableSet) {
+					for (String var : qRTemplateVariableSet)
 						sb.addVar(var);
-					}
 					sb.setDistinct(true);
 					Query subQuery = sb.build();
 
@@ -338,7 +334,7 @@ public class Specializer extends QueryOperator {
 			QueryAndContextNode parentNode = popTopScoredQueryCtx();
 			if (parentNode != null) {
 				// 2. Store the QueryAndContextNode with qRScore max into the
-				// recommandedQueryList as it could be one of the recommendated query
+				// recommandedQueryList as it could be one of the recommended query
 				this.recommendations.add(parentNode);
 				// this.notifyQueryRecommendation(parentQueryAndContextNode.getqR(),
 				// parentQueryAndContextNode.getqRScore());
@@ -397,7 +393,7 @@ public class Specializer extends QueryOperator {
 
 									// ======
 									// Ho commentato questa riga perche non ha un senso logico. Non c'e' motivo
-									// di aggiungere la query instantiata nella lista di query da specializzare.
+									// di aggiungere la query istanziata nella lista di query da specializzare.
 									// did it 13/05/2017
 									// addSpecializableQueryList(childNode);
 									// invece, ho aggiunto questa in quanto la query e' pronta per essere

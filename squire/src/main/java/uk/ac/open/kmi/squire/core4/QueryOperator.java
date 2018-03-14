@@ -9,6 +9,10 @@ import uk.ac.open.kmi.squire.entityvariablemapping.RDFVocVarMapping;
 
 public abstract class QueryOperator extends AbstractQueryRecommendationObservable {
 
+	protected enum NodeRole {
+		OBJECT, PREDICATE, SUBJECT
+	}
+
 	protected static final String CLASS_TEMPLATE_VAR = "ct";
 	protected static final String DT_PROP_TEMPLATE_VAR = "dpt";
 	protected static final String INDIVIDUAL_TEMPLATE_VAR = "it";

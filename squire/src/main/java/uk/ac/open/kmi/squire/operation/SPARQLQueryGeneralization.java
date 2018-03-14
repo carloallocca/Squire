@@ -15,6 +15,8 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -38,11 +40,7 @@ public class SPARQLQueryGeneralization {
 
 		@Override
 		public void visit(ElementPathBlock el) {
-			// System.out.println("[SQGeneralizationVisitor::visit(ElementPathBlock el)] ");
-			if (el == null) {
-				throw new IllegalStateException(
-						"[SQGeneralizationVisitor::visit(ElementPathBlock el)] The ElementPathBlock is null!!");
-			}
+			if (el == null) throw new IllegalStateException("The ElementPathBlock is null");
 			ListIterator<TriplePath> it = el.getPattern().iterator();
 			while (it.hasNext()) {
 				final TriplePath tp = it.next();
@@ -55,23 +53,9 @@ public class SPARQLQueryGeneralization {
 					if (oldSubject.isURI() && node.isURI()) {
 						if (oldSubject.getURI().equals(node.getURI())) {
 							newSubject = Var.alloc(varTemplate);
-						} else {
-							newSubject = oldSubject;
-						}
-					} else {
-						if (oldSubject.isLiteral() && node.isLiteral()) {
-							if (oldSubject.getLiteral().toString().equals(node.getLiteral().toString())) {
-								newSubject = Var.alloc(varTemplate);
-							} else {
-								newSubject = oldSubject;
-							}
-						} else {
-							newSubject = oldSubject;
-						}
-					}
-				} else {
-					newSubject = oldSubject;
-				}
+						} else newSubject = oldSubject;
+					} else newSubject = oldSubject;
+				} else newSubject = oldSubject;
 
 				Node oldPredicate = tp.getPredicate();
 				final Node newPredicate;
@@ -122,15 +106,22 @@ public class SPARQLQueryGeneralization {
 
 	}
 
+	/**
+	 * FIXME the operation alters the original query! is it safe?
+	 * 
+	 * @param q
+	 * @param n
+	 * @param varTemplate
+	 * @return
+	 */
 	public Query perform(Query q, Node n, Var varTemplate) {
-		if (q == null || n == null || varTemplate == null) {
-			throw new IllegalArgumentException(
-					"[SPARQLQueryGeneralization::generalize()]The Query or the Node or the Var is null!!");
-		}
-		// Query newQuery=QueryFactory.create(q.toString());
+		if (q == null || n == null || varTemplate == null)
+			throw new IllegalArgumentException("The Query or the Node or the Var is null");
+		Logger log = LoggerFactory.getLogger(getClass());
+		log.trace(" * Generalizing over node {}", n);
 		SQGeneralizationVisitor genVisitor = new SQGeneralizationVisitor(n, varTemplate);
 		ElementWalker.walk(q.getQueryPattern(), genVisitor);
-		// this.generalizedQuery=this.originalQuery;
+		log.trace("Generalization step returned query:\r\n{}", q);
 		return q;
 	}
 

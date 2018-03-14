@@ -20,7 +20,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
  * AA: Apparently an all-knowing POJO for the process of generating
- * recommendations.
+ * recommendations. It also includes the solution space of that query
  *
  * @author carloallocca
  */

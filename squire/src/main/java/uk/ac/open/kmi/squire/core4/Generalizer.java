@@ -33,8 +33,7 @@ public class Generalizer extends QueryOperator {
 
 	private final Query originalQuery;
 
-	private final IRDFDataset rdfd1;
-	private final IRDFDataset rdfd2;
+	private final IRDFDataset rdfd1, rdfd2;
 
 	public Generalizer(Query query, IRDFDataset d1, IRDFDataset d2) {
 		super();
@@ -45,96 +44,65 @@ public class Generalizer extends QueryOperator {
 		this.rdfd2 = d2;
 	}
 
+	/*
+	 * Typically done once per original query
+	 */
 	public Query generalize() {
 		// The generalized query is created from a clone of the original one.
 		Query qGeneral = QueryFactory.create(this.originalQuery.toString());
+		// Three separate generalization steps are performed
 		SPARQLQueryGeneralization qg = new SPARQLQueryGeneralization();
 		// SUBJECT
-		for (Node subj : getSubjectsSet())
+		for (Node subj : getEntitySet(NodeRole.SUBJECT))
 			if (!(subj.isVariable()) && !(subj.isBlank())) {
 				Var templateVarSub = ifSubjectIsNotD2ThenGenerateVariableNew(subj);
-				if (templateVarSub != null) {
-					qGeneral = qg.perform(qGeneral, subj, templateVarSub);
-				}
+				if (templateVarSub != null) qGeneral = qg.perform(qGeneral, subj, templateVarSub);
 			}
 		// PREDICATE
-		for (Node pred : getPredicatesSet())
+		for (Node pred : getEntitySet(NodeRole.PREDICATE))
 			if (!(pred.isVariable()) && !(pred.isBlank())) {
 				if (!this.rdfd2.getRDFVocabulary().contains(pred.getURI())) {
 					Var templateVarPred = ifPredicateIsNotD2ThenGenerateVariableNew(pred);
-					if (templateVarPred != null) {
-						qGeneral = qg.perform(qGeneral, pred, templateVarPred);
-					}
+					if (templateVarPred != null) qGeneral = qg.perform(qGeneral, pred, templateVarPred);
 				}
 			}
 		// OBJECT
-		for (Node obj : getObjectsSet())
+		for (Node obj : getEntitySet(NodeRole.OBJECT))
 			if (!(obj.isVariable()) && !(obj.isBlank())) {
 				Var templateVarObj = ifObjectIsNotD2ThenGenerateVariableNew(obj);
-				if (templateVarObj != null) {
-					qGeneral = qg.perform(qGeneral, obj, templateVarObj);
-				}
+				if (templateVarObj != null) qGeneral = qg.perform(qGeneral, obj, templateVarObj);
 			}
 		return qGeneral;
 	}
 
-	private Set<Node> getObjectsSet() {
-		// Remember distinct objects in this
-		final Set<Node> objects = new HashSet<Node>();
+	private Set<Node> getEntitySet(NodeRole nodeType) {
+		final Set<Node> objects = new HashSet<>(); // Remember distinct objects in this
 		// This will walk through all parts of the query
-		ElementWalker.walk(this.originalQuery.getQueryPattern(),
-				// For each element
-				new ElementVisitorBase() {
-					// ...when it's a block of triples...
-					public void visit(ElementPathBlock el) {
-						// ...go through all the triples...
-						Iterator<TriplePath> triples = el.patternElts();
-						while (triples.hasNext()) {
-							// ...and grab the objects
-							objects.add(triples.next().getObject());
-						}
+		ElementWalker.walk(this.originalQuery.getQueryPattern(), new ElementVisitorBase() {
+			@Override
+			public void visit(ElementPathBlock el) {
+				Iterator<TriplePath> triples = el.patternElts();
+				while (triples.hasNext()) {
+					TriplePath tp = triples.next();
+					Node n;
+					switch (nodeType) {
+					case SUBJECT:
+						n = tp.getSubject();
+						break;
+					case PREDICATE:
+						n = tp.getPredicate();
+						break;
+					case OBJECT:
+						n = tp.getObject();
+						break;
+					default:
+						n = null;
 					}
-				});
+					if (n != null) objects.add(n);
+				}
+			}
+		});
 		return objects;
-	}
-
-	private Set<Node> getPredicatesSet() {
-		// Remember distinct predicates in this
-		final Set<Node> predicates = new HashSet<Node>();
-		// This will walk through all parts of the query
-		ElementWalker.walk(this.originalQuery.getQueryPattern(),
-				// For each element
-				new ElementVisitorBase() {
-					// ...when it's a block of triples...
-					public void visit(ElementPathBlock el) {
-						// ...go through all the triples...
-						Iterator<TriplePath> triples = el.patternElts();
-						while (triples.hasNext()) {
-							// ...and grab the subject
-							predicates.add(triples.next().getPredicate());
-						}
-					}
-				});
-		return predicates;
-	}
-
-	private Set<Node> getSubjectsSet() {
-		final Set<Node> subjects = new HashSet<Node>();
-		// This will walk through all parts of the query
-		ElementWalker.walk(this.originalQuery.getQueryPattern(),
-				// For each element
-				new ElementVisitorBase() {
-					// ...when it's a block of triples...
-					public void visit(ElementPathBlock el) {
-						// ...go through all the triples...
-						Iterator<TriplePath> triples = el.patternElts();
-						while (triples.hasNext()) {
-							// ...and grab the subject
-							subjects.add(triples.next().getSubject());
-						}
-					}
-				});
-		return subjects;
 	}
 
 	private Var ifObjectIsNotD2ThenGenerateVariableNew(Node obj) {
@@ -143,16 +111,16 @@ public class Generalizer extends QueryOperator {
 		if (obj.isURI()) {
 			String o = obj.getURI();
 			if ((rdfd1.getClassSet().contains(o)) && !(rdfd2.getClassSet().contains(o)))
-				varName = classVarTable.generateIFAbsentClassVar(o);
+				varName = classVarTable.generateVarIfAbsent(o);
 			else if (rdfd1.isInObjectPropertySet(o) && !(rdfd2.isInObjectPropertySet(o)))
-				varName = objectProperyVarTable.generateIFAbsentObjectPropertyVar(o);
+				varName = objectProperyVarTable.generateVarIfAbsent(o);
 			else if (rdfd1.isInDatatypePropertySet(o) && !(rdfd2.isInDatatypePropertySet(o)))
-				varName = datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(o);
+				varName = datatypePropertyVarTable.generateVarIfAbsent(o);
 			else if (rdfd1.isInRDFVocabulary(o) && !(rdfd2.isInRDFVocabulary(o)))
-				varName = rdfVocVarTable.generateIFAbsentRDFVocVar(o);
+				varName = rdfVocVarTable.generateVarIfAbsent(o);
 			else return null;
 		} else if (obj.isLiteral()) {
-			varName = literalVarTable.generateIFAbsentLiteralVar(obj.getLiteralValue().toString());
+			varName = literalVarTable.generateVarIfAbsent(obj.getLiteralValue().toString());
 		} else return null;
 		if (varName == null) throw new IllegalStateException("Object node generated a null variable name.");
 		return Var.alloc(varName);
@@ -170,10 +138,10 @@ public class Generalizer extends QueryOperator {
 		log.trace("rdfd2 datatype property list : {}", rdfd2.getDatatypePropertySet());
 		if (rdfd1.isInObjectPropertySet(p) && !(rdfd2.isInObjectPropertySet(p))) {
 			log.debug(" ... is an object property in <{}> and not in <{}>", rdfd1, rdfd2);
-			varName = objectProperyVarTable.generateIFAbsentObjectPropertyVar(p);
+			varName = objectProperyVarTable.generateVarIfAbsent(p);
 		} else if (rdfd1.isInDatatypePropertySet(p) && !(rdfd2.isInDatatypePropertySet(p))) {
 			log.debug(" ... is a datatype property in <{}> and not in <{}>", rdfd1, rdfd2);
-			varName = datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(p);
+			varName = datatypePropertyVarTable.generateVarIfAbsent(p);
 		} else {
 			log.debug(" ... is either present both in <{}> and <{}>, or in neither. Will not generalize.", rdfd1,
 					rdfd2);
@@ -189,19 +157,19 @@ public class Generalizer extends QueryOperator {
 		if (subj.isURI()) {
 			String sub = subj.getURI();
 			if ((rdfd1.getClassSet().contains(sub)) && !(rdfd2.getClassSet().contains(sub)))
-				varName = classVarTable.generateIFAbsentClassVar(sub);
+				varName = classVarTable.generateVarIfAbsent(sub);
 			else if (rdfd1.isInObjectPropertySet(sub) && !(rdfd2.isInObjectPropertySet(sub)))
-				varName = objectProperyVarTable.generateIFAbsentObjectPropertyVar(sub);
+				varName = objectProperyVarTable.generateVarIfAbsent(sub);
 			else if (rdfd1.isInDatatypePropertySet(sub) && !(rdfd2.isInDatatypePropertySet(sub)))
-				varName = datatypePropertyVarTable.generateIFAbsentDatatypePropertyVar(sub);
+				varName = datatypePropertyVarTable.generateVarIfAbsent(sub);
 			else if (rdfd1.isInRDFVocabulary(sub) && !(rdfd2.isInRDFVocabulary(sub)))
-				varName = rdfVocVarTable.generateIFAbsentRDFVocVar(sub);
+				varName = rdfVocVarTable.generateVarIfAbsent(sub);
 			else
 				// We assume by exclusion that sub is an individual.
 				// XXX is that assumption correct?
-				varName = individualVarTable.generateIFAbsentIndividualVar(sub);
+				varName = individualVarTable.generateVarIfAbsent(sub);
 		} else if (subj.isLiteral()) {
-			varName = literalVarTable.generateIFAbsentLiteralVar(subj.getLiteralValue().toString());
+			varName = literalVarTable.generateVarIfAbsent(subj.getLiteralValue().toString());
 		} else return null;
 		if (varName == null) throw new IllegalStateException("Subject node generated a null variable name.");
 		return Var.alloc(varName);
