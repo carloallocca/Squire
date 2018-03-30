@@ -5,6 +5,10 @@
  */
 package uk.ac.open.kmi.squire.querytemplate;
 
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_CLASS;
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_INDIVIDUAL;
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_LITERAL;
+
 import java.util.ListIterator;
 
 import org.apache.jena.graph.Node;
@@ -14,11 +18,8 @@ import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 
-import uk.ac.open.kmi.squire.entityvariablemapping.ClassVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.DatatypePropertyVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.IndividualVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.LiteralVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.ObjectPropertyVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.GeneralVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
@@ -28,26 +29,22 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  */
 public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 
-	private IRDFDataset rdfd1;
-	private IRDFDataset rdfd2;
+	private IRDFDataset rdfd1, rdfd2;
 
-	private LiteralVarMapping literalVarTable;
-	private ClassVarMapping classVarTable;
-	private DatatypePropertyVarMapping datatypePropertyVarTable;
-	private IndividualVarMapping individualVarTable;
-	private ObjectPropertyVarMapping objectProperyVarTable;
-
-	public SQTVisitor() {
-	}
+	private VarMapping literalVarTable;
+	private VarMapping classVarTable;
+	private VarMapping datatypePropertyVarTable;
+	private VarMapping individualVarTable;
+	private VarMapping objectProperyVarTable;
 
 	public SQTVisitor(IRDFDataset d1, IRDFDataset d2) {
 		rdfd1 = d1;
 		rdfd2 = d2;
-		classVarTable = new ClassVarMapping();
-		individualVarTable = new IndividualVarMapping();
-		literalVarTable = new LiteralVarMapping();
-		objectProperyVarTable = new ObjectPropertyVarMapping();
-		datatypePropertyVarTable = new DatatypePropertyVarMapping();
+		classVarTable = new GeneralVarMapping();
+		individualVarTable = new GeneralVarMapping();
+		literalVarTable = new GeneralVarMapping();
+		objectProperyVarTable = new GeneralVarMapping();
+		datatypePropertyVarTable = new GeneralVarMapping();
 	}
 
 	// In theory: The outer-most graph pattern in a query is called the query
@@ -94,8 +91,9 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 				if (rdfd1.getIndividualSet().contains(subject)
 						&& predicate.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
 						&& rdfd1.getClassSet().contains(object)) {
-					Var individualVar = Var.alloc(individualVarTable.generateVarIfAbsent(subj.getURI()));
-					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(obj.getURI()));
+					Var individualVar = Var
+							.alloc(individualVarTable.generateVarIfAbsent(subj.getURI(), TEMPLATE_VAR_INDIVIDUAL));
+					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(obj.getURI(), TEMPLATE_VAR_CLASS));
 					it.set(new TriplePath(new Triple(individualVar, tp.getPredicate(), classVar)));
 
 				}
@@ -104,8 +102,9 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 				// an individual then
 				if (rdfd1.getIndividualSet().contains(subject) && rdfd1.getObjectPropertySet().contains(predicate)
 						&& rdfd1.getIndividualSet().contains(object)) {
-					Var individualVar = Var.alloc(individualVarTable.generateVarIfAbsent(subj.getURI()));
-					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(obj.getURI()));
+					Var individualVar = Var
+							.alloc(individualVarTable.generateVarIfAbsent(subj.getURI(), TEMPLATE_VAR_INDIVIDUAL));
+					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(obj.getURI(), TEMPLATE_VAR_CLASS));
 					it.set(new TriplePath(new Triple(individualVar, tp.getPredicate(), classVar)));
 				}
 				//
@@ -127,7 +126,7 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 				System.out.println("subj.isURI() && pred.isURI() && obj.isLiteral()");
 				// Var literalVar1 = Var.alloc(
 				// LiteralVarMapping.generateIFAbsentLiteralVar(obj.toString()));
-				Var literalVar1 = Var.alloc(literalVarTable.generateVarIfAbsent(obj.toString()));
+				Var literalVar1 = Var.alloc(literalVarTable.generateVarIfAbsent(obj.toString(), TEMPLATE_VAR_LITERAL));
 				it.set(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), literalVar1)));
 
 			}
@@ -151,7 +150,7 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 				// Var predVar1 = Var.alloc( pred.getURI() );
 				// Var literalVar1 = Var.alloc(
 				// LiteralVarMapping.generateIFAbsentLiteralVar(obj.toString()));
-				Var literalVar1 = Var.alloc(literalVarTable.generateVarIfAbsent(obj.toString()));
+				Var literalVar1 = Var.alloc(literalVarTable.generateVarIfAbsent(obj.toString(), TEMPLATE_VAR_LITERAL));
 				it.set(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), literalVar1)));
 
 			}

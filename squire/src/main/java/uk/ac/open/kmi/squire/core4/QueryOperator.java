@@ -1,11 +1,7 @@
 package uk.ac.open.kmi.squire.core4;
 
-import uk.ac.open.kmi.squire.entityvariablemapping.ClassVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.DatatypePropertyVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.IndividualVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.LiteralVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.ObjectPropertyVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.RDFVocVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.GeneralVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 
 public abstract class QueryOperator extends AbstractQueryRecommendationObservable {
 
@@ -13,49 +9,45 @@ public abstract class QueryOperator extends AbstractQueryRecommendationObservabl
 		OBJECT, PREDICATE, SUBJECT
 	}
 
-	protected static final String CLASS_TEMPLATE_VAR = "ct";
-	protected static final String DT_PROP_TEMPLATE_VAR = "dpt";
-	protected static final String INDIVIDUAL_TEMPLATE_VAR = "it";
-	protected static final String LITERAL_TEMPLATE_VAR = "lt";
-	protected static final String OBJ_PROP_TEMPLATE_VAR = "opt";
+	public static final String TEMPLATE_VAR_CLASS = "ct";
+	public static final String TEMPLATE_VAR_PROP_DT = "dpt";
+	public static final String TEMPLATE_VAR_INDIVIDUAL = "it";
+	public static final String TEMPLATE_VAR_LITERAL = "lt";
+	public static final String TEMPLATE_VAR_PROP_OBJ = "opt";
 
-	protected ClassVarMapping classVarTable;
-	protected DatatypePropertyVarMapping datatypePropertyVarTable;
-	protected IndividualVarMapping individualVarTable;
-	protected LiteralVarMapping literalVarTable;
-	protected ObjectPropertyVarMapping objectProperyVarTable;
-	protected RDFVocVarMapping rdfVocVarTable;
+	protected VarMapping classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
+			objectProperyVarTable, rdfVocVarTable;
 
 	protected QueryOperator() {
-		classVarTable = new ClassVarMapping();
-		individualVarTable = new IndividualVarMapping();
-		literalVarTable = new LiteralVarMapping();
-		objectProperyVarTable = new ObjectPropertyVarMapping();
-		datatypePropertyVarTable = new DatatypePropertyVarMapping();
-		rdfVocVarTable = new RDFVocVarMapping();
+		classVarTable = new GeneralVarMapping();
+		individualVarTable = new GeneralVarMapping();
+		literalVarTable = new GeneralVarMapping();
+		objectProperyVarTable = new GeneralVarMapping();
+		datatypePropertyVarTable = new GeneralVarMapping();
+		rdfVocVarTable = new GeneralVarMapping();
 	}
 
-	public ClassVarMapping getClassVarTable() {
+	public VarMapping getClassVarTable() {
 		return classVarTable;
 	}
 
-	public DatatypePropertyVarMapping getDatatypePropertyVarTable() {
+	public VarMapping getDatatypePropertyVarTable() {
 		return datatypePropertyVarTable;
 	}
 
-	public IndividualVarMapping getIndividualVarTable() {
+	public VarMapping getIndividualVarTable() {
 		return individualVarTable;
 	}
 
-	public LiteralVarMapping getLiteralVarTable() {
+	public VarMapping getLiteralVarTable() {
 		return literalVarTable;
 	}
 
-	public ObjectPropertyVarMapping getObjectProperyVarTable() {
+	public VarMapping getObjectProperyVarTable() {
 		return objectProperyVarTable;
 	}
 
-	public RDFVocVarMapping getRdfVocVarTable() {
+	public VarMapping getRdfVocVarTable() {
 		return rdfVocVarTable;
 	}
 

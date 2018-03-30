@@ -11,8 +11,6 @@ import java.util.Set;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.ElementWalker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionVisitor;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
@@ -22,12 +20,6 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
  * @author carloallocca
  */
 public class QuerySpecificityDistance {
-
-	private final Logger log = LoggerFactory.getLogger(getClass());
-
-	public QuerySpecificityDistance() {
-		super();
-	}
 
 	public float computeQSDwrtQueryVariable(Query qO, Query qR) {
 		float dist;

@@ -80,7 +80,6 @@ public class TestJenaAssumptions {
 
 	private TriplePath makeTpVars(String s, String p, String o) {
 		return new TriplePath(new Triple(Var.alloc(s), Var.alloc(p), Var.alloc(o)));
-
 	}
 
 }

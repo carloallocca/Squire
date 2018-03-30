@@ -8,7 +8,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.http.HttpResponse;
@@ -22,8 +28,10 @@ import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,13 +194,158 @@ public class SparqlUtils {
 		return output.stream().distinct().collect(Collectors.toList());
 	}
 
+	/**
+	 * * A utility method to expand a SPARQL SELECT result set with the values of
+	 * variables mapped to existing ones. This is useful if, for example, the query
+	 * was reduced before sending it to an endpoint. In that case, this function
+	 * will rebuild the solution space as the cross product between the reduced
+	 * variables and the "surviving" ones (i.e. either not reduced at all or
+	 * retained by the reduction).
+	 * 
+	 * @param solution
+	 *            the original result set
+	 * @param reducedVars
+	 *            a mapping of retained variables to set of reduced ones
+	 * @return the reconstructed result set
+	 */
+	public static List<QuerySolution> inflateResultSet(List<QuerySolution> solution, Map<Var, Set<Var>> reducedVars) {
+		log.debug("Inflating a result set of size {}", solution.size());
+		log.debug("Reduction map follows:");
+		log.debug("{}", reducedVars);
+
+		final List<QuerySolution> inflated = new ArrayList<>();
+
+		// Example : { p1: "A" } -> [ { y1: "X" } , { y1: "Y" } ]
+		// (assuming y2 is reduced into y1)
+		// Cannot directly use QuerySolution because equivalence does not seem to be
+		// implemented for that class. That sucks but what can we do.
+		Map<Map<String, RDFNode>, Set<Map<String, RDFNode>>> fixed2kept = new HashMap<>();
+
+		// Run a full scan to populate the above
+		for (QuerySolution sol : solution) {
+			QuerySolutionMap fixedSlice = new QuerySolutionMap();
+			QuerySolutionMap keptSlice = new QuerySolutionMap();
+			for (Iterator<String> it = sol.varNames(); it.hasNext();) {
+				String v = it.next();
+				if (reducedVars.containsKey(Var.alloc(v))) keptSlice.add(v, sol.get(v));
+				else fixedSlice.add(v, sol.get(v));
+			}
+			if (!fixed2kept.containsKey(fixedSlice.asMap())) fixed2kept.put(fixedSlice.asMap(), new HashSet<>());
+			fixed2kept.get(fixedSlice.asMap()).add(keptSlice.asMap());
+		}
+
+		for (Map<String, RDFNode> fixed : fixed2kept.keySet()) {
+			log.trace("Fixed solution: {}", fixed);
+			// Expand the other part of each reduced solution
+			for (Map<String, RDFNode> kepts : fixed2kept.get(fixed)) {
+				log.trace(" ... kept: {}", kepts);
+				QuerySolutionMap solNu = new QuerySolutionMap();
+				// Add the part of the solution that is not reduced
+				for (Entry<String, RDFNode> entry : fixed.entrySet())
+					solNu.add(entry.getKey(), entry.getValue());
+				// Process every "kept" variable from the expandable part
+				for (Entry<String, RDFNode> entry : kepts.entrySet()) {
+					// First add the kept value
+					solNu.add(entry.getKey(), entry.getValue());
+					log.trace(" ..... added: {} - {}", entry.getKey(), entry.getValue());
+					// Then iteratively expand every reduced variable over the kept one
+					inflateSolution(solNu, reducedVars, fixed2kept, fixed, inflated);
+				}
+			}
+		}
+		log.debug("DONE. Inflated to size {}", inflated.size());
+		return inflated;
+	}
+
 	public static boolean isValidUri(String uri) {
 		try {
-			IRIFactory.iriImplementation().create(uri);// = IRIResolver(uri);
+			IRIFactory.iriImplementation().create(uri); // = IRIResolver(uri);
 			return true;
 		} catch (Exception e1) {
 			return false;
 		}
+	}
+
+	/**
+	 * The recursive call of the {@link #inflateResultSet(List, Map)} function,
+	 * operating on a single solution.
+	 * 
+	 * @param solution
+	 *            the (possibly partial) SPARQL SELECT solution being inflated
+	 * @param kept
+	 *            the variable (retained, i.e. not reduced) to be inspected for
+	 *            reductions
+	 * @param reduced
+	 *            the variable (reduced to kept) being inspected: determines the
+	 *            recursive step
+	 * @param reducedVars
+	 *            the mapping from kept variables to sets of reduced variables, used
+	 *            to call further recursions and check when the process is complete
+	 * @param expansionPlan
+	 *            this is actually the entire result set, but split into a mapping
+	 *            from "fixed" parts of solutions (i.e. neither kept not reduced) to
+	 *            the kept ones
+	 * @param fixedPart
+	 *            the key of the expansionPlan being inspected
+	 * @param result
+	 *            the list of {@link QuerySolution}s where the computation is being
+	 *            written to
+	 */
+	private static void inflateSolution(QuerySolutionMap solution, Map<Var, Set<Var>> reducedVars,
+			Map<Map<String, RDFNode>, Set<Map<String, RDFNode>>> expansionPlan, Map<String, RDFNode> fixedPart,
+			final List<QuerySolution> result) {
+		log.trace("Solution:");
+		log.trace("{}", solution);
+
+		// If the solution can no longer be expanded, add it to the final list...
+		boolean complete = true;
+		for (Entry<Var, Set<Var>> entry : reducedVars.entrySet()) {
+			if (!solution.contains(entry.getKey().getName())) {
+				complete = false;
+				break;
+			}
+			for (Var v : entry.getValue()) {
+				if (!solution.contains(v.getName())) {
+					complete = false;
+					break;
+				}
+			}
+		}
+		if (complete) {
+			log.trace("... is complete, so adding to result set.");
+			result.add(solution);
+			return;
+		}
+		// TODO can we reduce this O(n^4) complexity, even though n is small for most?
+		for (Var kept : reducedVars.keySet()) {
+			log.trace("... - kept variable : {}", kept);
+			// iterate over the (pre-processed) variable-value bindings of the result set
+			for (Map<String, RDFNode> keptBind : expansionPlan.get(fixedPart))
+				for (Entry<String, RDFNode> entry : keptBind.entrySet()) {
+					String var = entry.getKey();
+					// Add the retained binding if not present.
+					// Iterate over e.g. { y1:X } , { y2:Y }
+					log.trace(" ... processing binding: {} - {}", var, entry.getValue());
+					if (!solution.contains(var)) solution.add(var, entry.getValue());
+					// Recursively expand the solution by re-adding the value for the variables that
+					// were reduced into the kept one.
+					for (Var reduced : reducedVars.get(kept)) {
+						// Each reduced variable generates a new (cloned) solution, so recurse into it
+						log.trace("... - reduced variable : {}", reduced);
+						if (solution.contains(kept.getName()) && !solution.contains(reduced.getName())
+								&& reducedVars.get(kept).contains(reduced)) {
+							log.trace(" ... performing expansion ...");
+							QuerySolutionMap newSol = new QuerySolutionMap();
+							newSol.addAll(solution);
+							newSol.add(reduced.getName(), entry.getValue());
+							log.trace(" ..... added: {} - {}", reduced.getName(), entry.getValue());
+							inflateSolution(newSol, reducedVars, expansionPlan, fixedPart, result);
+						}
+					}
+				}
+
+		}
+
 	}
 
 }

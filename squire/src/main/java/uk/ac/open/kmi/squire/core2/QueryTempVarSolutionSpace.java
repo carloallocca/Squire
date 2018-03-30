@@ -6,20 +6,18 @@
 package uk.ac.open.kmi.squire.core2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.syntax.Element;
@@ -32,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQTemplateVariableVisitor;
+import uk.ac.open.kmi.squire.sparqlqueryvisitor.TemplateVariableScanner;
 import uk.ac.open.kmi.squire.utils.SparqlUtils;
 import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
 
@@ -49,8 +47,24 @@ import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
  */
 public class QueryTempVarSolutionSpace {
 
+	private class NotTemplatedException extends Exception {
+		private static final long serialVersionUID = 5830516022506521166L;
+		private Query q;
+
+		public NotTemplatedException(Query q) {
+			this.q = q;
+		}
+
+		public Query getQuery() {
+			return this.q;
+		}
+	}
+
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
+	/**
+	 * Maps the "kept" variable to the reduced ones.
+	 */
 	private Map<Var, Set<Var>> reductions = new HashMap<>();
 
 	/**
@@ -62,36 +76,34 @@ public class QueryTempVarSolutionSpace {
 	 *             if the query is too general (e.g. too many variables and few
 	 *             URIs) to be safely executed.
 	 */
-	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2) throws TooGeneralException {
+	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2, Var... projectToThese)
+			throws TooGeneralException {
 		List<QuerySolution> qTsol;
-
-		// 0. Only proceed if the input query has some template variables.
-		Set<Var> templateVarSet = getQueryTemplateVariableSet(qChild);
-		if (templateVarSet.size() > 0) try {
-
+		// Defer the check for template variables to the templatizeAndReduce() function.
+		try {
 			// 1. Transform the query qChild so that only template variables are projected.
-			Query qT = templatizeAndReduce(qChild);
-
+			Query qT = templatizeAndReduce(qChild, projectToThese);
 			// 1a. Check if the resulting query is not too general to be executed.
 			checkGenerality(qT);
-
 			// 2. Compute the solution space for the templated (and possibly reduced) query.
 			log.debug("Computing solution space for subquery:");
 			log.debug("{}", qT);
 			String res = SparqlUtils.doRawQuery(qT.toString(), rdfd2.getEndPointURL().toString());
 			qTsol = SparqlUtils.extractProjectedValues(res, qT.getProjectVars());
-
 			// 2a. Re-expand the solution space to include the variables that were reduced
 			// earlier.
-			qTsol = reinstateReducedBindings(qTsol);
+			Map<Var, Set<Var>> diocane = filter(reductions, qT.getProjectVars().toArray(new Var[0]));
+			qTsol = SparqlUtils.inflateResultSet(qTsol, diocane);
 			log.debug(" ... Solution space size = {} ", qTsol.size());
 		} catch (SparqlException ex) {
 			log.error("Connection failed while checking solution space.", ex);
 			log.error("Assuming empty solution space.");
 			qTsol = new ArrayList<>();
+		} catch (NotTemplatedException ex) {
+			log.error("Apparently the query has no template variables.");
+			log.error("Assuming empty solution space.");
+			qTsol = new ArrayList<>();
 		}
-		else qTsol = new ArrayList<>();
-
 		return qTsol;
 	}
 
@@ -113,58 +125,29 @@ public class QueryTempVarSolutionSpace {
 		if (throwIt[0]) throw new TooGeneralException(q);
 	}
 
-	private Set<Var> getQueryTemplateVariableSet(Query qR) {
-		SQTemplateVariableVisitor v = new SQTemplateVariableVisitor();
-		// ... This will walk through all parts of the query
-		ElementWalker.walk(qR.getQueryPattern(), v);
-		return v.getQueryTemplateVariableSet();
-	}
-
-	/**
-	 * If the query was reduced by a call to {@link #templatizeAndReduce(Query)}
-	 * before sending it to the endpoint, this function will attempt to rebuild the
-	 * solution space as the cross product between the reduced variables and the
-	 * surviving ones.
-	 * 
-	 * @param solution
-	 * @return
-	 */
-	private List<QuerySolution> reinstateReducedBindings(List<QuerySolution> solution) {
-
-		// Cannot directly use QuerySolution because equivalence does not seem to be
-		// implemented for that class.
-		Set<Map<String, RDFNode>> expanded = new HashSet<>();
-
-		for (QuerySolution sol : solution) {
-			// For every reduced solution generate the cross-product solutions.
-			Iterator<QuerySolution> it2 = solution.iterator();
-			while (it2.hasNext()) {
-				QuerySolution tmpSol = it2.next();
-				QuerySolutionMap solNu = new QuerySolutionMap();
-				// Iterate over all the variables in the solution and check if other variables
-				// were reduced into them. If so, reconstruct their values.
-				for (Iterator<String> it = sol.varNames(); it.hasNext();) {
-					String v = it.next();
-					solNu.add(v, sol.get(v));
-					Var vv = Var.alloc(v);
-					if (reductions.containsKey(vv)) for (Var reduced : reductions.get(vv))
-						solNu.add(reduced.getName(), tmpSol.get(v));
-				}
-				expanded.add(solNu.asMap());
+	private Map<Var, Set<Var>> filter(Map<Var, Set<Var>> reductions, Var... variables) {
+		Set<Var> projv = new HashSet<>(Arrays.asList(variables));
+		Map<Var, Set<Var>> filtered = new HashMap<>();
+		for (Var v : reductions.keySet()) {
+			// If the key is filtered in, copy the whole value
+			if (projv.contains(v)) filtered.put(v, new HashSet<>(reductions.get(v)));
+			else {
+				for (Var r : reductions.get(v))
+					if (projv.contains(r)) {
+						if (!filtered.containsKey(v)) filtered.put(v, new HashSet<>());
+						filtered.get(v).add(r);
+					}
 			}
 
 		}
+		return filtered;
+	}
 
-		// Now re-copy everything into a list of the desired return type.
-		List<QuerySolution> result = new ArrayList<>();
-		for (Map<String, RDFNode> exp : expanded) {
-			QuerySolutionMap sol = new QuerySolutionMap();
-			for (Entry<String, RDFNode> entry : exp.entrySet())
-				sol.add(entry.getKey(), entry.getValue());
-			result.add(sol);
-		}
-
-		return result;
+	private Set<Var> getQueryTemplateVariableSet(Query qR) {
+		TemplateVariableScanner v = new TemplateVariableScanner();
+		// ... This will walk through all parts of the query
+		ElementWalker.walk(qR.getQueryPattern(), v);
+		return v.getTemplateVariables();
 	}
 
 	/**
@@ -180,9 +163,14 @@ public class QueryTempVarSolutionSpace {
 	 * @param queryOrig
 	 * @return
 	 */
-	private Query templatizeAndReduce(Query queryOrig) {
+	private Query templatizeAndReduce(Query queryOrig, Var... projectToThese) throws NotTemplatedException {
 		log.debug("Original query: {}", queryOrig);
-		Set<Var> templateVarSet = getQueryTemplateVariableSet(queryOrig);
+		Set<Var> templateVars = getQueryTemplateVariableSet(queryOrig);
+		if (projectToThese.length > 0) {
+			log.debug("Projection forced to the following variables: {}", (Object[]) projectToThese);
+			templateVars.retainAll(new HashSet<>(Arrays.asList(projectToThese)));
+		}
+		if (templateVars.isEmpty()) throw new NotTemplatedException(queryOrig);
 		Set<Var> usedVars = new HashSet<>();
 		/*
 		 * The subject node and the corresponding TP that we choose to keep.
@@ -190,41 +178,67 @@ public class QueryTempVarSolutionSpace {
 		final Map<Node, TriplePath> subjectsWithGenericTPs = new HashMap<>();
 		Element qp = queryOrig.getQueryPattern();
 		final ElementGroup qpNu = new ElementGroup();
-
 		ElementWalker.walk(qp, new ElementVisitorBase() {
 
 			@Override
 			public void visit(ElementPathBlock el) {
-				ElementPathBlock elNu = new ElementPathBlock();
+				final ElementPathBlock pathBlock = new ElementPathBlock();
 				// Here we decide what to copy into qpNu and what not to
+
+				Set<Var> projected = new HashSet<>(Arrays.asList(projectToThese));
+				// Do a first scan to decide which TPs to keep
 				for (Iterator<TriplePath> it = el.patternElts(); it.hasNext();) {
 					TriplePath tp = it.next();
-					// Only add the first trivial TP (i.e. predicate and object are variables) for
-					// each subject
+					if (projected.contains(tp.getSubject()) || projected.contains(tp.getPredicate())
+							|| projected.contains(tp.getObject()))
+						try {
+						if (tp.getPredicate().isVariable() && tp.getObject().isVariable()) keep(tp, pathBlock);
+					} catch (NotTemplatedException ex) {
+						throw new RuntimeException(ex);
+					}
+				}
+				// Do another scan for reductions
+				for (Iterator<TriplePath> it = el.patternElts(); it.hasNext();) {
+					TriplePath tp = it.next();
+					// For each subject, only keep the first trivial TP (i.e. where both predicate
+					// and object are variables) that we haven't already kept.
+					Node s = tp.getSubject();
 					if (tp.getPredicate().isVariable() && tp.getObject().isVariable()) {
 						Var p = (Var) tp.getPredicate(), o = (Var) tp.getObject();
-						if (!subjectsWithGenericTPs.containsKey(tp.getSubject())) {
-							subjectsWithGenericTPs.put(tp.getSubject(), tp);
-							elNu.addTriple(tp);
-							usedVars.add(p);
-							reductions.put(p, new HashSet<>());
-							usedVars.add(o);
-							reductions.put(o, new HashSet<>());
-							if (tp.getSubject().isVariable()) usedVars.add((Var) tp.getSubject());
+						if (!subjectsWithGenericTPs.containsKey(s)) {
+							try {
+								keep(tp, pathBlock);
+							} catch (NotTemplatedException ex) {
+								throw new RuntimeException(ex);
+							}
 						} else {
 							// memorize the variables for the other trivial TPs.
-							TriplePath kept = subjectsWithGenericTPs.get(tp.getSubject());
+							TriplePath kept = subjectsWithGenericTPs.get(s);
 							reductions.get((Var) kept.getPredicate()).add(p);
 							reductions.get((Var) kept.getObject()).add(o);
 						}
 					} else {
-						elNu.addTriple(tp); // Always add nontrivial TPs
-						if (tp.getSubject().isVariable()) usedVars.add((Var) tp.getSubject());
+						pathBlock.addTriple(tp); // Always add nontrivial TPs
+						if (s.isVariable()) usedVars.add((Var) s);
 						if (tp.getPredicate().isVariable()) usedVars.add((Var) tp.getPredicate());
 						if (tp.getObject().isVariable()) usedVars.add((Var) tp.getObject());
 					}
 				}
-				qpNu.addElement(elNu);
+				qpNu.addElement(pathBlock);
+			}
+
+			private void keep(TriplePath tp, ElementPathBlock pathBlock) throws NotTemplatedException {
+				if (tp.getPredicate().isConcrete() || tp.getObject().isConcrete())
+					throw new NotTemplatedException(queryOrig);
+				Node s = tp.getSubject();
+				Var p = (Var) tp.getPredicate(), o = (Var) tp.getObject();
+				subjectsWithGenericTPs.put(s, tp);
+				pathBlock.addTriple(tp);
+				usedVars.add(p);
+				if (!reductions.containsKey(p)) reductions.put(p, new HashSet<>());
+				usedVars.add(o);
+				if (!reductions.containsKey(o)) reductions.put(o, new HashSet<>());
+				if (s.isVariable()) usedVars.add((Var) s);
 			}
 
 		});
@@ -233,7 +247,7 @@ public class QueryTempVarSolutionSpace {
 		qT.setDistinct(true);
 		qT.setQueryPattern(qpNu);
 		qT.setQuerySelectType();
-		for (Var tv : templateVarSet)
+		for (Var tv : templateVars)
 			if (usedVars.contains(tv)) qT.addResultVar(tv.getName());
 		log.debug("Reduced query: {}", qT);
 		return qT;

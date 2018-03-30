@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.open.kmi.squire.processor;
+package uk.ac.open.kmi.squire.operation;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.reasoner.TriplePattern;

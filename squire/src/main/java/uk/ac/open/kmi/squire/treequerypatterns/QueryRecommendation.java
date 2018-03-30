@@ -5,6 +5,12 @@
  */
 package uk.ac.open.kmi.squire.treequerypatterns;
 
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_CLASS;
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_INDIVIDUAL;
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_LITERAL;
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_PROP_DT;
+import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_PROP_OBJ;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,12 +31,8 @@ import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
 
 import uk.ac.open.kmi.squire.core.QueryScorePair;
-import uk.ac.open.kmi.squire.entityvariablemapping.ClassVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.DatatypePropertyVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.IndividualVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.LiteralVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.ObjectPropertyVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.RDFVocVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.GeneralVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 import uk.ac.open.kmi.squire.evaluation.QueryGPESim;
 import uk.ac.open.kmi.squire.evaluation.QueryResultTypeSimilarity;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
@@ -48,13 +50,6 @@ import uk.ac.open.kmi.squire.utils.TreeNodez;
  */
 public class QueryRecommendation<T> {
 
-	private static String CLASS_TEMPLATE_VAR = "ct";
-
-	private static String OBJ_PROP_TEMPLATE_VAR = "opt";
-
-	private static String DT_PROP_TEMPLATE_VAR = "dpt";
-	private static String INDIVIDUAL_TEMPLATE_VAR = "it";
-	private static String LITERAL_TEMPLATE_VAR = "lt";
 	private static String INSTANCE_OP = "I";
 
 	private static String REMOVE_TP_OP = "R";
@@ -71,13 +66,8 @@ public class QueryRecommendation<T> {
 	// private ArrayList<String> recommendedQueryList;
 
 	private List<QueryScorePair> queryRecommendatedList = new ArrayList<>();
-	private LiteralVarMapping literalVarTable;
-	private ClassVarMapping classVarTable;
-	private DatatypePropertyVarMapping datatypePropertyVarTable;
-	private IndividualVarMapping individualVarTable;
-
-	private ObjectPropertyVarMapping objectProperyVarTable;
-	private RDFVocVarMapping rdfVocVarTable;
+	private VarMapping literalVarTable, classVarTable, datatypePropertyVarTable, individualVarTable,
+			objectProperyVarTable, rdfVocVarTable;
 
 	public QueryRecommendation(Query query, IRDFDataset d1, IRDFDataset d2) {
 		// this.root = node;
@@ -88,12 +78,12 @@ public class QueryRecommendation<T> {
 		// this.originalQuery = query; "+
 		// originalQuery);
 		rdfd1 = d1;
-		classVarTable = new ClassVarMapping();
-		individualVarTable = new IndividualVarMapping();
-		literalVarTable = new LiteralVarMapping();
-		objectProperyVarTable = new ObjectPropertyVarMapping();
-		datatypePropertyVarTable = new DatatypePropertyVarMapping();
-		rdfVocVarTable = new RDFVocVarMapping();
+		classVarTable = new GeneralVarMapping();
+		individualVarTable = new GeneralVarMapping();
+		literalVarTable = new GeneralVarMapping();
+		objectProperyVarTable = new GeneralVarMapping();
+		datatypePropertyVarTable = new GeneralVarMapping();
+		rdfVocVarTable = new GeneralVarMapping();
 
 		rdfd2 = d2;
 
@@ -464,28 +454,28 @@ public class QueryRecommendation<T> {
 			// System.out.println("[QTTree::generalize] The Object is " + obj);
 			// if (rdfd1.getClassSet().contains(o) && !(rdfd2.getClassSet().contains(o))) {
 			if (!(rdfd2.getClassSet().contains(o))) {
-				result = Var.alloc(classVarTable.generateVarIfAbsent(o));
+				result = Var.alloc(classVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_CLASS));
 				return result;
 			} else // if (rdfd1.isInIndividualSet(o) && !(rdfd2.isInIndividualSet(o))) {
 			{
 				if (!(rdfd2.isInIndividualSet(o))) {
-					result = Var.alloc(individualVarTable.generateVarIfAbsent(o));
+					result = Var.alloc(individualVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_INDIVIDUAL));
 					return result;
 				} else // if (rdfd1.isInObjectPropertySet(o) && !(rdfd2.isInObjectPropertySet(o))) {
 				{
 					if (!(rdfd2.isInObjectPropertySet(o))) {
-						result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(o));
+						result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_PROP_OBJ));
 						return result;
 					} else // if (rdfd1.isInDatatypePropertySet(o) && !(rdfd2.isInDatatypePropertySet(o)))
 							// {
 					{
 						if (!(rdfd2.isInDatatypePropertySet(o))) {
-							result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(o));
+							result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_PROP_DT));
 							return result;
 						} else // if (rdfd1.isInRDFVocabulary(o) && !(rdfd2.isInRDFVocabulary(o))) {
 						{
 							if (!(rdfd2.isInRDFVocabulary(o))) {
-								result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(o));
+								result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(o, "rdf"));
 								return result;
 							} else {
 								result = null;
@@ -502,7 +492,7 @@ public class QueryRecommendation<T> {
 			// "+rdfd2.getLiteralSet().toString());
 
 			if (rdfd1.isInLiteralSet(objAsString) && !(rdfd2.isInLiteralSet(objAsString))) {
-				result = Var.alloc(literalVarTable.generateVarIfAbsent(objAsString));
+				result = Var.alloc(literalVarTable.generateVarIfAbsent(objAsString, TEMPLATE_VAR_LITERAL));
 				return result;
 			} else {
 				result = null;
@@ -530,34 +520,34 @@ public class QueryRecommendation<T> {
 			String o = obj.getURI();
 			// System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
 			if ((rdfd1.getClassSet().contains(o)) && !(rdfd2.getClassSet().contains(o))) {
-				result = Var.alloc(classVarTable.generateVarIfAbsent(o));
+				result = Var.alloc(classVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_CLASS));
 				return result;
 			} else if (rdfd1.isInObjectPropertySet(o) && !(rdfd2.isInObjectPropertySet(o))) {
 				// if (!(rdfd2.isInObjectPropertySet(o))) {
-				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(o));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_PROP_OBJ));
 				// System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(o) && !(rdfd2.isInDatatypePropertySet(o))) {
 				// if (!(rdfd2.isInDatatypePropertySet(o))) {
 
-				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(o));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_PROP_DT));
 				// System.out.println("[QTTree::generalize] The Sub is an datatype Property
 				// URI");
 				return result;
 			} else if (rdfd1.isInRDFVocabulary(o) && !(rdfd2.isInRDFVocabulary(o))) {
 				// if (!(rdfd2.isInRDFVocabulary(o))) {
 
-				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(o));
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(o, "rdf"));
 				// System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
 				return result;
 			} else {
 				// this means that it is an individual
-				result = Var.alloc(individualVarTable.generateVarIfAbsent(o));
+				result = Var.alloc(individualVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_INDIVIDUAL));
 				return result;
 			}
 		} else if (obj.isLiteral()) {
 			String subjAsString = obj.getLiteralValue().toString();
-			result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString));
+			result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString, TEMPLATE_VAR_LITERAL));
 			return result;
 		} else {
 			// subject = tp.getSubject();
@@ -595,7 +585,7 @@ public class QueryRecommendation<T> {
 			if (rdfd1.isInObjectPropertySet(pre) && !(rdfd2.isInObjectPropertySet(pre))) {
 				// if (!(rdfd2.isInObjectPropertySet(pre)) && !(rdfd2.isInRDFVocabulary(pre)) &&
 				// !(rdfd1.isInDatatypePropertySet(pre))) {
-				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(pre));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(pre, TEMPLATE_VAR_PROP_OBJ));
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(pre) && !(rdfd2.isInDatatypePropertySet(pre))) {
 				// {
@@ -609,7 +599,7 @@ public class QueryRecommendation<T> {
 				// rdfd2.isInObjectPropertySet(pre) "
 				// + rdfd1.isInObjectPropertySet(pre));
 
-				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(pre));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(pre, TEMPLATE_VAR_PROP_DT));
 				return result;
 
 				// if (!(rdfd2.isInDatatypePropertySet(pre)) && !(rdfd2.isInRDFVocabulary(pre)))
@@ -620,7 +610,7 @@ public class QueryRecommendation<T> {
 				// }
 			} else if (rdfd1.isInRDFVocabulary(pre) && !(rdfd2.isInRDFVocabulary(pre))) {
 				// if ((rdfd2.isInRDFVocabulary(pre))) {
-				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(pre));
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(pre, "rdf"));
 				return result;
 			} else {
 				// System.out.println("[QTTree::ifPredicateIsNotD2ThenGenerateVariable(Node
@@ -652,10 +642,10 @@ public class QueryRecommendation<T> {
 		if (pred.isURI()) {
 			String pre = pred.getURI();
 			if (rdfd1.isInObjectPropertySet(pre) && !(rdfd2.isInObjectPropertySet(pre))) {
-				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(pre));
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(pre, TEMPLATE_VAR_PROP_OBJ));
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(pre) && !(rdfd2.isInDatatypePropertySet(pre))) {
-				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(pre));
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(pre, TEMPLATE_VAR_PROP_DT));
 				return result;
 			} // else if (rdfd1.isInRDFVocabulary(pre) && !(rdfd2.isInRDFVocabulary(pre))) {
 				// result = Var.alloc(rdfVocVarTable.generateIFAbsentRDFVocVar(pre));
@@ -682,33 +672,25 @@ public class QueryRecommendation<T> {
 		if (subj.isURI()) {
 			// s= classURI
 			String sub = subj.getURI();
-			// System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
 			if ((rdfd1.getClassSet().contains(subj)) && !(rdfd2.getClassSet().contains(subj))) {
 				// if (!rdfd2.getClassSet().contains(o)) {
-
-				result = Var.alloc(classVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is a class URI");
+				result = Var.alloc(classVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_CLASS));
 				return result;
 			} else if (rdfd1.isInIndividualSet(sub) && !(rdfd2.isInIndividualSet(sub))) {
 				// if (!(rdfd2.isInIndividualSet(o))) {
-				result = Var.alloc(individualVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is an individual URI");
+				result = Var.alloc(individualVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_INDIVIDUAL));
 				return result;
 			} else if (rdfd1.isInObjectPropertySet(sub) && !(rdfd2.isInObjectPropertySet(sub))) {
 				// if (!(rdfd2.isInObjectPropertySet(o))) {
-				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_PROP_OBJ));
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(sub) && !(rdfd2.isInDatatypePropertySet(sub))) {
 				// if (!(rdfd2.isInDatatypePropertySet(o))) {
-				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is an datatype Property
-				// URI");
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_PROP_DT));
 				return result;
 			} else if (rdfd1.isInRDFVocabulary(sub) && !(rdfd2.isInRDFVocabulary(sub))) {
 				// if (!(rdfd2.isInRDFVocabulary(o))) {
-				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(sub, "rdf"));
 				return result;
 			} else {
 				// subject = tp.getSubject();
@@ -718,7 +700,7 @@ public class QueryRecommendation<T> {
 		} else if (subj.isLiteral()) {
 			String subjAsString = subj.getLiteralValue().toString();
 			if (rdfd1.isInLiteralSet(subjAsString) && !(rdfd2.isInLiteralSet(subjAsString))) {
-				result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString));
+				result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString, TEMPLATE_VAR_LITERAL));
 				return result;
 			} else {
 				// subject = tp.getSubject();
@@ -743,34 +725,29 @@ public class QueryRecommendation<T> {
 		if (subj.isURI()) {
 			// s= classURI
 			String sub = subj.getURI();
-			// System.out.println("[QTTree::generalize] The Sub is an URI " + subj);
 			if ((rdfd1.getClassSet().contains(subj)) && !(rdfd2.getClassSet().contains(subj))) {
-				result = Var.alloc(classVarTable.generateVarIfAbsent(sub));
+				result = Var.alloc(classVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_CLASS));
 				return result;
 			} else if (rdfd1.isInObjectPropertySet(sub) && !(rdfd2.isInObjectPropertySet(sub))) {
 				// if (!(rdfd2.isInObjectPropertySet(o))) {
-				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is an Object Property URI");
+				result = Var.alloc(objectProperyVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_PROP_OBJ));
 				return result;
 			} else if (rdfd1.isInDatatypePropertySet(sub) && !(rdfd2.isInDatatypePropertySet(sub))) {
 				// if (!(rdfd2.isInDatatypePropertySet(o))) {
-				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is an datatype Property
-				// URI");
+				result = Var.alloc(datatypePropertyVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_PROP_DT));
 				return result;
 			} else if (rdfd1.isInRDFVocabulary(sub) && !(rdfd2.isInRDFVocabulary(sub))) {
 				// if (!(rdfd2.isInRDFVocabulary(o))) {
-				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(sub));
-				// System.out.println("[QTTree::generalize] The Sub is an RDF voc term URI");
+				result = Var.alloc(rdfVocVarTable.generateVarIfAbsent(sub, "rdf"));
 				return result;
 			} else {
 				// this means that it is an individual
-				result = Var.alloc(individualVarTable.generateVarIfAbsent(sub));
+				result = Var.alloc(individualVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_INDIVIDUAL));
 				return result;
 			}
 		} else if (subj.isLiteral()) {
 			String subjAsString = subj.getLiteralValue().toString();
-			result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString));
+			result = Var.alloc(literalVarTable.generateVarIfAbsent(subjAsString, TEMPLATE_VAR_LITERAL));
 			return result;
 		} else {
 			// subject = tp.getSubject();
@@ -781,13 +758,11 @@ public class QueryRecommendation<T> {
 	}
 
 	private boolean isClassTemplateVariable(String name) {
-		return name.startsWith(CLASS_TEMPLATE_VAR); // To change body of generated methods, choose Tools |
-													// Templates.
+		return name.startsWith(TEMPLATE_VAR_CLASS);
 	}
 
 	private boolean isIndividualTemplateVariable(String name) {
-		return name.startsWith(INDIVIDUAL_TEMPLATE_VAR); // To change body of generated methods, choose Tools
-															// | Templates.
+		return name.startsWith(TEMPLATE_VAR_INDIVIDUAL);
 	}
 
 	private boolean isInTreeNodeIndex(TreeNodez<Query> currNode) {
@@ -841,12 +816,11 @@ public class QueryRecommendation<T> {
 	}
 
 	private boolean isLiteralTemplateVariable(String name) {
-		return name.startsWith(LITERAL_TEMPLATE_VAR); // To change body of generated methods, choose Tools |
-														// Templates.
+		return name.startsWith(TEMPLATE_VAR_LITERAL);
 	}
 
 	private boolean isPropertyTemplateVariable(String name) {
-		return name.startsWith(OBJ_PROP_TEMPLATE_VAR) || name.startsWith(DT_PROP_TEMPLATE_VAR);
+		return name.startsWith(TEMPLATE_VAR_PROP_OBJ) || name.startsWith(TEMPLATE_VAR_PROP_DT);
 	}
 
 	private boolean isTemplateVariable(String entity) {
@@ -1488,7 +1462,7 @@ public class QueryRecommendation<T> {
 							Query childQuery = QueryFactory.create(parentQuery.toString());
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
-							String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
+							String entityqO = this.classVarTable.getValueFromVar(templateVar.getVarName());
 							String entityqR = clas;
 							List<String> childOperationList = new ArrayList<>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -1537,7 +1511,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
+							String entityqO = this.individualVarTable.getValueFromVar(templateVarString);
 							String entityqR = individual;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -1591,7 +1565,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
+							String entityqO = this.literalVarTable.getValueFromVar(templateVarString);
 							String entityqR = literal;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -1650,10 +1624,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = "";
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							List<String> childOperationList = new ArrayList<>();
@@ -1724,10 +1698,10 @@ public class QueryRecommendation<T> {
 
 						String entityqO = null;
 						if (templateVarString.contains("opt")) {
-							entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+							entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 						}
 						if (templateVarString.contains("dpt")) {
-							entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+							entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 						}
 						String entityqR = property;
 						List<String> childOperationList = new ArrayList<>();
@@ -1794,7 +1768,7 @@ public class QueryRecommendation<T> {
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
 
-							String entityqO = this.classVarTable.getClassFromVar(templateVarString);
+							String entityqO = this.classVarTable.getValueFromVar(templateVarString);
 							String entityqR = clas;
 							List<String> childOperationList = new ArrayList<>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -1850,7 +1824,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
+							String entityqO = this.individualVarTable.getValueFromVar(templateVarString);
 							String entityqR = individual;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -1906,7 +1880,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
+							String entityqO = this.literalVarTable.getValueFromVar(templateVarString);
 							String entityqR = literal;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -1963,10 +1937,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = null;
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							List<String> childOperationList = new ArrayList<>();
@@ -2105,7 +2079,7 @@ public class QueryRecommendation<T> {
 							Query childQuery = QueryFactory.create(parentQuery.toString());
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
-							String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
+							String entityqO = this.classVarTable.getValueFromVar(templateVar.getVarName());
 							String entityqR = clas;
 							List<String> childOperationList = new ArrayList<>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2154,7 +2128,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
+							String entityqO = this.individualVarTable.getValueFromVar(templateVarString);
 							String entityqR = individual;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2208,7 +2182,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
+							String entityqO = this.literalVarTable.getValueFromVar(templateVarString);
 							String entityqR = literal;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2267,10 +2241,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = "";
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							List<String> childOperationList = new ArrayList<>();
@@ -2341,10 +2315,10 @@ public class QueryRecommendation<T> {
 
 						String entityqO = null;
 						if (templateVarString.contains("opt")) {
-							entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+							entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 						}
 						if (templateVarString.contains("dpt")) {
-							entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+							entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 						}
 						String entityqR = property;
 						List<String> childOperationList = new ArrayList<>();
@@ -2412,7 +2386,7 @@ public class QueryRecommendation<T> {
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
 
-							String entityqO = this.classVarTable.getClassFromVar(templateVarString);
+							String entityqO = this.classVarTable.getValueFromVar(templateVarString);
 							String entityqR = clas;
 							List<String> childOperationList = new ArrayList<>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2468,7 +2442,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
+							String entityqO = this.individualVarTable.getValueFromVar(templateVarString);
 							String entityqR = individual;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2524,7 +2498,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
+							String entityqO = this.literalVarTable.getValueFromVar(templateVarString);
 							String entityqR = literal;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2581,10 +2555,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = null;
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							ArrayList<String> childOperationList = new ArrayList();
@@ -2677,7 +2651,7 @@ public class QueryRecommendation<T> {
 							Query childQuery = QueryFactory.create(parentQuery.toString());
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
-							String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
+							String entityqO = this.classVarTable.getValueFromVar(templateVar.getVarName());
 							String entityqR = clas;
 							ArrayList<String> childOperationList = new ArrayList();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2728,7 +2702,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
+							String entityqO = this.individualVarTable.getValueFromVar(templateVarString);
 							String entityqR = individual;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2784,7 +2758,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
+							String entityqO = this.literalVarTable.getValueFromVar(templateVarString);
 							String entityqR = literal;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -2846,10 +2820,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = "";
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							ArrayList<String> childOperationList = new ArrayList();
@@ -2921,10 +2895,10 @@ public class QueryRecommendation<T> {
 
 						String entityqO = null;
 						if (templateVarString.contains("opt")) {
-							entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+							entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 						}
 						if (templateVarString.contains("dpt")) {
-							entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+							entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 						}
 						String entityqR = property;
 						ArrayList<String> childOperationList = new ArrayList();
@@ -2994,7 +2968,7 @@ public class QueryRecommendation<T> {
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
 
-							String entityqO = this.classVarTable.getClassFromVar(templateVarString);
+							String entityqO = this.classVarTable.getValueFromVar(templateVarString);
 							String entityqR = clas;
 							ArrayList<String> childOperationList = new ArrayList();
 							childOperationList.addAll(pNode.getOperationList());
@@ -3053,7 +3027,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.individualVarTable.getIndividualFromVar(templateVarString);
+							String entityqO = this.individualVarTable.getValueFromVar(templateVarString);
 							String entityqR = individual;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -3112,7 +3086,7 @@ public class QueryRecommendation<T> {
 							// Step 4: creating a childNode and we add it to the Tree, if it is not added
 							// alrady.
 
-							String entityqO = this.literalVarTable.getLiteralFromVar(templateVarString);
+							String entityqO = this.literalVarTable.getValueFromVar(templateVarString);
 							String entityqR = literal;
 							ArrayList<String> childOperationList = new ArrayList<String>();
 							childOperationList.addAll(pNode.getOperationList());
@@ -3172,10 +3146,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = null;
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							ArrayList<String> childOperationList = new ArrayList();
@@ -3305,7 +3279,7 @@ public class QueryRecommendation<T> {
 							Query childQuery = QueryFactory.create(parentQuery.toString());
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
-							String entityqO = this.classVarTable.getClassFromVar(templateVar.getVarName());
+							String entityqO = this.classVarTable.getValueFromVar(templateVar.getVarName());
 							String entityqR = clas;
 							ArrayList<String> childOperationList = new ArrayList();
 							childOperationList.addAll(pNode.getOperationList());
@@ -3478,10 +3452,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = "";
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							ArrayList<String> childOperationList = new ArrayList();
@@ -3545,10 +3519,10 @@ public class QueryRecommendation<T> {
 								NodeFactory.createURI(property));
 						String entityqO = null;
 						if (templateVarString.contains("opt")) {
-							entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+							entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 						}
 						if (templateVarString.contains("dpt")) {
-							entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+							entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 						}
 						String entityqR = property;
 						ArrayList<String> childOperationList = new ArrayList();
@@ -3612,7 +3586,7 @@ public class QueryRecommendation<T> {
 							childQuery = qi.instantiateVarTemplate(childQuery, templateVar,
 									NodeFactory.createURI(clas));
 
-							String entityqO = this.classVarTable.getClassFromVar(templateVarString);
+							String entityqO = this.classVarTable.getValueFromVar(templateVarString);
 							String entityqR = clas;
 							ArrayList<String> childOperationList = new ArrayList();
 							childOperationList.addAll(pNode.getOperationList());
@@ -3795,10 +3769,10 @@ public class QueryRecommendation<T> {
 
 							String entityqO = null;
 							if (templateVarString.contains("opt")) {
-								entityqO = this.objectProperyVarTable.getObjectProperyFromVar(templateVarString);
+								entityqO = this.objectProperyVarTable.getValueFromVar(templateVarString);
 							}
 							if (templateVarString.contains("dpt")) {
-								entityqO = this.datatypePropertyVarTable.getDatatypeProperyFromVar(templateVarString);
+								entityqO = this.datatypePropertyVarTable.getValueFromVar(templateVarString);
 							}
 							String entityqR = property;
 							ArrayList<String> childOperationList = new ArrayList();

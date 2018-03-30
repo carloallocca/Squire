@@ -111,16 +111,17 @@ public class Generalizer extends QueryOperator {
 		if (obj.isURI()) {
 			String o = obj.getURI();
 			if ((rdfd1.getClassSet().contains(o)) && !(rdfd2.getClassSet().contains(o)))
-				varName = classVarTable.generateVarIfAbsent(o);
+				varName = classVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_CLASS);
 			else if (rdfd1.isInObjectPropertySet(o) && !(rdfd2.isInObjectPropertySet(o)))
-				varName = objectProperyVarTable.generateVarIfAbsent(o);
+				varName = objectProperyVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_PROP_OBJ);
 			else if (rdfd1.isInDatatypePropertySet(o) && !(rdfd2.isInDatatypePropertySet(o)))
-				varName = datatypePropertyVarTable.generateVarIfAbsent(o);
+				varName = datatypePropertyVarTable.generateVarIfAbsent(o, TEMPLATE_VAR_PROP_DT);
 			else if (rdfd1.isInRDFVocabulary(o) && !(rdfd2.isInRDFVocabulary(o)))
-				varName = rdfVocVarTable.generateVarIfAbsent(o);
+				varName = rdfVocVarTable.generateVarIfAbsent(o, "rdf");
 			else return null;
 		} else if (obj.isLiteral()) {
-			varName = literalVarTable.generateVarIfAbsent(obj.getLiteralValue().toString());
+			varName = literalVarTable.generateVarIfAbsent(obj.getLiteralValue().toString(),
+					QueryOperator.TEMPLATE_VAR_LITERAL);
 		} else return null;
 		if (varName == null) throw new IllegalStateException("Object node generated a null variable name.");
 		return Var.alloc(varName);
@@ -138,10 +139,10 @@ public class Generalizer extends QueryOperator {
 		log.trace("rdfd2 datatype property list : {}", rdfd2.getDatatypePropertySet());
 		if (rdfd1.isInObjectPropertySet(p) && !(rdfd2.isInObjectPropertySet(p))) {
 			log.debug(" ... is an object property in <{}> and not in <{}>", rdfd1, rdfd2);
-			varName = objectProperyVarTable.generateVarIfAbsent(p);
+			varName = objectProperyVarTable.generateVarIfAbsent(p, TEMPLATE_VAR_PROP_OBJ);
 		} else if (rdfd1.isInDatatypePropertySet(p) && !(rdfd2.isInDatatypePropertySet(p))) {
 			log.debug(" ... is a datatype property in <{}> and not in <{}>", rdfd1, rdfd2);
-			varName = datatypePropertyVarTable.generateVarIfAbsent(p);
+			varName = datatypePropertyVarTable.generateVarIfAbsent(p, TEMPLATE_VAR_PROP_DT);
 		} else {
 			log.debug(" ... is either present both in <{}> and <{}>, or in neither. Will not generalize.", rdfd1,
 					rdfd2);
@@ -157,19 +158,20 @@ public class Generalizer extends QueryOperator {
 		if (subj.isURI()) {
 			String sub = subj.getURI();
 			if ((rdfd1.getClassSet().contains(sub)) && !(rdfd2.getClassSet().contains(sub)))
-				varName = classVarTable.generateVarIfAbsent(sub);
+				varName = classVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_CLASS);
 			else if (rdfd1.isInObjectPropertySet(sub) && !(rdfd2.isInObjectPropertySet(sub)))
-				varName = objectProperyVarTable.generateVarIfAbsent(sub);
+				varName = objectProperyVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_PROP_OBJ);
 			else if (rdfd1.isInDatatypePropertySet(sub) && !(rdfd2.isInDatatypePropertySet(sub)))
-				varName = datatypePropertyVarTable.generateVarIfAbsent(sub);
+				varName = datatypePropertyVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_PROP_DT);
 			else if (rdfd1.isInRDFVocabulary(sub) && !(rdfd2.isInRDFVocabulary(sub)))
-				varName = rdfVocVarTable.generateVarIfAbsent(sub);
+				varName = rdfVocVarTable.generateVarIfAbsent(sub, "rdf");
 			else
 				// We assume by exclusion that sub is an individual.
 				// XXX is that assumption correct?
-				varName = individualVarTable.generateVarIfAbsent(sub);
+				varName = individualVarTable.generateVarIfAbsent(sub, TEMPLATE_VAR_INDIVIDUAL);
 		} else if (subj.isLiteral()) {
-			varName = literalVarTable.generateVarIfAbsent(subj.getLiteralValue().toString());
+			varName = literalVarTable.generateVarIfAbsent(subj.getLiteralValue().toString(),
+					QueryOperator.TEMPLATE_VAR_LITERAL);
 		} else return null;
 		if (varName == null) throw new IllegalStateException("Subject node generated a null variable name.");
 		return Var.alloc(varName);

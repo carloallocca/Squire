@@ -21,6 +21,8 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 /**
  * AA: Apparently an all-knowing POJO for the process of generating
  * recommendations. It also includes the solution space of that query
+ * 
+ * TODO make this a real treenode, with pointers to children and all that.
  *
  * @author carloallocca
  */
@@ -45,7 +47,6 @@ public class QueryAndContextNode {
 	// private Set<TriplePath> qRTriplePathSet;
 
 	private String op; // It can be either R (for Removal) or I (Instantiation).
-	private List<String> operationList;
 
 	private Query qO, qR;
 
@@ -56,8 +57,6 @@ public class QueryAndContextNode {
 	private float queryRootDistance;
 	private float queryRootDistanceSim;
 	private float querySpecificityDistance;
-
-	// private ArrayList<VarTemplateAndEntityQoQr> tvEntityQoQrInstanciatedList;
 
 	private List<QuerySolution> queryTempVarSolutionSpace;
 
@@ -75,10 +74,6 @@ public class QueryAndContextNode {
 
 	public String getOp() {
 		return op;
-	}
-
-	public List<String> getOperationList() {
-		return operationList;
 	}
 
 	public Query getOriginalQuery() {
@@ -141,16 +136,8 @@ public class QueryAndContextNode {
 		this.op = op;
 	}
 
-	public void setOperationList(List<String> clonedOperationList) {
-		this.operationList = clonedOperationList;
-	}
-
-	public void setqO(Query qO) {
+	public void setOriginalQuery(Query qO) {
 		this.qO = qO;
-	}
-
-	public void setqR(Query qR) {
-		this.qR = qR;
 	}
 
 	public void setqRScore(float qRScore) {
@@ -173,7 +160,7 @@ public class QueryAndContextNode {
 		this.queryRootDistanceSim = queryRootDistance;
 	}
 
-	public void setQuerySpecificityDistanceSimilarity(float querySpecificityDistance) {
+	public void setQuerySpecificityDistance(float querySpecificityDistance) {
 		this.querySpecificityDistance = querySpecificityDistance;
 	}
 
@@ -190,12 +177,12 @@ public class QueryAndContextNode {
 	}
 
 	public void setSolutionSpace(List<QuerySolution> queryTempVarSolutionSpace) {
-		if (queryTempVarSolutionSpace == null) {
-			this.queryTempVarSolutionSpace = new ArrayList<>();
-		} else {
-			this.queryTempVarSolutionSpace = queryTempVarSolutionSpace;
-		}
+		if (queryTempVarSolutionSpace == null) this.queryTempVarSolutionSpace = new ArrayList<>();
+		else this.queryTempVarSolutionSpace = queryTempVarSolutionSpace;
+	}
 
+	public void setTransformedQuery(Query qR) {
+		this.qR = qR;
 	}
 
 }

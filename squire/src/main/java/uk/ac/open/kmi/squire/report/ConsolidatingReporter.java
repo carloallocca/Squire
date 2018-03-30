@@ -73,10 +73,14 @@ public class ConsolidatingReporter extends Reporter {
 	 * @throws IOException
 	 */
 	public void printReport(PrintWriter out, int topK) throws IOException {
+		log.info("Generating consolidating report for top {} recommendations", topK);
 		printHeader(out);
 		out.println("## Recommendations");
 		out.println("Top " + Math.min(topK, recommendations.size()) + " recommended queries follow.");
+		log.debug("Sorting recommendations...");
+		long before = System.currentTimeMillis();
 		recommendations.sort(comparator);
+		log.debug("DONE. Sorted {} items in {} ms", recommendations.size(), System.currentTimeMillis() - before);
 		int total = recommendations.size();
 		for (int i = 0; i < topK && i < total; i++) {
 			out.println("=========");
@@ -90,6 +94,7 @@ public class ConsolidatingReporter extends Reporter {
 		}
 		out.flush();
 		printFooter(out);
+		log.info("Consolidating report complete.");
 	}
 
 	@Override

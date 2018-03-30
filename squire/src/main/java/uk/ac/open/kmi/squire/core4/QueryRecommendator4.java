@@ -14,12 +14,8 @@ import org.apache.jena.query.QueryFactory;
 
 import uk.ac.open.kmi.squire.core.QueryScorePair;
 import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
-import uk.ac.open.kmi.squire.entityvariablemapping.ClassVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.DatatypePropertyVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.IndividualVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.LiteralVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.ObjectPropertyVarMapping;
-import uk.ac.open.kmi.squire.entityvariablemapping.RDFVocVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.GeneralVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
@@ -28,26 +24,25 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  */
 public class QueryRecommendator4 extends AbstractQueryRecommendationObservable implements IQueryRecommendationObserver {
 
-	private ClassVarMapping classVarTable;
-	private DatatypePropertyVarMapping datatypePropertyVarTable;
-	private IndividualVarMapping individualVarTable;
-	private LiteralVarMapping literalVarTable;
-	private ObjectPropertyVarMapping objectProperyVarTable;
-	private RDFVocVarMapping rdfVocVarTable;
+	private VarMapping classVarTable;
+	private VarMapping datatypePropertyVarTable;
+	private VarMapping individualVarTable;
+	private VarMapping literalVarTable;
+	private VarMapping objectProperyVarTable;
+	private VarMapping rdfVocVarTable;
 
 	private final Query q0;
 
 	/*
 	 * This is for storing the output of the specializer
 	 */
-	private List<QueryAndContextNode> qRList = new ArrayList<>();
+	// private List<QueryAndContextNode> qRList = new ArrayList<>();
 	private Query qTemplate;
+	private final IRDFDataset rdfD1, rdfD2;
 
 	private final float queryRootDistanceDegree;
 	private final float querySpecificityDistanceDegree;
-	private final IRDFDataset rdfD1, rdfD2;
 	private final float resultSizeSimilarityDegree;
-
 	private final float resultTypeSimilarityDegree;
 	/*
 	 * This is for storing the output of the QueryRecommendator
@@ -58,12 +53,12 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree) {
 		q0 = QueryFactory.create(query.toString());
 		rdfD1 = d1;
-		classVarTable = new ClassVarMapping();
-		individualVarTable = new IndividualVarMapping();
-		literalVarTable = new LiteralVarMapping();
-		objectProperyVarTable = new ObjectPropertyVarMapping();
-		datatypePropertyVarTable = new DatatypePropertyVarMapping();
-		rdfVocVarTable = new RDFVocVarMapping();
+		classVarTable = new GeneralVarMapping();
+		individualVarTable = new GeneralVarMapping();
+		literalVarTable = new GeneralVarMapping();
+		objectProperyVarTable = new GeneralVarMapping();
+		datatypePropertyVarTable = new GeneralVarMapping();
+		rdfVocVarTable = new GeneralVarMapping();
 		rdfD2 = d2;
 		this.queryRootDistanceDegree = queryRootDistanceDegree;
 		this.querySpecificityDistanceDegree = querySpecificityDistanceDegree;
@@ -97,18 +92,7 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 		qS.specialize();
 
 		// RANKING...
-		this.qRList = qS.getRecommendations();
-		applyRankingToRecommandedQueryList(qRList);
-
-		// for(QueryAndContextNode n:this.qRList){
-		// log.info("[queryR] " +n.getqR());
-		// log.info("[query Score] " +n.getqRScore());
-		// }
-
-	}
-
-	public List<QueryScorePair> getSortedRecomQueryList() {
-		return sortedRecomQueryList;
+		rankRecommendations(qS.getRecommendations());
 	}
 
 	@Override
@@ -131,7 +115,7 @@ public class QueryRecommendator4 extends AbstractQueryRecommendationObservable i
 		// Nothing to do
 	}
 
-	private void applyRankingToRecommandedQueryList(List<QueryAndContextNode> qRList) {
+	private void rankRecommendations(List<QueryAndContextNode> qRList) {
 		for (QueryAndContextNode qrRecom : qRList) {
 			QueryScorePair pair = new QueryScorePair(qrRecom.getTransformedQuery(), qrRecom.getqRScore());
 			this.sortedRecomQueryList.add(pair);
