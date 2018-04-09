@@ -124,7 +124,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 		return qOvarList.containsAll(projectVarListString);
 	}
 
-	public boolean isSatisfiableWrtResults(Query q, IRDFDataset rdfd2) throws java.net.ConnectException {
+	public boolean isSatisfiableWrtResults(Query q, IRDFDataset rdfd2) {
 		String datasetPath = (String) rdfd2.getEndPointURL();
 		if (datasetPath == null || datasetPath.isEmpty()) {
 			this.notifyQuerySatisfiableValue(q, false);

@@ -92,8 +92,8 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 						&& predicate.equals("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")
 						&& rdfd1.getClassSet().contains(object)) {
 					Var individualVar = Var
-							.alloc(individualVarTable.generateVarIfAbsent(subj.getURI(), TEMPLATE_VAR_INDIVIDUAL));
-					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(obj.getURI(), TEMPLATE_VAR_CLASS));
+							.alloc(individualVarTable.getOrCreateVar(subj.getURI(), TEMPLATE_VAR_INDIVIDUAL));
+					Var classVar = Var.alloc(classVarTable.getOrCreateVar(obj.getURI(), TEMPLATE_VAR_CLASS));
 					it.set(new TriplePath(new Triple(individualVar, tp.getPredicate(), classVar)));
 
 				}
@@ -103,8 +103,8 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 				if (rdfd1.getIndividualSet().contains(subject) && rdfd1.getObjectPropertySet().contains(predicate)
 						&& rdfd1.getIndividualSet().contains(object)) {
 					Var individualVar = Var
-							.alloc(individualVarTable.generateVarIfAbsent(subj.getURI(), TEMPLATE_VAR_INDIVIDUAL));
-					Var classVar = Var.alloc(classVarTable.generateVarIfAbsent(obj.getURI(), TEMPLATE_VAR_CLASS));
+							.alloc(individualVarTable.getOrCreateVar(subj.getURI(), TEMPLATE_VAR_INDIVIDUAL));
+					Var classVar = Var.alloc(classVarTable.getOrCreateVar(obj.getURI(), TEMPLATE_VAR_CLASS));
 					it.set(new TriplePath(new Triple(individualVar, tp.getPredicate(), classVar)));
 				}
 				//
@@ -126,7 +126,7 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 				System.out.println("subj.isURI() && pred.isURI() && obj.isLiteral()");
 				// Var literalVar1 = Var.alloc(
 				// LiteralVarMapping.generateIFAbsentLiteralVar(obj.toString()));
-				Var literalVar1 = Var.alloc(literalVarTable.generateVarIfAbsent(obj.toString(), TEMPLATE_VAR_LITERAL));
+				Var literalVar1 = Var.alloc(literalVarTable.getOrCreateVar(obj.toString(), TEMPLATE_VAR_LITERAL));
 				it.set(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), literalVar1)));
 
 			}
@@ -150,7 +150,7 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 				// Var predVar1 = Var.alloc( pred.getURI() );
 				// Var literalVar1 = Var.alloc(
 				// LiteralVarMapping.generateIFAbsentLiteralVar(obj.toString()));
-				Var literalVar1 = Var.alloc(literalVarTable.generateVarIfAbsent(obj.toString(), TEMPLATE_VAR_LITERAL));
+				Var literalVar1 = Var.alloc(literalVarTable.getOrCreateVar(obj.toString(), TEMPLATE_VAR_LITERAL));
 				it.set(new TriplePath(new Triple(tp.getSubject(), tp.getPredicate(), literalVar1)));
 
 			}

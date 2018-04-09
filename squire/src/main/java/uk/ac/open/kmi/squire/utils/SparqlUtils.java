@@ -25,6 +25,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonArray;
 import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.atlas.json.JsonParseException;
 import org.apache.jena.atlas.json.JsonValue;
 import org.apache.jena.iri.IRIFactory;
 import org.apache.jena.query.QuerySolution;
@@ -36,6 +37,13 @@ import org.apache.jena.sparql.core.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A collection of utility methods for executing SPARQL queries or for
+ * manipulating them or their results.
+ * 
+ * @author Alessandro Adamou<alexdma@apache.org>
+ *
+ */
 public class SparqlUtils {
 
 	public static class SparqlException extends Exception {
@@ -93,6 +101,8 @@ public class SparqlUtils {
 	 *             if anything happens other than receiving a HTTP 200 OK
 	 */
 	public static String doRawQuery(String queryString, String endpoint, int timeout) throws SparqlException {
+		if (timeout < 1) throw new IllegalArgumentException(
+				"Sorry, waiting forever is disallowed. Timeout must be a positive integer.");
 		log.debug("About to execute the following:");
 		log.debug(" * endpoint: {}", endpoint);
 		log.debug(" * query: {}", queryString.replaceAll("\\s+", " "));
@@ -147,9 +157,22 @@ public class SparqlUtils {
 		return filtered;
 	}
 
-	public static String[][] extractSelectValuePairs(String sparqlResultJson, String var1, String var2) {
-		String[][] output;
-		JsonArray results = JSON.parse(sparqlResultJson).get("results").getAsObject().get("bindings").getAsArray();
+	public static String[][] extractSelectValuePairs(String sparqlResultJson, String var1, String var2)
+			throws SparqlException {
+		final String[][] output;
+		JsonObject ob;
+		try {
+			ob = JSON.parse(sparqlResultJson);
+		} catch (JsonParseException ex) {
+			log.warn("Error parsing JSON object.", ex);
+			log.warn("Dumping content below:\r\n{}", sparqlResultJson);
+			throw new RuntimeException(ex);
+		}
+		if (ob == null) {
+			log.warn("Parsing returned null JSON object.");
+			return new String[0][0];
+		}
+		JsonArray results = ob.get("results").getAsObject().get("bindings").getAsArray();
 		output = new String[results.size()][2];
 		for (int i = 0; i < results.size(); i++) {
 			JsonObject bind = results.get(i).getAsObject();
@@ -238,19 +261,23 @@ public class SparqlUtils {
 			log.trace("Fixed solution: {}", fixed);
 			// Expand the other part of each reduced solution
 			for (Map<String, RDFNode> kepts : fixed2kept.get(fixed)) {
-				log.trace(" ... kept: {}", kepts);
 				QuerySolutionMap solNu = new QuerySolutionMap();
 				// Add the part of the solution that is not reduced
-				for (Entry<String, RDFNode> entry : fixed.entrySet())
+				for (Entry<String, RDFNode> entry : fixed.entrySet()) {
 					solNu.add(entry.getKey(), entry.getValue());
-				// Process every "kept" variable from the expandable part
-				for (Entry<String, RDFNode> entry : kepts.entrySet()) {
+					log.trace(" ..... added: {} - {}", entry.getKey(), entry.getValue());
+				}
+				log.trace(" ... kept: {}", kepts);
+				if (kepts.isEmpty()) inflated.add(solNu);
+				else
+					// Process every "kept" variable from the expandable part
+					for (Entry<String, RDFNode> entry : kepts.entrySet()) {
 					// First add the kept value
 					solNu.add(entry.getKey(), entry.getValue());
 					log.trace(" ..... added: {} - {}", entry.getKey(), entry.getValue());
 					// Then iteratively expand every reduced variable over the kept one
 					inflateSolution(solNu, reducedVars, fixed2kept, fixed, inflated);
-				}
+					}
 			}
 		}
 		log.debug("DONE. Inflated to size {}", inflated.size());
@@ -317,18 +344,18 @@ public class SparqlUtils {
 			return;
 		}
 		// TODO can we reduce this O(n^4) complexity, even though n is small for most?
-		for (Var kept : reducedVars.keySet()) {
-			log.trace("... - kept variable : {}", kept);
-			// iterate over the (pre-processed) variable-value bindings of the result set
-			for (Map<String, RDFNode> keptBind : expansionPlan.get(fixedPart))
-				for (Entry<String, RDFNode> entry : keptBind.entrySet()) {
-					String var = entry.getKey();
-					// Add the retained binding if not present.
-					// Iterate over e.g. { y1:X } , { y2:Y }
-					log.trace(" ... processing binding: {} - {}", var, entry.getValue());
-					if (!solution.contains(var)) solution.add(var, entry.getValue());
-					// Recursively expand the solution by re-adding the value for the variables that
-					// were reduced into the kept one.
+		// Iterate over the (pre-processed) variable-value bindings of the result set.
+		for (Map<String, RDFNode> keptBind : expansionPlan.get(fixedPart))
+			for (Entry<String, RDFNode> entry : keptBind.entrySet()) {
+				String var = entry.getKey();
+				// Add the retained binding if not present.
+				// Iterate over e.g. { y1:X } , { y2:Y }
+				log.trace(" ... processing binding: {} - {}", var, entry.getValue());
+				if (!solution.contains(var)) solution.add(var, entry.getValue());
+				// Recursively expand the solution by re-adding the value for the variables that
+				// were reduced into the kept one.
+				for (Var kept : reducedVars.keySet()) {
+					log.trace("... - kept variable : {}", kept);
 					for (Var reduced : reducedVars.get(kept)) {
 						// Each reduced variable generates a new (cloned) solution, so recurse into it
 						log.trace("... - reduced variable : {}", reduced);
@@ -344,7 +371,7 @@ public class SparqlUtils {
 					}
 				}
 
-		}
+			}
 
 	}
 

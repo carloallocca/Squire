@@ -5,8 +5,6 @@
  */
 package uk.ac.open.kmi.squire.operation;
 
-import java.util.Set;
-
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.syntax.ElementWalker;
@@ -19,36 +17,35 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionVisitor;
  *
  * @author carloallocca
  */
-public class RemoveTriple {
+public class RemoveTriple implements Operation<Query> {
 
-	public RemoveTriple() {
-		super();
+	private Query query;
+
+	private Triple triple;
+
+	public RemoveTriple(Query q, Triple tp) {
+		this.query = q;
+		this.triple = tp;
 	}
 
-	public Query removeTP(Query q, Triple tp) {
-
+	@Override
+	public Query apply() {
 		SQGraphPatternExpressionVisitor gpeVisitorO = new SQGraphPatternExpressionVisitor();
-		// ...get the GPE of qOri
-		ElementWalker.walk(q.getQueryPattern(), gpeVisitorO);
-		Set qGPE = gpeVisitorO.getQueryGPE();
+		ElementWalker.walk(this.query.getQueryPattern(), gpeVisitorO);
+		if (gpeVisitorO.getQueryGPE().size() <= 1) return this.query;
+		RemoveOpTransform rOpTransform = new RemoveOpTransform(this.query, this.triple);
+		Query qPostOp = QueryTransformOps.transform(this.query, rOpTransform);
+		// if(qPostOp.getGroupBy()!=null){
+		// //Iterator
+		// orderBy=qPostOp.getGroupBy().getVars().iterator();
+		// }
+		// qPostOp.getAggregators()
+		return qPostOp;
+	}
 
-		if (qGPE.size() > 1) {
-
-			RemoveOpTransform rOpTransform = new RemoveOpTransform(q, tp);
-			Query queryWithoutTriplePattern = QueryTransformOps.transform(q, rOpTransform);
-			// if(queryWithoutTriplePattern.getGroupBy()!=null){
-			// //Iterator
-			// orderBy=queryWithoutTriplePattern.getGroupBy().getVars().iterator();
-			// // queryWithoutTriplePattern
-			// }
-			// queryWithoutTriplePattern.getAggregators()
-
-			return queryWithoutTriplePattern;
-
-		}
-
-		return q;
-
+	@Override
+	public Object[] getOperands() {
+		return new Object[] { query, triple };
 	}
 
 }

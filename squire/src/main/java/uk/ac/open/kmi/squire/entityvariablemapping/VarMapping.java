@@ -6,7 +6,7 @@ public interface VarMapping {
 
 	public void clear();
 
-	public String generateVarIfAbsent(String uri, String varPrefix);
+	public String getOrCreateVar(String uri, String varPrefix);
 
 	public String getValueFromVar(String varString);
 

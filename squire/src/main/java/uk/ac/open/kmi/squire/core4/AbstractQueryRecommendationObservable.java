@@ -32,46 +32,26 @@ public abstract class AbstractQueryRecommendationObservable implements IQueryRec
 
 	@Override
 	public void notifyQueryRecommendation(Query qR, float score) {
-		for (IQueryRecommendationObserver obs : observers) {
+		for (IQueryRecommendationObserver obs : observers)
 			obs.updateQueryRecommendated(qR, score, token);
-		}
 	}
 
 	@Override
 	public void notifyQuerySatisfiableValue(Query query, boolean value) {
-		for (IQueryRecommendationObserver observer : observers) {
-			System.out.println("[AbstractQueryRecommendationObservable::notifyQuerySatisfiableValue] value:" + value);
+		for (IQueryRecommendationObserver observer : observers)
 			observer.updateSatisfiableValue(query, value, token);
-		}
-		//
-		// if(value){
-		// for (IQueryRecommendationObserver observer : observers) {
-		// System.out.println("[AbstractQueryRecommendationObservable::notifyQuerySatisfiableValue]
-		// The input query is satisfiable w.r.t. D2");
-		// observer.updateSatisfiableMessage("[AbstractQueryRecommendationObservable::notifyQuerySatisfiableValue]
-		// The input query is satisfiable w.r.t. D2", token);
-		// }
-		// }
-		// else{
-		// for (IQueryRecommendationObserver observer : observers) {
-		// observer.updateSatisfiableMessage("[AbstractQueryRecommendationObservable::notifyQuerySatisfiableValue]
-		// The input query is NOT satisfiable w.r.t. D2",token);
-		// }
-		// }
 	}
 
 	@Override
 	public void notifyDatatsetSimilarity(float score) {
-		for (IQueryRecommendationObserver obs : observers) {
+		for (IQueryRecommendationObserver obs : observers)
 			obs.updateDatasetSimilarity(score, token);
-		}
 	}
 
 	@Override
 	public void notifyQueryRecommendationCompletion(Boolean finished) {
-		for (IQueryRecommendationObserver obs : observers) {
+		for (IQueryRecommendationObserver obs : observers)
 			obs.updateQueryRecommendationCompletion(finished, token);
-		}
 	}
 
 }

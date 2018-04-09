@@ -26,9 +26,7 @@ public class TreeNodez<T> {
 	}
 
 	public void addChild(TreeNodez<T> child) {
-		if (this.children == null) {
-			this.children = new ArrayList<>();
-		}
+		if (this.children == null) this.children = new ArrayList<>();
 		this.children.add(child);// .addSibling(childNode);
 	}
 

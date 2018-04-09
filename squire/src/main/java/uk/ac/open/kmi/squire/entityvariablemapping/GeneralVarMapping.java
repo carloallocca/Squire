@@ -5,21 +5,37 @@ import java.util.Map;
 
 public class GeneralVarMapping implements VarMapping {
 
-	protected int succ = 0;
+	/**
+	 * This is appended to the next template variable when it is generated.
+	 */
+	protected int index = 0;
 	protected Map<String, String> valueToVar;
 	protected Map<String, String> varToValue;
 
 	public GeneralVarMapping() {
 		valueToVar = new HashMap<>();
 		varToValue = new HashMap<>();
-		succ = 1;
+		index = 1;
 	}
 
 	@Override
 	public void clear() {
 		valueToVar = null;
 		varToValue = null;
-		succ = 0;
+		index = 0;
+	}
+
+	@Override
+	public String getOrCreateVar(String uri, String varPrefix) {
+		if (valueToVar == null || index == 0)
+			throw new IllegalStateException("The mapping table needs to be initialized before use.");
+		if (!valueToVar.containsKey(uri)) {
+			// this.classVar = "ct"+Integer.toString(++index);
+			String tmp = varPrefix + Integer.toString(index++);
+			valueToVar.put(uri, tmp);
+			varToValue.put(tmp, uri);
+			return tmp;
+		} else return valueToVar.get(uri);
 	}
 
 	@Override
@@ -38,19 +54,6 @@ public class GeneralVarMapping implements VarMapping {
 	@Override
 	public Map<String, String> getVarToValueTable() {
 		return this.varToValue;
-	}
-
-	@Override
-	public String generateVarIfAbsent(String uri, String varPrefix) {
-		if (valueToVar == null || succ == 0)
-			throw new IllegalStateException("The mapping table needs to be initialized before use.");
-		if (!valueToVar.containsKey(uri)) {
-			// this.classVar = "ct"+Integer.toString(++succ);
-			String tmp = varPrefix + Integer.toString(succ++);
-			valueToVar.put(uri, tmp);
-			varToValue.put(tmp, uri);
-			return tmp;
-		} else return valueToVar.get(uri);
 	}
 
 }

@@ -34,6 +34,34 @@ public class SparqlUtilsTest {
 			+ "\" }      }    ]  }}";
 
 	@Test
+	public void inflateBindingsNoReduction() throws Exception {
+		// Build the reduction map
+		Map<Var, Set<Var>> reducedVars = new HashMap<>();
+
+		// Build the reduced query solutions
+		List<QuerySolution> solsRed = new ArrayList<>();
+		addSolution(solsRed, "A", "X");
+		addSolution(solsRed, "A", "Y");
+		addSolution(solsRed, "B", "Z");
+		addSolution(solsRed, "C", "Z");
+		addSolution(solsRed, "B", "Y");
+
+		List<QuerySolution> expanded = SparqlUtils.inflateResultSet(solsRed, reducedVars);
+		assertFalse(expanded.isEmpty());
+		assertSame(5, expanded.size());
+		assertTrue(checkSolution(expanded, "A", "X"));
+		assertTrue(checkSolution(expanded, "A", "Y"));
+		assertTrue(checkSolution(expanded, "B", "Z"));
+		assertTrue(checkSolution(expanded, "C", "Z"));
+		assertTrue(checkSolution(expanded, "B", "Y"));
+
+		assertFalse(checkSolution(expanded, "A", "Z"));
+		assertFalse(checkSolution(expanded, "B", "X"));
+		assertFalse(checkSolution(expanded, "C", "X"));
+		assertFalse(checkSolution(expanded, "C", "Y"));
+	}
+
+	@Test
 	public void inflateBindingsEmptyReduction() throws Exception {
 		// Build the reduction map
 		Map<Var, Set<Var>> reducedVars = new HashMap<>();
@@ -50,6 +78,7 @@ public class SparqlUtilsTest {
 
 		List<QuerySolution> expanded = SparqlUtils.inflateResultSet(solsRed, reducedVars);
 		assertFalse(expanded.isEmpty());
+		assertSame(5, expanded.size());
 		assertTrue(checkSolution(expanded, "A", "X"));
 		assertTrue(checkSolution(expanded, "A", "Y"));
 		assertTrue(checkSolution(expanded, "B", "Z"));

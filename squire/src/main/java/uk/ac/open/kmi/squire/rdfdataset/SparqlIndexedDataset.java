@@ -436,6 +436,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	}
 
 	/**
+	 * 
 	 * This is the variant that uses a Map as a container.
 	 * 
 	 * @param partialQuery
@@ -452,6 +453,10 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	 *            because they have already been indexed. If NULL, the method will
 	 *            do pure pagination.
 	 * @return true iff the computation is deemed complete.
+	 *
+	 * @throws BootedException
+	 *             if the remote endpoint refused to even respond to the first step
+	 *             of the iteration.
 	 */
 	protected boolean iterativeComputation(final String partialQuery, final Map<String, Set<String>> targetContainer,
 			int stepLength, int iteration, Set<Property> exclusions) throws BootedException {
@@ -464,7 +469,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		try {
 			String res = SparqlUtils.doRawQuery(q, this.endpointURL);
 			items = SparqlUtils.extractSelectValuePairs(res, "x", "p1");
-		} catch (SparqlException e1) {
+		} catch (SparqlException | RuntimeException e1) {
 			// Don't die. Keep whatever was indexed so far.
 			log.warn("Got remote response : {}", e1.getMessage());
 			// If it was the first attempt though, give up and raise an exception.

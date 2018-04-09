@@ -8,13 +8,9 @@ package uk.ac.open.kmi.squire.core2;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QuerySolution;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.sparql.core.Var;
 
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
@@ -36,43 +32,37 @@ public class QueryAndContextNode {
 			float score2 = p2.getqRScore();
 			// ...For ascending order
 			return Float.compare(score2, score1);
-			// return (-1)*Float.compare(score1, score2); // For discending order
+			// return -1*Float.compare(score1, score2); // For descending order
 		}
 
 	}
 
-	private String entityqO, entityqR;
+	private IRDFDataset ds1, ds2;
 
-	// private Set<Var> qRTemplateVariableSet;
-	// private Set<TriplePath> qRTriplePathSet;
-
-	private String op; // It can be either R (for Removal) or I (Instantiation).
+	private String op;
 
 	private Query qO, qR;
 
 	private float qRScore;
-
-	private float queryResultSizeSimilarity;
-	private float queryResultTypeSimilarity;
 	private float queryRootDistance;
-	private float queryRootDistanceSim;
 	private float querySpecificityDistance;
 
 	private List<QuerySolution> queryTempVarSolutionSpace;
 
-	private Map<Var, Set<RDFNode>> queryTempVarValueMap;
-
-	private IRDFDataset rdfD1, rdfD2;
-
-	public String getEntityqO() {
-		return entityqO;
+	public IRDFDataset getDataset1() {
+		return ds1;
 	}
 
-	public String getEntityqR() {
-		return entityqR;
+	public IRDFDataset getDataset2() {
+		return ds2;
 	}
 
-	public String getOp() {
+	/**
+	 * It can be either R (for Removal) or I (Instantiation).
+	 *
+	 * @return
+	 */
+	public String getLastOperation() {
 		return op;
 	}
 
@@ -84,20 +74,8 @@ public class QueryAndContextNode {
 		return qRScore;
 	}
 
-	public float getQueryResultSizeSimilarity() {
-		return queryResultSizeSimilarity;
-	}
-
-	public float getQueryResultTypeSimilarity() {
-		return queryResultTypeSimilarity;
-	}
-
 	public float getQueryRootDistance() {
 		return queryRootDistance;
-	}
-
-	public float getQueryRootDistanceSimilarity() {
-		return queryRootDistanceSim;
 	}
 
 	public float getQuerySpecificityDistance() {
@@ -108,28 +86,16 @@ public class QueryAndContextNode {
 		return queryTempVarSolutionSpace;
 	}
 
-	public Map<Var, Set<RDFNode>> getQueryTempVarValueMap() {
-		return queryTempVarValueMap;
-	}
-
-	public IRDFDataset getRdfD1() {
-		return rdfD1;
-	}
-
-	public IRDFDataset getRdfD2() {
-		return rdfD2;
-	}
-
 	public Query getTransformedQuery() {
 		return qR;
 	}
 
-	public void setEntityqO(String entityqO) {
-		this.entityqO = entityqO;
+	public void setDataset1(IRDFDataset rdfD1) {
+		this.ds1 = rdfD1;
 	}
 
-	public void setEntityqR(String entityqR) {
-		this.entityqR = entityqR;
+	public void setDataset2(IRDFDataset rdfD2) {
+		this.ds2 = rdfD2;
 	}
 
 	public void setOp(String op) {
@@ -144,36 +110,12 @@ public class QueryAndContextNode {
 		this.qRScore = qRScore;
 	}
 
-	public void setQueryResultSizeSimilarity(float queryResultSizeSimilarity) {
-		this.queryResultSizeSimilarity = queryResultSizeSimilarity;
-	}
-
-	public void setQueryResultTypeSimilarity(float queryResultTypeSimilarity) {
-		this.queryResultTypeSimilarity = queryResultTypeSimilarity;
-	}
-
 	public void setQueryRootDistance(float queryRootDistance) {
 		this.queryRootDistance = queryRootDistance;
 	}
 
-	public void setQueryRootDistanceSimilarity(float queryRootDistance) {
-		this.queryRootDistanceSim = queryRootDistance;
-	}
-
 	public void setQuerySpecificityDistance(float querySpecificityDistance) {
 		this.querySpecificityDistance = querySpecificityDistance;
-	}
-
-	public void setQueryTempVarValueMap(Map<Var, Set<RDFNode>> queryTempVarValueMap) {
-		this.queryTempVarValueMap = queryTempVarValueMap;
-	}
-
-	public void setRdfD1(IRDFDataset rdfD1) {
-		this.rdfD1 = rdfD1;
-	}
-
-	public void setRdfD2(IRDFDataset rdfD2) {
-		this.rdfD2 = rdfD2;
 	}
 
 	public void setSolutionSpace(List<QuerySolution> queryTempVarSolutionSpace) {

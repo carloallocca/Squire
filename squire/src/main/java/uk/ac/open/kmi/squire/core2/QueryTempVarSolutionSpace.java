@@ -7,19 +7,25 @@ package uk.ac.open.kmi.squire.core2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.jena.atlas.json.JsonParseException;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.resultset.ResultSetException;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
@@ -78,31 +84,48 @@ public class QueryTempVarSolutionSpace {
 	 */
 	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2, Var... projectToThese)
 			throws TooGeneralException {
-		List<QuerySolution> qTsol;
+		List<QuerySolution> qTsol = new ArrayList<>();
 		// Defer the check for template variables to the templatizeAndReduce() function.
+		String res = null;
+		Query qT = qChild;
 		try {
 			// 1. Transform the query qChild so that only template variables are projected.
-			Query qT = templatizeAndReduce(qChild, projectToThese);
+			qT = templatizeAndReduce(qChild, projectToThese);
 			// 1a. Check if the resulting query is not too general to be executed.
 			checkGenerality(qT);
 			// 2. Compute the solution space for the templated (and possibly reduced) query.
 			log.debug("Computing solution space for subquery:");
 			log.debug("{}", qT);
-			String res = SparqlUtils.doRawQuery(qT.toString(), rdfd2.getEndPointURL().toString());
+			res = SparqlUtils.doRawQuery(qT.toString(), rdfd2.getEndPointURL().toString());
 			qTsol = SparqlUtils.extractProjectedValues(res, qT.getProjectVars());
-			// 2a. Re-expand the solution space to include the variables that were reduced
+		} catch (SparqlException | JsonParseException ex) {
+			if (ex instanceof SparqlException) log.error("Connection failed while checking solution space.", ex);
+			else if (ex instanceof JsonParseException) {
+				log.error("Solution space result size is not valid JSON. Content follows:");
+				log.error("{}", res);
+			}
+			log.error("Falling back to paginated querying.");
+			final Set<Map<String, RDFNode>> fallbackSol = new HashSet<>();
+			computeSolutionSpacePaginated(qT, rdfd2, 0, 100, fallbackSol);
+			log.debug("Fallback procedure computed {} solutions", fallbackSol.size());
+			for (Map<String, RDFNode> sol : fallbackSol) {
+				QuerySolutionMap qs = new QuerySolutionMap();
+				for (Entry<String, RDFNode> entry : sol.entrySet())
+					qs.add(entry.getKey(), entry.getValue());
+				qTsol.add(qs);
+				log.trace("Added {}", qs);
+			}
+			log.debug("Templated solution size now = {}", qTsol.size());
+		} catch (NotTemplatedException ex) {
+			log.error("Apparently the query has no template variables.");
+			log.error("Assuming empty solution space.");
+			qTsol = Collections.emptyList();
+		} finally {
+			// 2a. Re-expand the solutions space to include the variables that were reduced
 			// earlier.
 			Map<Var, Set<Var>> diocane = filter(reductions, qT.getProjectVars().toArray(new Var[0]));
 			qTsol = SparqlUtils.inflateResultSet(qTsol, diocane);
 			log.debug(" ... Solution space size = {} ", qTsol.size());
-		} catch (SparqlException ex) {
-			log.error("Connection failed while checking solution space.", ex);
-			log.error("Assuming empty solution space.");
-			qTsol = new ArrayList<>();
-		} catch (NotTemplatedException ex) {
-			log.error("Apparently the query has no template variables.");
-			log.error("Assuming empty solution space.");
-			qTsol = new ArrayList<>();
 		}
 		return qTsol;
 	}
@@ -251,6 +274,63 @@ public class QueryTempVarSolutionSpace {
 			if (usedVars.contains(tv)) qT.addResultVar(tv.getName());
 		log.debug("Reduced query: {}", qT);
 		return qT;
+	}
+
+	protected void computeSolutionSpacePaginated(Query baseQuery, IRDFDataset dataset, int step, int stepLength,
+			final Set<Map<String, RDFNode>> solutions) {
+		if (stepLength <= 0) throw new IllegalArgumentException("Step length must be a positive integer.");
+		long before = System.currentTimeMillis();
+		Query paginatedQuery = QueryFactory.create(baseQuery);
+		paginatedQuery.setLimit(stepLength);
+		paginatedQuery.setOffset(step * stepLength);
+		String res = "";
+		boolean error = false;
+		try {
+			res = SparqlUtils.doRawQuery(paginatedQuery.toString(), dataset.getEndPointURL().toString());
+			List<QuerySolution> items = SparqlUtils.extractProjectedValues(res, paginatedQuery.getProjectVars());
+			boolean doAgain = false;
+			if (items.size() > 0) {
+				int added = 0;
+				// Inspect for new bindings: if at least one is found, do another round (rhyme
+				// unintentional)
+				for (QuerySolution sol : items) {
+					QuerySolutionMap solMap;
+					if (sol instanceof QuerySolutionMap) solMap = (QuerySolutionMap) sol;
+					else {
+						solMap = new QuerySolutionMap();
+						solMap.addAll(sol);
+					}
+					Map<String, RDFNode> mapSol = solMap.asMap();
+					if (!solutions.contains(mapSol)) {
+						solutions.add(mapSol);
+						added++;
+						doAgain = true;
+					}
+				}
+				log.debug("Added {} new solutions (time={} ms)", added, System.currentTimeMillis() - before);
+			} else log.debug("No new solutions, stopping at size {}", solutions.size());
+			doAgain &= items.size() == stepLength;
+			if (doAgain) computeSolutionSpacePaginated(baseQuery, dataset, step + 1, stepLength, solutions);
+		} catch (SparqlException ex) {
+			log.error("Query failed.", ex);
+			error = true;
+		} catch (JsonParseException ex) {
+			log.error("Malformed JSON returned at index ({},{}).", ex.getLine(), ex.getColumn());
+			log.error("Content follows:\r\n{}", res);
+			log.error("Stopping iteration and keeping previous results.");
+			error = true;
+		} catch (ResultSetException ex) {
+			log.error("Returned JSON does not seem to be a SPARQL result set. Reason: {}", ex.getMessage());
+			log.error("Content follows:\r\n{}", res);
+			error = true;
+		} catch (Exception ex) {
+			log.error("An unthought-of error occurred. Check exception trace", ex);
+			error = true;
+		}
+		if (error) {
+			log.error("Failing query follows:\r\n{}", paginatedQuery);
+			log.error("Stopping iteration and keeping previous results.");
+		}
 	}
 
 }

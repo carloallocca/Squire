@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.ac.open.kmi.squire.operation;
 
 import java.util.ListIterator;
@@ -19,10 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Performs a single generalization step replacing a node with a template
+ * variable in a query. All three objects are taken as arguments by the
+ * {@link #perform(Query, Node, Var)} method.
  *
  * @author callocca
  */
-public class SPARQLQueryGeneralization {
+public class SparqlQueryGeneralization {
 
 	private class SQGeneralizationVisitor extends ElementVisitorBase {
 
@@ -30,10 +28,8 @@ public class SPARQLQueryGeneralization {
 		private Var varTemplate;
 
 		public SQGeneralizationVisitor(Node n, Var varTemplate) {
-			// System.out.println("The triple ==> " + tp.toString());
-			if (n == null || varTemplate == null) {
-				throw new IllegalStateException("[SQGeneralizationVisitor]The Node or the varTemplate is null!!");
-			}
+			if (n == null || varTemplate == null)
+				throw new IllegalArgumentException("The RDF node and template variable cannot be null.");
 			this.node = n;
 			this.varTemplate = varTemplate;
 		}
@@ -44,61 +40,43 @@ public class SPARQLQueryGeneralization {
 			ListIterator<TriplePath> it = el.getPattern().iterator();
 			while (it.hasNext()) {
 				final TriplePath tp = it.next();
-				// System.out.println("The triple ==> " + tp.toString());
+				log.trace("Visiting triple: {}", tp);
 
+				// SUBJECT
 				Node oldSubject = tp.getSubject();
 				final Node newSubject;
-				// SUBJECT
 				if (!oldSubject.isVariable()) {
 					if (oldSubject.isURI() && node.isURI()) {
-						if (oldSubject.getURI().equals(node.getURI())) {
-							newSubject = Var.alloc(varTemplate);
-						} else newSubject = oldSubject;
+						if (oldSubject.getURI().equals(node.getURI())) newSubject = Var.alloc(varTemplate);
+						else newSubject = oldSubject;
 					} else newSubject = oldSubject;
 				} else newSubject = oldSubject;
 
+				// PREDICATE
 				Node oldPredicate = tp.getPredicate();
 				final Node newPredicate;
-				// PREDICATE
 				if (!oldPredicate.isVariable()) {
 					if (oldPredicate.isURI() && node.isURI()) {
-						if (oldPredicate.getURI().equals(node.getURI())) {
-							newPredicate = Var.alloc(varTemplate);
-						} else {
-							newPredicate = oldPredicate;
-						}
-					} else {
-						newPredicate = oldPredicate;
-					}
-
-				} else {
-					newPredicate = oldPredicate;
-				}
+						if (oldPredicate.getURI().equals(node.getURI())) newPredicate = Var.alloc(varTemplate);
+						else newPredicate = oldPredicate;
+					} else newPredicate = oldPredicate;
+				} else newPredicate = oldPredicate;
 
 				// OBJECT
 				Node oldObject = tp.getObject();
 				final Node newObject;
 				if (!oldObject.isVariable()) {
 					if (oldObject.isURI() && node.isURI()) {
-						if (oldObject.getURI().equals(node.getURI())) {
-							newObject = Var.alloc(varTemplate);
-						} else {
-							newObject = oldObject;
-						}
+						if (oldObject.getURI().equals(node.getURI())) newObject = Var.alloc(varTemplate);
+						else newObject = oldObject;
 					} else {
 						if (oldObject.isLiteral() && node.isLiteral()) {
-							if (oldObject.getLiteral().toString().equals(node.getLiteral().toString())) {
+							if (oldObject.getLiteral().toString().equals(node.getLiteral().toString()))
 								newObject = Var.alloc(varTemplate);
-							} else {
-								newObject = oldObject;
-							}
-						} else {
-							newObject = oldObject;
-						}
+							else newObject = oldObject;
+						} else newObject = oldObject;
 					}
-				} else {
-					newObject = oldObject;
-				}
+				} else newObject = oldObject;
 				TriplePath newTriplePattern = new TriplePath(new Triple(newSubject, newPredicate, newObject));
 				it.set(newTriplePattern);
 			}
@@ -106,18 +84,20 @@ public class SPARQLQueryGeneralization {
 
 	}
 
+	private Logger log = LoggerFactory.getLogger(getClass());
+
 	/**
-	 * FIXME the operation alters the original query! is it safe?
+	 * FIXME the operation alters the given query! is it safe?
 	 * 
 	 * @param q
 	 * @param n
 	 * @param varTemplate
-	 * @return
+	 * @return the altered (not cloned!) q
 	 */
 	public Query perform(Query q, Node n, Var varTemplate) {
-		if (q == null || n == null || varTemplate == null)
-			throw new IllegalArgumentException("The Query or the Node or the Var is null");
-		Logger log = LoggerFactory.getLogger(getClass());
+		if (q == null) throw new IllegalArgumentException("The query cannot be null.");
+		if (n == null) throw new IllegalArgumentException("The node cannot be null.");
+		if (varTemplate == null) throw new IllegalArgumentException("The template variable cannot be null.");
 		log.trace(" * Generalizing over node {}", n);
 		SQGeneralizationVisitor genVisitor = new SQGeneralizationVisitor(n, varTemplate);
 		ElementWalker.walk(q.getQueryPattern(), genVisitor);

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.ac.open.kmi.squire.utils;
 
 import java.util.ArrayList;
@@ -54,7 +49,6 @@ public class PowerSetFactory<T> {
 				public int compare(final List<T> object1, final List<T> object2) {
 					// return Integer.compare(object1.size(),object2.size()); //ordering ascendende
 					return -1 * Integer.valueOf(object1.size()).compareTo(object2.size()); // ordering discendete
-
 				}
 			});
 		}

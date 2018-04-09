@@ -10,13 +10,14 @@ public abstract class QueryOperator extends AbstractQueryRecommendationObservabl
 	}
 
 	public static final String TEMPLATE_VAR_CLASS = "ct";
-	public static final String TEMPLATE_VAR_PROP_DT = "dpt";
 	public static final String TEMPLATE_VAR_INDIVIDUAL = "it";
 	public static final String TEMPLATE_VAR_LITERAL = "lt";
+	public static final String TEMPLATE_VAR_PROP_DT = "dpt";
 	public static final String TEMPLATE_VAR_PROP_OBJ = "opt";
+	public static final String TEMPLATE_VAR_PROP_PLAIN = "ppt";
 
 	protected VarMapping classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
-			objectProperyVarTable, rdfVocVarTable;
+			objectProperyVarTable, rdfVocVarTable, plainPropertyVarTable;
 
 	protected QueryOperator() {
 		classVarTable = new GeneralVarMapping();
@@ -25,6 +26,7 @@ public abstract class QueryOperator extends AbstractQueryRecommendationObservabl
 		objectProperyVarTable = new GeneralVarMapping();
 		datatypePropertyVarTable = new GeneralVarMapping();
 		rdfVocVarTable = new GeneralVarMapping();
+		plainPropertyVarTable = new GeneralVarMapping();
 	}
 
 	public VarMapping getClassVarTable() {
@@ -45,6 +47,10 @@ public abstract class QueryOperator extends AbstractQueryRecommendationObservabl
 
 	public VarMapping getObjectProperyVarTable() {
 		return objectProperyVarTable;
+	}
+
+	public VarMapping getPlainProperyVarTable() {
+		return plainPropertyVarTable;
 	}
 
 	public VarMapping getRdfVocVarTable() {

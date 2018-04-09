@@ -1,6 +1,5 @@
 package uk.ac.open.kmi.squire.operation;
 
-import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class StatefulSPARQLQuerySatisfiable extends SPARQLQuerySatisfiable {
 		return dataset;
 	}
 
-	public boolean isSatisfiableWrtResults(Query q) throws ConnectException {
+	public boolean isSatisfiableWrtResults(Query q) {
 		if (satisfiables.containsKey(q)) {
 			log.debug("Satisfiability check already cached, not executing again");
 			boolean cond = satisfiables.get(q);

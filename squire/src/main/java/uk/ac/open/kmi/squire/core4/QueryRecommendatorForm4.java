@@ -5,7 +5,6 @@
  */
 package uk.ac.open.kmi.squire.core4;
 
-import java.net.ConnectException;
 import java.nio.channels.ClosedByInterruptException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -113,13 +112,9 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable(this.token);
 		qs.register(this);
 		boolean satisfiable = false;
-		try {
-			log.info("Checking satisfiability against source dataset <{}>", rdfd1.getEndPointURL());
-			satisfiable = qs.isSatisfiableWrtResults(query, rdfd1);
-			log.info(" ... is satisfiable? {}", satisfiable);
-		} catch (ConnectException ex) {
-			throw new RuntimeException(ex);
-		}
+		log.info("Checking satisfiability against source dataset <{}>", rdfd1.getEndPointURL());
+		satisfiable = qs.isSatisfiableWrtResults(query, rdfd1);
+		log.info(" ... is satisfiable? {}", satisfiable);
 		fireSatisfiabilityChecked(query, satisfiable);
 		notifyQuerySatisfiableValue(query, satisfiable); // FIXME legacy
 		// Phase 2 : check dataset similarity
@@ -135,7 +130,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 			log.info("Building recommended query tree");
 			qR.buildRecommendation();
 		} catch (Exception ex) {
-			log.error("", ex);
+			log.error("Exception caught while building recommendation.", ex);
 		}
 		return Collections.emptyList();
 	}
