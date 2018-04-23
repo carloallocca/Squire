@@ -28,6 +28,15 @@
 		},
 		"http://data.open.ac.uk/openlearn/ontology/Podcast": {
 			
+		},
+		"http://statistics.data.gov.uk/def/geography/LocalEducationAuthority": {
+			"dps": [
+				"http://www.w3.org/2004/02/skos/core#notation",
+				"http://www.w3.org/2004/02/skos/core#prefLabel"
+			],
+			"ops": [
+				"http://statistics.data.gov.uk/def/geography/coverage"
+			]
 		}
 	},
 	"http://example.org/dataset/2": {
@@ -62,7 +71,23 @@
 			"dps": [
 				"http://www.w3.org/2000/01/rdf-schema#label"
 			],
-			"ops": ["http://xmlns.com/foaf/0.1/depiction"]
+			"ops": [
+				"http://xmlns.com/foaf/0.1/depiction"
+			]
+		},
+		"http://schema.org/School": {
+			"dps": [
+				"http://gov.genealogy.net/ontology.owl#hasDenomination",
+				"http://schema.org/legalName",
+				"http://schema.stapferenquete.ch/schoolType",
+				"https://gont.ch/id"
+			]
+		},
+		"http://example.org/BadRecommendation/1": {
+			"dps": [
+				"http://www.w3.org/2004/02/skos/core#notation",
+				"http://www.w3.org/2004/02/skos/core#prefLabel"
+			]
 		}
 	}
 }

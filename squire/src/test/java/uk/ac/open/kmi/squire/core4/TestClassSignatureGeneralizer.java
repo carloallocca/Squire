@@ -3,6 +3,7 @@ package uk.ac.open.kmi.squire.core4;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.apache.jena.vocabulary.DC;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.SKOS;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -214,6 +216,26 @@ public class TestClassSignatureGeneralizer {
 		Query q1 = qG.iterator().next();
 		assertTrue(find(q1, var_s, rdf_type, new NorT(NodeFactory.createURI(FOAF.Document.getURI()))));
 		assertFalse(find(q1, var_s, rdf_type, type_var));
+	}
+
+	/**
+	 * One type not appearing in the target dataset; two properties, both used in
+	 * the target dataset, also for same type, but neither for the type we need in
+	 * the recommendation. In other words, the ideal query to recommend has
+	 * <em>nothing</em> in common with the original one, except for the rdf:type
+	 * property.
+	 * 
+	 * I have no idea what a generalized query that satisfies this case would look
+	 * like.
+	 */
+	@Test
+	public void twoPropertiesPresentButNeitherForOptimalType() throws Exception {
+		String q = "SELECT DISTINCT ?id ?name WHERE {"
+				+ " ?s a <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority>" + " ; <"
+				+ SKOS.notation.getURI() + "> ?id" + " ; <" + SKOS.prefLabel.getURI() + "> ?name" + " }";
+		Set<Query> qG = _op.generalize(QueryFactory.create(q));
+		assertEquals(1, qG.size());
+		fail("Unit test NIY - don't know yet what general query we should require.");
 	}
 
 	/**
