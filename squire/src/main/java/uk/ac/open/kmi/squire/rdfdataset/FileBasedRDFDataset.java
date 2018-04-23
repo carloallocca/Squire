@@ -34,8 +34,8 @@ public class FileBasedRDFDataset extends AbstractRdfDataset {
 	 */
 	private Object datasetPath;
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
 	private OntModel inf = null;
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	public FileBasedRDFDataset(String rdfDatasetFilePath) {
 		InputStream in = null;
@@ -155,6 +155,11 @@ public class FileBasedRDFDataset extends AbstractRdfDataset {
 	@Override
 	public boolean isIndexed() {
 		throw new UnsupportedOperationException("Not supported yet.");
+	}
+
+	@Override
+	public void rebuildPropertyCoOccurrenceMap() {
+		this.propertyCoOc = buildPropertyCoOccurrence();
 	}
 
 	@Override

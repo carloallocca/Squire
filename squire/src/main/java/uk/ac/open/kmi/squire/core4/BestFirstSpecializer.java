@@ -38,7 +38,7 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.TemplateVariableScanner;
  * @author alessandro
  *
  */
-public class BestFirstSpecializer extends QueryOperator {
+public class BestFirstSpecializer extends QueryTransform {
 
 	private final IRDFDataset dFrom, dTo;
 

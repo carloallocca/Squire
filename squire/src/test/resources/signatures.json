@@ -1,0 +1,32 @@
+{
+	"http://data.aalto.fi/sparql" : {
+		"http://purl.org/ontology/bibo/Patent" : {
+			"dps": [
+				"http://purl.org/dc/elements/1.1/contributor",
+				"http://purl.org/dc/terms/date",
+				"http://purl.org/dc/terms/title"
+			],
+			"ops": [
+				"http://purl.org/ontology/bibo/authorList"
+			]
+		}     
+	},
+	"http://data.open.ac.uk/query" : {
+		"http://purl.org/ontology/bibo/Patent" : {
+			"dps": [
+				"http://purl.org/dc/terms/date",
+				"http://purl.org/dc/terms/title",
+				"http://purl.org/ontology/bibo/abstract",
+				"http://purl.org/ontology/bibo/uri",
+				"http://www.w3.org/2000/01/rdf-schema#label"
+			],
+			"ops": [
+				"http://purl.org/dc/terms/creator",
+				"http://purl.org/dc/terms/isPartOf",
+				"http://purl.org/ontology/bibo/authorList",
+				"http://purl.org/ontology/bibo/status",
+				"http://rdfs.org/ns/void#inDataset"
+			]
+		}     
+	}
+}

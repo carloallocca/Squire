@@ -11,13 +11,13 @@ import org.apache.jena.sparql.syntax.ElementWalker;
 import org.apache.jena.sparql.syntax.syntaxtransform.QueryTransformOps;
 
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.RemoveOpTransform;
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionVisitor;
+import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionAggregator;
 
 /**
  *
  * @author carloallocca
  */
-public class RemoveTriple implements Operation<Query> {
+public class RemoveTriple implements Operator<Query> {
 
 	private Query query;
 
@@ -30,9 +30,9 @@ public class RemoveTriple implements Operation<Query> {
 
 	@Override
 	public Query apply() {
-		SQGraphPatternExpressionVisitor gpeVisitorO = new SQGraphPatternExpressionVisitor();
+		SQGraphPatternExpressionAggregator gpeVisitorO = new SQGraphPatternExpressionAggregator();
 		ElementWalker.walk(this.query.getQueryPattern(), gpeVisitorO);
-		if (gpeVisitorO.getQueryGPE().size() <= 1) return this.query;
+		if (gpeVisitorO.getMembersInQuery().size() <= 1) return this.query;
 		RemoveOpTransform rOpTransform = new RemoveOpTransform(this.query, this.triple);
 		Query qPostOp = QueryTransformOps.transform(this.query, rOpTransform);
 		// if(qPostOp.getGroupBy()!=null){

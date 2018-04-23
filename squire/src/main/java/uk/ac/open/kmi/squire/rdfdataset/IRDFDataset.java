@@ -39,6 +39,10 @@ public interface IRDFDataset extends Runnable {
 
 	public Map<String, ClassSignature> getClassSignatures();
 
+	public int getCoOccurrences(String property1, String property2);
+
+	public Map<String, Integer> getCoOccurringProperties(String property1);
+
 	public Set<String> getDatatypePropertySet();
 
 	public Object getEndPointURL();
@@ -70,6 +74,8 @@ public interface IRDFDataset extends Runnable {
 	public boolean isInPropertySet(String propertyUri);
 
 	public boolean isInRDFVocabulary(String rdfEntity);
+
+	public void rebuildPropertyCoOccurrenceMap();
 
 	public void setGraph(Object path);
 

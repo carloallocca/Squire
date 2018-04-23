@@ -1,6 +1,5 @@
 package uk.ac.open.kmi.squire.core4;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -19,18 +18,23 @@ import uk.ac.open.kmi.squire.operation.SparqlQueryGeneralization;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
- * A {@link Generalizer} that is able to return multiple generalized queries
- * depending on the parameters passed to the generalize operation.
+ * A {@link BasicGeneralizer} that is able to return multiple generalized
+ * queries depending on the parameters passed to the generalize operation.
+ * 
+ * TODO decommission this implementation if redundant
  * 
  * @author alessandro
  *
  */
-public class ProgrammableGeneralizer extends Generalizer {
+public class ProgrammableGeneralizer extends BasicGeneralizer {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
+	private Query originalQuery;
+
 	public ProgrammableGeneralizer(Query query, IRDFDataset d1, IRDFDataset d2) {
-		super(query, d1, d2);
+		super(d1, d2);
+		this.originalQuery = query;
 	}
 
 	/**
@@ -43,10 +47,9 @@ public class ProgrammableGeneralizer extends Generalizer {
 	 * @return
 	 */
 	public Set<Query> generalizeMultiple() {
-		Set<Query> result = new HashSet<>();
-		Query qGeneral = super.generalize();
-		result.add(qGeneral);
-		generalizeStep(qGeneral, result);
+		Set<Query> result = super.generalize(this.originalQuery);
+		for (Query q : result)
+			generalizeStep(q, result);
 		log.debug("Total {} generalized queries", result.size());
 		return result;
 	}

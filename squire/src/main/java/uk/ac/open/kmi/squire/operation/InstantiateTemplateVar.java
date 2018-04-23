@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author carloallocca
  */
-public class InstantiateTemplateVar implements Operation<Query> {
+public class InstantiateTemplateVar implements Operator<Query> {
 
 	private Logger log = LoggerFactory.getLogger(getClass());
 

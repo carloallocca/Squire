@@ -53,7 +53,7 @@ public class TestJenaAssumptions {
 	}
 
 	/*
-	 * Two triple paths made only of the same variables are equal.
+	 * Two triple paths made only of the same variables are equivalent.
 	 */
 	@Test
 	public void tpEquals() throws Exception {
@@ -63,7 +63,7 @@ public class TestJenaAssumptions {
 	}
 
 	/**
-	 * Two sets of triple paths made only of the same variables are equal.
+	 * Two sets of triple paths made only of the same variables are equivalent.
 	 * 
 	 * @throws Exception
 	 */

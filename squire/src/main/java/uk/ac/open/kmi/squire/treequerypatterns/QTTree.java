@@ -5,11 +5,11 @@
  */
 package uk.ac.open.kmi.squire.treequerypatterns;
 
-import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_CLASS;
-import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_INDIVIDUAL;
-import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_LITERAL;
-import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_PROP_DT;
-import static uk.ac.open.kmi.squire.core4.QueryOperator.TEMPLATE_VAR_PROP_OBJ;
+import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_CLASS;
+import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_INDIVIDUAL;
+import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_LITERAL;
+import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_PROP_DT;
+import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_PROP_OBJ;
 
 import java.util.ArrayList;
 import java.util.Collections;

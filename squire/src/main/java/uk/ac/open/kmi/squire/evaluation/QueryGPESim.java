@@ -14,7 +14,7 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionVisitor;
+import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionAggregator;
 
 /**
  *
@@ -35,15 +35,15 @@ public class QueryGPESim {
 
 	public float computeQueryPatternsSim(Query qO, Query qR) {
 		// ...get the GPE of qOri
-		SQGraphPatternExpressionVisitor gpeVisitorO = new SQGraphPatternExpressionVisitor();
+		SQGraphPatternExpressionAggregator gpeVisitorO = new SQGraphPatternExpressionAggregator();
 		ElementWalker.walk(qO.getQueryPattern(), gpeVisitorO);
-		Set<TriplePath> qOGPE = gpeVisitorO.getQueryGPE();
+		Set<TriplePath> qOGPE = gpeVisitorO.getMembersInQuery();
 		// log.info("qOGPE : " +qOGPE.toString());
 
 		// ...get the GPE of qRec
-		SQGraphPatternExpressionVisitor gpeVisitorR = new SQGraphPatternExpressionVisitor();
+		SQGraphPatternExpressionAggregator gpeVisitorR = new SQGraphPatternExpressionAggregator();
 		ElementWalker.walk(qR.getQueryPattern(), gpeVisitorR);
-		Set<TriplePath> qRGPE = gpeVisitorR.getQueryGPE();
+		Set<TriplePath> qRGPE = gpeVisitorR.getMembersInQuery();
 		// log.info("qRGPE : " +qRGPE.toString());
 
 		// this is as it was before 13-04-2017
@@ -59,15 +59,15 @@ public class QueryGPESim {
 
 	public float computeQueryPatternsSimWithWeighedNonCommonTriplePattern(Query qO, Query qR) {
 		// ...get the GPE of qOri
-		SQGraphPatternExpressionVisitor gpeVisitorO = new SQGraphPatternExpressionVisitor();
+		SQGraphPatternExpressionAggregator gpeVisitorO = new SQGraphPatternExpressionAggregator();
 		ElementWalker.walk(qO.getQueryPattern(), gpeVisitorO);
-		Set<TriplePath> qOGPE = gpeVisitorO.getQueryGPE();
+		Set<TriplePath> qOGPE = gpeVisitorO.getMembersInQuery();
 		// log.info("qOGPE : " +qOGPE.toString());
 
 		// ...get the GPE of qRec
-		SQGraphPatternExpressionVisitor gpeVisitorR = new SQGraphPatternExpressionVisitor();
+		SQGraphPatternExpressionAggregator gpeVisitorR = new SQGraphPatternExpressionAggregator();
 		ElementWalker.walk(qR.getQueryPattern(), gpeVisitorR);
-		Set<TriplePath> qRGPE = gpeVisitorR.getQueryGPE();
+		Set<TriplePath> qRGPE = gpeVisitorR.getMembersInQuery();
 		// log.info("qRGPE : " +qRGPE.toString());
 
 		// //this is as it was before 13-04-2017

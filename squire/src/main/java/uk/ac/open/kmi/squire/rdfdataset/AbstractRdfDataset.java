@@ -1,8 +1,10 @@
 package uk.ac.open.kmi.squire.rdfdataset;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -17,6 +19,9 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 	protected Set<String> individualSet = new HashSet<>();
 	protected Set<String> literalSet = new HashSet<>();
 	protected Set<String> objectPropertySet = new HashSet<>();
+
+	protected Map<String, Map<String, Integer>> propertyCoOc = new HashMap<>();
+
 	protected Set<String> rdfVocabulary = new HashSet<>();
 
 	@Override
@@ -31,7 +36,7 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 
 	@Override
 	public Set<String> getClassSet() {
-		return classSignatures.keySet();
+		return Collections.unmodifiableSet(classSignatures.keySet());
 	}
 
 	@Override
@@ -40,23 +45,38 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 	}
 
 	@Override
+	public int getCoOccurrences(String property1, String property2) {
+		if (propertyCoOc.containsKey(property1) && propertyCoOc.get(property1).containsKey(property2))
+			return propertyCoOc.get(property1).get(property2).intValue();
+		else if (propertyCoOc.containsKey(property2) && propertyCoOc.get(property2).containsKey(property1))
+			return propertyCoOc.get(property2).get(property1).intValue();
+		return 0;
+	}
+
+	@Override
+	public Map<String, Integer> getCoOccurringProperties(String property) {
+		if (propertyCoOc.containsKey(property)) return Collections.unmodifiableMap(propertyCoOc.get(property));
+		return Collections.emptyMap();
+	}
+
+	@Override
 	public Set<String> getDatatypePropertySet() {
-		return datatypePropertySet;
+		return Collections.unmodifiableSet(datatypePropertySet);
 	}
 
 	@Override
 	public Set<String> getIndividualSet() {
-		return individualSet;
+		return Collections.unmodifiableSet(individualSet);
 	}
 
 	@Override
 	public Set<String> getLiteralSet() {
-		return literalSet;
+		return Collections.unmodifiableSet(literalSet);
 	}
 
 	@Override
 	public Set<String> getObjectPropertySet() {
-		return objectPropertySet;
+		return Collections.unmodifiableSet(objectPropertySet);
 	}
 
 	/**
@@ -69,12 +89,12 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 		Set<String> result = new HashSet<>();
 		result.addAll(getDatatypePropertySet());
 		result.addAll(getObjectPropertySet());
-		return result;
+		return Collections.unmodifiableSet(result);
 	}
 
 	@Override
 	public Set<String> getRDFVocabulary() {
-		return rdfVocabulary;
+		return Collections.unmodifiableSet(rdfVocabulary);
 	}
 
 	@Override
@@ -110,6 +130,34 @@ public abstract class AbstractRdfDataset implements IRDFDataset {
 	@Override
 	public boolean isInRDFVocabulary(String rdfEntity) {
 		return rdfVocabulary.contains(rdfEntity);
+	}
+
+	protected Map<String, Map<String, Integer>> buildPropertyCoOccurrence() {
+		Map<String, Map<String, Integer>> res = new HashMap<>();
+		// Co-occurrence with details on the classes.
+		Map<String, Map<String, Set<String>>> cooc = new HashMap<>();
+		for (Entry<String, ClassSignature> entry : classSignatures.entrySet()) {
+			ClassSignature sign = entry.getValue();
+			for (String p1 : sign.listPathOrigins()) {
+				if (!cooc.containsKey(p1)) cooc.put(p1, new HashMap<>());
+				for (String p2 : sign.listPathOrigins())
+					if (p1 != p2) {
+						if (!cooc.get(p1).containsKey(p2)) cooc.get(p1).put(p2, new HashSet<>());
+						cooc.get(p1).get(p2).add(sign.getOwlClass());
+						if (!cooc.containsKey(p2)) cooc.put(p2, new HashMap<>());
+						if (!cooc.get(p2).containsKey(p1)) cooc.get(p2).put(p1, new HashSet<>());
+						cooc.get(p2).get(p1).add(sign.getOwlClass());
+					}
+
+			}
+		}
+		for (Entry<String, Map<String, Set<String>>> entry : cooc.entrySet()) {
+			res.put(entry.getKey(), new HashMap<>());
+			Map<String, Integer> row = res.get(entry.getKey());
+			for (Entry<String, Set<String>> e2 : entry.getValue().entrySet())
+				if (!row.containsKey(e2.getKey())) row.put(e2.getKey(), e2.getValue().size());
+		}
+		return res;
 	}
 
 }

@@ -64,9 +64,10 @@
 			},
 			{
 				"description": "List the labels and denominations of all schools.",
-				"original": "SELECT DISTINCT ?school ?label ?notation WHERE { ?school rdf:type <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority> . ?school <http://www.w3.org/2004/02/skos/core#prefLabel> ?label . ?school <http://www.w3.org/2004/02/skos/core#notation> ?notation }",
+				"note":"A case where 2+ properties co-exist in the target dataset, but not for the class that maps best (none of them in fact!). Ideally both properties should be lost.",
+				"original": "SELECT DISTINCT ?school ?name ?denomination WHERE { ?school a <http://statistics.data.gov.uk/def/geography/LocalEducationAuthority> ; <http://www.w3.org/2004/02/skos/core#prefLabel> ?name ; <http://www.w3.org/2004/02/skos/core#notation> ?denomination }",
 				"expected": [
-					"SELECT DISTINCT ?school ?denomination ?label WHERE { ?school a <http://schema.org/School> . ?school <http://gov.genealogy.net/ontology.owl#hasDenomination> ?notation . ?school <http://schema.org/legalName> ?label }"
+					"SELECT DISTINCT ?school ?name ?denomination WHERE { ?school a <http://schema.org/School> ; <http://schema.org/legalName> ?name ; <http://gov.genealogy.net/ontology.owl#hasDenomination> ?denomination }"
 				]
 			},
 			{
@@ -147,10 +148,11 @@
 				]
 			},
 			{
-				"description": "Data about catalogue patents",
-				"original": "PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent <http://www.w3.org/2000/01/rdf-schema#label> ?label . ?patent dc:date ?date .?patent dc:title ?title .?patent dc:creator ?creator . ?patent bibo:status ?status . ?patent bibo:authorList ?authorList }",
+				"description": "Data about catalogued patents",
+				"note": "An instance of the common properties not being present together in the target dataset. Note that dce:contributor is also used by Aalto but as a datatype/annotation property. Also note that ideally the recommended query should lose the '?status' binding amd create a rather complex chain on '?authorList'",
+				"original": "PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?title ?date ?author ?status WHERE { ?patent a bibo:Patent ; <http://www.w3.org/2000/01/rdf-schema#label> ?title ; dc:date ?date ; dc:creator ?author . ?patent bibo:status ?status }",
 				"expected": [
-					"PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?patent ?label ?date ?title ?creator ?status ?authorList WHERE { ?patent a bibo:Patent . ?patent dc:date ?date . ?patent dc:title ?title . ?patent bibo:authorList ?authorList }"
+					"PREFIX dc: <http://purl.org/dc/terms/> PREFIX bibo: <http://purl.org/ontology/bibo/> SELECT DISTINCT ?title ?date ?author WHERE { ?patent a bibo:Patent ; dc:title ?title ; dc:date ?date ; bibo:authorList/(rdf:first|(rdf:rest/rdf:first)+) ?creator }"
 				]
 			},
 			{

@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
@@ -28,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import uk.ac.open.kmi.squire.core4.AbstractQueryRecommendationObservable;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableVisitor;
+import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQVariableAggregator;
 import uk.ac.open.kmi.squire.utils.SparqlUtils;
 import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
 
@@ -62,7 +63,6 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 			// ResultSet results = qexec.execSelect();
 			// resList = ResultSetFormatter.toList(results); //.out(, results, q);
 			// return resList.size() >= 1;
-
 			try {
 				QueryExecution qexec = QueryExecutionFactory.sparqlService(datasetPath, qTMP, (String) d.getGraph());
 				ResultSet results = qexec.execSelect();
@@ -70,7 +70,10 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 				resList = ResultSetFormatter.toList(results); // .out(, results, q);
 				return resList.size() >= 1;
 			} catch (Exception ex) {
-				log.error("", ex);
+				log.error("Query failed");
+				log.error("Dataset path was: <{}>", datasetPath);
+				log.error("Query was:\r\n{}", qTMP);
+				log.error("Exception stack trace follows.", ex);
 				return false;
 			}
 
@@ -109,7 +112,7 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 
 	public boolean isSatisfiableWRTProjectVar(Query qRec) {
 
-		List<String> qOvarList = computeQueryVariableSet(qRec);
+		Set<String> qOvarList = computeQueryVariableSet(qRec);
 		// System.out.println("[SPARQLQuerySatisfiable::isSatisfiableWRTProjectVar] 1 "
 		// + qOvarList.toString());
 
@@ -142,17 +145,21 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 			return cond;
 		} catch (SparqlException e) {
 			log.warn("Satisfiability query failed. Reason follows.", e);
+			log.error("Query failed");
+			log.error("Dataset path was: <{}>", datasetPath);
+			log.error("Query was:\r\n{}", qTMP);
+			log.error("Reason:", e);
 			return false;
 		}
 	}
 
-	private List<String> computeQueryVariableSet(Query qO) {
-		SQVariableVisitor v = new SQVariableVisitor();
+	private Set<String> computeQueryVariableSet(Query qO) {
+		SQVariableAggregator v = new SQVariableAggregator();
 		// ... This will walk through all parts of the query
 		ElementWalker.walk(qO.getQueryPattern(), v);
 		// System.out.println("[QuerySpecificityDistance::computeQueryVariableSet]
 		// v.getQueryClassSet() " + v.getQueryClassSet().toString());
-		return v.getQueryVariableSet();
+		return v.getMembersInQuery();
 	}
 
 }

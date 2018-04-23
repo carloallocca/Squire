@@ -5,6 +5,7 @@
  */
 package uk.ac.open.kmi.squire.core4;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,12 +48,12 @@ import uk.ac.open.kmi.squire.utils.PowerSetFactory;
 
 /**
  * 
- * XXX for a {@link QueryOperator} in itself, this class has too much control
+ * XXX for a {@link QueryTransform} in itself, this class has too much control
  * over other operations.
  *
  * @author carloallocca
  */
-public class Specializer extends QueryOperator {
+public class Specializer extends QueryTransform {
 
 	private static String OPID_INSTANTIATE = "I";
 	private static String OPID_TP_REMOVE = "R";
@@ -76,7 +77,7 @@ public class Specializer extends QueryOperator {
 	 */
 	private final List<QueryAndContextNode> specializables = new ArrayList<>();
 
-	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, Generalizer previousOp,
+	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, BasicGeneralizer previousOp,
 			float resultTypeSimilarityDegree, float queryRootDistanceDegree, float resultSizeSimilarityDegree,
 			float querySpecificityDistanceDegree, String token) {
 		super();
@@ -346,12 +347,12 @@ public class Specializer extends QueryOperator {
 					List<QuerySolution> qSolList = parentNode.getQueryTempVarSolutionSpace();
 					log.debug("queryChild Instantiation step: {}", queryChild.toString());
 					log.debug("qSolList size = {} ", qSolList.size());
-
 					int c = 0;
+					DecimalFormat format = new DecimalFormat("##.##%");
+
 					for (QuerySolution sol : qSolList) {
 						log.trace("Solution {}: {}", c++, sol);
 						Query childQueryCopy = QueryFactory.create(queryChild.toString());
-
 						// [ REPLACED ] Query childQueryCopyInstanciated=
 						// applyInstanciationOP(childQueryCopy, sol);
 						Set<Var> qTempVarSet = getQueryTemplateVariableSet(childQueryCopy);
@@ -361,24 +362,21 @@ public class Specializer extends QueryOperator {
 						// that is going to be instantiated
 						List<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList = new ArrayList<>();
 						for (Var tv : qTempVarSet) {
-							// log.info("Var tv: " +tv.getVarName());
-							// log.info("Var tv: " +tv.getName());
 							RDFNode node = sol.get(tv.getName());
-							// log.info("RDFNode node: " +node.toString());
-
-							SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
-							childQueryCopyInstanciated = instOP.instantiateVarTemplate(childQueryCopy, tv,
-									node.asNode());
-
-							String entityQo = getEntityQo(tv);
-							String entityQr = node.asNode().getURI(); // as it is the name of a concrete node and not of
-																		// a variable;
-							VarTemplateAndEntityQoQr item = new VarTemplateAndEntityQoQr(tv, entityQo, entityQr);
-							templVarEntityQoQrInstanciatedList.add(item);
+							if (node != null && node.asNode().isURI()) {
+								// XXX The operator is stateful so we have to re-instantiate it...
+								SPARQLQueryInstantiation op_inst = new SPARQLQueryInstantiation();
+								childQueryCopyInstanciated = op_inst.instantiateVarTemplate(childQueryCopy, tv,
+										node.asNode());
+								String entityQo = getEntityQo(tv);
+								String entityQr = node.asNode().getURI(); // Expected to be concrete and named
+								VarTemplateAndEntityQoQr item = new VarTemplateAndEntityQoQr(tv, entityQo, entityQr);
+								templVarEntityQoQrInstanciatedList.add(item);
+							} else log.error("Unexpected state of node {} for template variable '{}'", node, tv);
 						}
 						if (childQueryCopyInstanciated != null) {
 							// 4.1.2. Check if it is alredy indexed and therefore generated
-							if (!(isQueryIndexed(childQueryCopyInstanciated))) {
+							if (!isQueryIndexed(childQueryCopyInstanciated)) {
 								// add qWithoutTriple to the index
 								addQueryToIndexIFAbsent(childQueryCopyInstanciated);
 
@@ -399,8 +397,8 @@ public class Specializer extends QueryOperator {
 
 									// =====
 
-									log.info("qR score ======" + childNode.getqRScore());
-									log.info("qR " + childNode.getTransformedQuery());
+									log.debug("qR score ======" + childNode.getqRScore());
+									log.debug("qR " + childNode.getTransformedQuery());
 
 									notifyQueryRecommendation(childNode.getTransformedQuery(), childNode.getqRScore());
 
@@ -411,6 +409,8 @@ public class Specializer extends QueryOperator {
 								}
 							}
 						}
+						double ratio = (double) c / qSolList.size();
+						if (0 == c % 10) log.info(" ... {} done ({} of {}) ", format.format(ratio), c, qSolList.size());
 					} // end for
 				}
 			}

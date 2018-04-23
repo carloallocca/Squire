@@ -2,7 +2,9 @@ package uk.ac.open.kmi.squire.core4;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.jena.query.Query;
 
@@ -17,7 +19,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  */
 public class QueryRecommendator4 extends AbstractQueryRecommender {
 
-	protected Query qTemplate;
+	protected Set<Query> qTemplate;
 
 	/*
 	 * This is for storing the output of the QueryRecommendator
@@ -33,19 +35,25 @@ public class QueryRecommendator4 extends AbstractQueryRecommender {
 	public void buildRecommendation() {
 
 		// GENERALIZE...
-		Generalizer qG = new Generalizer(getQuery(), getSourceDataset(), getTargetDataset());
-		this.qTemplate = qG.generalize();
+		BasicGeneralizer qG 
+		= new BasicGeneralizer(getSourceDataset(), getTargetDataset());
+		//= new ClassSignatureGeneralizer(getSourceDataset(), getTargetDataset());
+		this.qTemplate = qG.generalize(getQuery());
 
+		List<QueryAndContextNode> recoms = new LinkedList<>();
 		// SPECIALIZE...
-		Specializer qS = new Specializer(getQuery(), this.qTemplate, getSourceDataset(), getTargetDataset(), qG,
-				getMetrics().resultTypeSimilarityCoefficient, getMetrics().queryRootDistanceCoefficient,
-				getMetrics().resultSizeSimilarityCoefficient, getMetrics().querySpecificityDistanceCoefficient,
-				this.token);
-		qS.register(this);
-		qS.specialize();
+		for (Query q : this.qTemplate) {
+			Specializer qS = new Specializer(getQuery(), q, getSourceDataset(), getTargetDataset(), qG,
+					getMetrics().resultTypeSimilarityCoefficient, getMetrics().queryRootDistanceCoefficient,
+					getMetrics().resultSizeSimilarityCoefficient, getMetrics().querySpecificityDistanceCoefficient,
+					this.token);
+			qS.register(this);
+			qS.specialize();
+			recoms.addAll(qS.getRecommendations());
+		}
 
 		// RANK...
-		rankRecommendations(qS.getRecommendations());
+		rankRecommendations(recoms);
 	}
 
 	protected void rankRecommendations(List<QueryAndContextNode> qRList) {

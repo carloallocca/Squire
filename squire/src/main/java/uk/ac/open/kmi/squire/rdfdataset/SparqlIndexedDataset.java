@@ -75,6 +75,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		RDFDatasetIndexer instance = RDFDatasetIndexer.getInstance();
 		this.signatureDoc = instance.getSignature(this.endpointURL, this.graphName);
 		loadAll();
+		this.propertyCoOc = buildPropertyCoOccurrence();
 	}
 
 	@Override
@@ -267,6 +268,13 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	public boolean isInPropertySet(String propertyUri) {
 		if (this.propertySet.contains(propertyUri)) return true;
 		return super.isInPropertySet(propertyUri);
+	}
+
+	@Override
+	public void rebuildPropertyCoOccurrenceMap() {
+		throw new UnsupportedOperationException(
+				"Class " + getClass().getName() + " does not support programmatic rebuilding of its indices."
+						+ " They are fixed once built by the constructor method.");
 	}
 
 	@Override

@@ -117,8 +117,9 @@ public class QueryTempVarSolutionSpace {
 			}
 			log.debug("Templated solution size now = {}", qTsol.size());
 		} catch (NotTemplatedException ex) {
-			log.error("Apparently the query has no template variables.");
-			log.error("Assuming empty solution space.");
+			log.error("Apparently the subquery has no template variables.");
+			log.error(" ... Subquery was:\r\n{}", qT);
+			log.error(" ... Assuming empty solution space.");
 			qTsol = Collections.emptyList();
 		} finally {
 			// 2a. Re-expand the solutions space to include the variables that were reduced
@@ -166,7 +167,7 @@ public class QueryTempVarSolutionSpace {
 		return filtered;
 	}
 
-	private Set<Var> getQueryTemplateVariableSet(Query qR) {
+	private Set<Var> getTemplateVariables(Query qR) {
 		TemplateVariableScanner v = new TemplateVariableScanner();
 		// ... This will walk through all parts of the query
 		ElementWalker.walk(qR.getQueryPattern(), v);
@@ -175,7 +176,7 @@ public class QueryTempVarSolutionSpace {
 
 	/**
 	 * Rewrites a given query using its template variables and also tries to
-	 * eliminate computational hogs that could cause endpoints to fail.
+	 * eliminate potential computational hogs that could cause endpoints to fail.
 	 * 
 	 * For example, the query pattern { ?x a ?t ; ?p1 ?y1 ; ?p2 ?y2 } is reduced to
 	 * { ?x a ?t ; ?p1 ?y1 } .
@@ -188,7 +189,7 @@ public class QueryTempVarSolutionSpace {
 	 */
 	private Query templatizeAndReduce(Query queryOrig, Var... projectToThese) throws NotTemplatedException {
 		log.debug("Original query: {}", queryOrig);
-		Set<Var> templateVars = getQueryTemplateVariableSet(queryOrig);
+		Set<Var> templateVars = getTemplateVariables(queryOrig);
 		if (projectToThese.length > 0) {
 			log.debug("Projection forced to the following variables: {}", (Object[]) projectToThese);
 			templateVars.retainAll(new HashSet<>(Arrays.asList(projectToThese)));
@@ -207,7 +208,6 @@ public class QueryTempVarSolutionSpace {
 			public void visit(ElementPathBlock el) {
 				final ElementPathBlock pathBlock = new ElementPathBlock();
 				// Here we decide what to copy into qpNu and what not to
-
 				Set<Var> projected = new HashSet<>(Arrays.asList(projectToThese));
 				// Do a first scan to decide which TPs to keep
 				for (Iterator<TriplePath> it = el.patternElts(); it.hasNext();) {

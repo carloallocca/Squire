@@ -3,7 +3,7 @@ package uk.ac.open.kmi.squire.core4;
 import uk.ac.open.kmi.squire.entityvariablemapping.GeneralVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 
-public abstract class QueryOperator extends AbstractQueryRecommendationObservable {
+public abstract class QueryTransform extends AbstractQueryRecommendationObservable {
 
 	protected enum NodeRole {
 		OBJECT, PREDICATE, SUBJECT
@@ -19,7 +19,7 @@ public abstract class QueryOperator extends AbstractQueryRecommendationObservabl
 	protected VarMapping classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
 			objectProperyVarTable, rdfVocVarTable, plainPropertyVarTable;
 
-	protected QueryOperator() {
+	protected QueryTransform() {
 		classVarTable = new GeneralVarMapping();
 		individualVarTable = new GeneralVarMapping();
 		literalVarTable = new GeneralVarMapping();

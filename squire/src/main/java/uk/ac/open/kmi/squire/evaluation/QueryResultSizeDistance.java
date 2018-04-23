@@ -26,9 +26,9 @@ import org.apache.jena.sparql.syntax.ElementWalker;
 import uk.ac.open.kmi.squire.rdfdataset.FileBasedRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQClassVisitor;
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQDatatypePropertyVisitor;
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQObjectPropertyVisitor;
+import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQClassAggregator;
+import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQDatatypePropertyAggregator;
+import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQObjectPropertyAggregator;
 
 /**
  *
@@ -389,32 +389,32 @@ public class QueryResultSizeDistance {
 	}
 
 	private Set<String> extractQueryClassSet(Query qOri, IRDFDataset d1) {
-		SQClassVisitor v = new SQClassVisitor(d1);
+		SQClassAggregator v = new SQClassAggregator(d1);
 		// This will walk through all parts of the query
 		ElementWalker.walk(qOri.getQueryPattern(), v);
 		System.out.println("[QueryResultSizeSimilarity::extractQueryClassSet] v.getQueryClassSet()  "
-				+ v.getQueryClassSet().toString());
+				+ v.getMembersInQuery().toString());
 
-		return v.getQueryClassSet();
+		return v.getMembersInQuery();
 	}
 
 	private Set<String> extractQueryDatatypePropertySet(Query qOri, IRDFDataset d1) {
-		SQDatatypePropertyVisitor v = new SQDatatypePropertyVisitor(d1);
+		SQDatatypePropertyAggregator v = new SQDatatypePropertyAggregator(d1);
 		// This will walk through all parts of the query
 		ElementWalker.walk(qOri.getQueryPattern(), v);
 		System.out.println("[QueryResultSizeSimilarity::extractQueryDatatypePropertySet] v.ObjectProperty()  "
-				+ v.getQueryDatatypePropertySet().toString());
+				+ v.getMembersInQuery().toString());
 
-		return v.getQueryDatatypePropertySet();
+		return v.getMembersInQuery();
 	}
 
 	private Set<String> extractQueryObjectPropertySet(Query qOri, IRDFDataset d1) {
-		SQObjectPropertyVisitor v = new SQObjectPropertyVisitor(d1);
+		SQObjectPropertyAggregator v = new SQObjectPropertyAggregator(d1);
 		// This will walk through all parts of the query
 		ElementWalker.walk(qOri.getQueryPattern(), v);
 		System.out.println("[QueryResultSizeSimilarity::extractQueryObjectPropertySet] v.ObjectProperty()  "
-				+ v.getQueryObjectPropertySet().toString());
-		return v.getQueryObjectPropertySet();
+				+ v.getMembersInQuery().toString());
+		return v.getMembersInQuery();
 	}
 
 }
