@@ -22,14 +22,16 @@ import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.operation.SparqlQueryGeneralization;
+import uk.ac.open.kmi.squire.operation.GeneralizeNode;
 import uk.ac.open.kmi.squire.rdfdataset.ClassSignature;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
- * Tries to compute a least general generalization by taking into account
- * whether there are triples on the rdf:type predicate with classes as objects.
- * If there are none, it does nothing.
+ * Tries to compute a least general generalization by taking into account the
+ * association between classes and properties of their instances in the query
+ * pattern. This generalizer acts upon triples on the rdf:type predicate, i.e.
+ * assumed to have classes as objects. If there are none, it acts like a
+ * {@link BasicGeneralizer} (TODO should do nothing instead).
  * 
  * @author Alessandro Adamou<alexdma@apache.org>
  *
@@ -44,32 +46,30 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 	}
 
 	@Override
-	public Set<Query> generalize(Query q) {
+	public Set<Query> generalize(final Query q) {
+		final Set<Query> generalized = new HashSet<>();
 
+		// TODO remove the call to the super generalization...
 		Query[] qGeneral;
 		Set<Query> preProc = super.generalize(q);
 		if (preProc.isEmpty()) qGeneral = new Query[] { QueryFactory.create(q) };
 		else qGeneral = preProc.toArray(new Query[0]);
-		// The operation that will be applied over and over.
-		SparqlQueryGeneralization qg = new SparqlQueryGeneralization();
-
 		Map<Node, Set<Node>> typesPerSubjectSurviving = new HashMap<>();
 		MappedQuery[] mq = new MappedQuery[] { new MappedQuery(q) };
+		// The operator that will be applied over and over.
+		GeneralizeNode qg = new GeneralizeNode();
 
 		/*
 		 * If there are multiple triple patterns on rdf:type with the same subject, take
 		 * all those targeted for generalization and collapse them into one.
 		 */
 		Map<Node, ClassSignature> keptD2Signatures = new HashMap<>();
-
 		for (Entry<Node, Set<Node>> entry : mq[0].getTypesPerSubject().entrySet()) {
-			log.debug("Subject {}", entry.getKey());
-			log.debug(" - #classes = {}", entry.getValue().size());
-
+			log.debug("Subject {} (#classes = {})", entry.getKey(), entry.getValue().size());
 			for (Node claz : entry.getValue()) {
-				log.debug(" ... {}", claz);
+				log.debug("Processing RDf type node {}", claz);
 				Var v = ifObjectIsNotD2ThenGenerateVariableNew(claz);
-				log.debug(" ... - var = {}", v);
+				log.debug(" ... produced template variable {}", v);
 				if (v == null) {
 					if (claz.isURI()) {
 						if (!keptD2Signatures.containsKey(claz)
@@ -83,9 +83,8 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 			}
 		}
 
-		mq[0] = new MappedQuery(qGeneral[0]);
+		mq[0] = new MappedQuery(qGeneral[0]); // Update the mapped version of the query
 
-		final Set<Query> generalized = new HashSet<>();
 		// Treat properties based on concrete types
 		ElementWalker.walk(qGeneral[0].getQueryPattern(), new ElementVisitorBase() {
 			@Override
@@ -93,21 +92,23 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 				Iterator<TriplePath> triples = el.patternElts();
 				while (triples.hasNext()) {
 					TriplePath tp = triples.next();
-					log.debug("{}", tp);
+					log.debug("Inspecting triple pattern [{}]", tp);
 					Node s = tp.getSubject();
 					if (mq[0].getTypesPerSubject().containsKey(s)) for (Node type : mq[0].getTypes(s)) {
 						if (keptD2Signatures.containsKey(type)) {
-							log.debug("Signature for <{}> in D2: {}", type,
-									keptD2Signatures.get(type).listPathOrigins());
-							// So, what is the predicate? Can it stay?
-							if (tp.getPredicate().isURI() && !RDF.type.asNode().equals(tp.getPredicate())) {
-								if (keptD2Signatures.get(type).hasProperty(tp.getPredicate().getURI()))
-									log.debug(" ... Yay! It stays.");
+							log.debug(" ... checking signature for type <{}> in target dataset.", type);
+							log.trace("{}", keptD2Signatures.get(type).listPathOrigins());
+							// Check if the predicate of that TP stays or goes.
+							Node p = tp.getPredicate();
+							if (tp.getPredicate().isURI() && !RDF.type.asNode().equals(p)) {
+								if (keptD2Signatures.get(type).hasProperty(p.getURI()))
+									log.debug(" ... KEEP - Signature contains predicate <{}>", p);
 								else {
-									log.debug(" ... sorry, it goes.");
+									log.debug(" ... GENERALIZE - Signature does not contain predicate <{}>", p);
 									// XXX should arg1 be true if there is no common class?
-									Var v = makeTplVariableFromPredicate(tp.getPredicate(), false);
-									if (v != null) qGeneral[0] = qg.perform(qGeneral[0], tp.getPredicate(), v);
+									Var v = makeTplVariableFromPredicate(p, false);
+									log.debug(" ... replacing with template variable {}", v);
+									if (v != null) qGeneral[0] = qg.perform(qGeneral[0], p, v);
 								}
 							}
 						} else log.warn(
@@ -120,19 +121,21 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 
 		log.debug("Intermediate generalized query:\r\n{}", mq[0].getQuery());
 
-		// If the types have been generalized (but a type expression still exists in the
-		// query), treat the properties based on whether they occur in the same type.
+		/*
+		 * If the types have been generalized (but a type expression still exists in the
+		 * query), treat the properties based on whether they occur in the same type.
+		 */
 		for (Node sub : mq[0].getRootSubjects()) {
 			Set<String> namedTypes = new HashSet<>();
 			for (Node type : mq[0].getTypes(sub))
-				if (type.isConcrete()) namedTypes.add(type.getURI());
-			// The cases of rdf:type triples having no concrete objects
+				if (type.isURI()) namedTypes.add(type.getURI());
+
+			// The case where there is at least one rdf:type TP with a named object
 			if (namedTypes.isEmpty()) {
-
-				// group properties in query depending on their presence and co-occurrences
-
+				// Group properties in the query depending on their presence and co-occurrences.
 				// First compute the unification, i.e. the largest subset of co-occurring
-				// properties
+				// properties.
+				log.debug("Grouping properties by co-occurrence...");
 				TreeMap<Integer, Set<Set<String>>> groupsBySize = new TreeMap<>();
 				for (Node n : mq[0].getPathOrigins(sub)) {
 					if (RDF.type.asNode().equals(n)) continue;
@@ -145,25 +148,30 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 					if (!groupsBySize.containsKey(group.size())) groupsBySize.put(group.size(), new HashSet<>());
 					groupsBySize.get(group.size()).add(group);
 				}
-
-				log.debug("Picking the largest groups:");
-				if (!groupsBySize.isEmpty()) for (Set<String> group : groupsBySize.firstEntry().getValue()) {
-					log.debug(" - Group: {}", group);
-					// Produce the query from the group
-					Set<Node> genUs = new HashSet<>();
-					Query groupQ = QueryFactory.create(mq[0].getQuery());
-					for (Node n : mq[0].getPathOrigins(sub))
-						if (n.isURI() && !RDF.type.asNode().equals(n) && !group.contains(n.getURI())) {
-							log.debug(" ... should generalize on property <{}>", n);
-							genUs.add(n);
-							Var v = makeTplVariableFromPredicate(n, false);
-							if (v != null) groupQ = qg.perform(groupQ, n, v);
-						}
-					generalized.add(groupQ);
+				// Produce the final generalized queries from the largest groups.
+				if (groupsBySize.isEmpty()) log.warn("Sorry, no suitable property grouping was created.");
+				else {
+					log.debug("Picking the largest groups:");
+					for (Set<String> group : groupsBySize.firstEntry().getValue()) {
+						log.debug(" - group: {}", group);
+						Set<Node> genUs = new HashSet<>();
+						Query groupQ = QueryFactory.create(mq[0].getQuery());
+						for (Node n : mq[0].getPathOrigins(sub))
+							if (n.isURI() && !RDF.type.asNode().equals(n) && !group.contains(n.getURI())) {
+								log.debug(" - ... generalizing on property node <{}>", n);
+								genUs.add(n);
+								Var v = makeTplVariableFromPredicate(n, false);
+								log.debug(" - ... produced template variable <{}>", v);
+								if (v != null) groupQ = qg.perform(groupQ, n, v);
+							}
+						generalized.add(groupQ);
+					}
 				}
 			}
-
 		}
+
+		// If the above has produced nothing, return the query to the point where it was
+		// processed.
 		if (generalized.isEmpty()) generalized.add(mq[0].getQuery());
 		log.debug("Generalized queries follow:");
 		int i = 0;

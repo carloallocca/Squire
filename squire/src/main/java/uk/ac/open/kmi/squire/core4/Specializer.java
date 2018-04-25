@@ -38,8 +38,8 @@ import uk.ac.open.kmi.squire.evaluation.QueryResultTypeSimilarity;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.ontologymatching.JaroWinklerSimilarity;
 import uk.ac.open.kmi.squire.operation.RemoveTriple;
-import uk.ac.open.kmi.squire.operation.SPARQLQueryInstantiation;
-import uk.ac.open.kmi.squire.operation.StatefulSPARQLQuerySatisfiable;
+import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
+import uk.ac.open.kmi.squire.operation.IsSparqlQuerySatisfiableStateful;
 import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
@@ -48,12 +48,17 @@ import uk.ac.open.kmi.squire.utils.PowerSetFactory;
 
 /**
  * 
- * XXX for a {@link QueryTransform} in itself, this class has too much control
- * over other operations.
+ * XXX for a {@link AbstractMappedQueryTransform} in itself, this class has too much
+ * control over other operations.
  *
  * @author carloallocca
  */
-public class Specializer extends QueryTransform {
+public class Specializer extends AbstractMappedQueryTransform {
+
+	/**
+	 * How many specializations before printing the log.
+	 */
+	private int logFreq = 20;
 
 	private static String OPID_INSTANTIATE = "I";
 	private static String OPID_TP_REMOVE = "R";
@@ -77,7 +82,7 @@ public class Specializer extends QueryTransform {
 	 */
 	private final List<QueryAndContextNode> specializables = new ArrayList<>();
 
-	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, BasicGeneralizer previousOp,
+	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, MappedQueryTransform previousOp,
 			float resultTypeSimilarityDegree, float queryRootDistanceDegree, float resultSizeSimilarityDegree,
 			float querySpecificityDistanceDegree, String token) {
 		super();
@@ -244,7 +249,7 @@ public class Specializer extends QueryTransform {
 			log.debug("   - generalized query:\r\n{}", qctx.getTransformedQuery());
 		}
 
-		StatefulSPARQLQuerySatisfiable satisfiability = new StatefulSPARQLQuerySatisfiable(this.rdfd2);
+		IsSparqlQuerySatisfiableStateful satisfiability = new IsSparqlQuerySatisfiableStateful(this.rdfd2);
 
 		if (this.specializables.size() == 1) {
 			QueryAndContextNode singleQctx = this.specializables.get(0);
@@ -325,8 +330,6 @@ public class Specializer extends QueryTransform {
 			}
 		}
 
-		// log.info("WE WILL START THE SPECIALIZATION PROCESS...");
-
 		// XXX Scary conditioned loop : specializables is reduced in another method...
 		while (!this.specializables.isEmpty()) {
 
@@ -340,14 +343,14 @@ public class Specializer extends QueryTransform {
 				// this.notifyQueryRecommendation(parentQueryAndContextNode.getqR(),
 				// parentQueryAndContextNode.getqRScore());
 
-				// 4. check if we can apply a instanciation operation;
+				// 4. check if we can apply a instantiation operation;
 				if (canBeInstantiated(parentNode)) {
 					Query queryChild = QueryFactory.create(parentNode.getTransformedQuery());
 					log.debug("Child query: {}", queryChild);
 					List<QuerySolution> qSolList = parentNode.getQueryTempVarSolutionSpace();
 					log.debug("queryChild Instantiation step: {}", queryChild.toString());
 					log.debug("qSolList size = {} ", qSolList.size());
-					int c = 0;
+					int c = 0, csat = 0;
 					DecimalFormat format = new DecimalFormat("##.##%");
 
 					for (QuerySolution sol : qSolList) {
@@ -365,7 +368,7 @@ public class Specializer extends QueryTransform {
 							RDFNode node = sol.get(tv.getName());
 							if (node != null && node.asNode().isURI()) {
 								// XXX The operator is stateful so we have to re-instantiate it...
-								SPARQLQueryInstantiation op_inst = new SPARQLQueryInstantiation();
+								InstantiateTemplateVar op_inst = new InstantiateTemplateVar();
 								childQueryCopyInstanciated = op_inst.instantiateVarTemplate(childQueryCopy, tv,
 										node.asNode());
 								String entityQo = getEntityQo(tv);
@@ -383,6 +386,7 @@ public class Specializer extends QueryTransform {
 								// ...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 
 								if (satisfiability.isSatisfiableWrtResults(childQueryCopyInstanciated)) {
+									csat++;
 									QueryAndContextNode childNode = createQctxForInstantiation(
 											childQueryCopyInstanciated, parentNode, templVarEntityQoQrInstanciatedList);
 
@@ -410,8 +414,10 @@ public class Specializer extends QueryTransform {
 							}
 						}
 						double ratio = (double) c / qSolList.size();
-						if (0 == c % 10) log.info(" ... {} done ({} of {}) ", format.format(ratio), c, qSolList.size());
+						if (0 == c % logFreq)
+							log.info(" ... {} done ({} of {}) ", format.format(ratio), c, qSolList.size());
 					} // end for
+					log.info("{} done (processed={}, satisfiable={}) ", format.format(1), c, csat);
 				}
 			}
 
@@ -433,7 +439,7 @@ public class Specializer extends QueryTransform {
 		Set<Var> qTempVarSet = getQueryTemplateVariableSet(queryChild);
 		for (Var tv : qTempVarSet) {
 			RDFNode node = sol.get(tv.getName());
-			SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
+			InstantiateTemplateVar instOP = new InstantiateTemplateVar();
 			queryChild = instOP.instantiateVarTemplate(queryChild, tv, node.asNode());
 
 			// String entityqO =
@@ -499,13 +505,16 @@ public class Specializer extends QueryTransform {
 	}
 
 	/**
+	 * A query can be instantiated if and only if it is "templated", i.e. there is
+	 * at least one template variable in the query pattern, even if that variable is
+	 * not in the projection.
 	 * 
 	 * @param node
 	 * @return true iff there is at least one template variable in the transformed
 	 *         query.
 	 */
-	private boolean canBeInstantiated(QueryAndContextNode node) {
-		Set<Var> tempVarSet = getQueryTemplateVariableSet(node.getTransformedQuery());
+	private boolean canBeInstantiated(QueryAndContextNode queryNode) {
+		Set<Var> tempVarSet = getQueryTemplateVariableSet(queryNode.getTransformedQuery());
 		return tempVarSet.size() > 0;
 	}
 
@@ -590,7 +599,7 @@ public class Specializer extends QueryTransform {
 
 		// (b) Set the (cloned) datasets on the node
 		// XXX cloning the dataset object for the child nodes, why?
-		IRDFDataset d1 = parentNode.getDataset1();
+		IRDFDataset d1 = parentNode.getSourceDataset();
 		if (d1 instanceof SparqlIndexedDataset) {
 			// IRDFDataset clone = new SparqlIndexedDataset((String)
 			// parentNode.getRdfD1().getEndPointURL(),
@@ -600,7 +609,7 @@ public class Specializer extends QueryTransform {
 
 		} else { // TO ADD the case of FILEBASED dataset
 		}
-		IRDFDataset d2 = parentNode.getDataset2();
+		IRDFDataset d2 = parentNode.getTargetDataset();
 		if (d2 instanceof SparqlIndexedDataset) {
 			// IRDFDataset clone = new SparqlIndexedDataset(((String)
 			// parentNode.getRdfD2().getEndPointURL()),
@@ -656,7 +665,7 @@ public class Specializer extends QueryTransform {
 		Query clonedqR = QueryFactory.create(queryPostOp.toString());
 		node.setTransformedQuery(clonedqR);
 		// ..set the RDF dataset 1
-		IRDFDataset d1 = parentNode.getDataset1();
+		IRDFDataset d1 = parentNode.getSourceDataset();
 		if (d1 instanceof SparqlIndexedDataset) {
 			// IRDFDataset newRdfD1 = new SparqlIndexedDataset(((String)
 			// parentNode.getRdfD1().getEndPointURL()),
@@ -666,7 +675,7 @@ public class Specializer extends QueryTransform {
 		} else { // TO ADD the case of FILEBASED dataset
 		}
 		// ..set the RDF dataset 2
-		IRDFDataset d2 = parentNode.getDataset2();
+		IRDFDataset d2 = parentNode.getTargetDataset();
 		if (d2 instanceof SparqlIndexedDataset) {
 			// IRDFDataset newRdfD2 = new SparqlIndexedDataset(((String)
 			// parentNode.getRdfD2().getEndPointURL()),

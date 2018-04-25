@@ -18,7 +18,7 @@ import org.mksmart.squire.websquire.v1.resources.QueryStringScorePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable;
+import uk.ac.open.kmi.squire.operation.IsSparqlQuerySatisfiable;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.RDFDatasetSimilarity;
 
@@ -109,7 +109,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		}
 
 		// Phase 1 : check query satisfiability
-		SPARQLQuerySatisfiable qs = new SPARQLQuerySatisfiable(this.token);
+		IsSparqlQuerySatisfiable qs = new IsSparqlQuerySatisfiable(this.token);
 		qs.register(this);
 		boolean satisfiable = false;
 		log.info("Checking satisfiability against source dataset <{}>", rdfd1.getEndPointURL());

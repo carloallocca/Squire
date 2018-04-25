@@ -3,7 +3,8 @@ package uk.ac.open.kmi.squire.core4;
 import uk.ac.open.kmi.squire.entityvariablemapping.GeneralVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 
-public abstract class QueryTransform extends AbstractQueryRecommendationObservable {
+public abstract class AbstractMappedQueryTransform extends AbstractQueryRecommendationObservable
+		implements MappedQueryTransform {
 
 	protected enum NodeRole {
 		OBJECT, PREDICATE, SUBJECT
@@ -19,7 +20,7 @@ public abstract class QueryTransform extends AbstractQueryRecommendationObservab
 	protected VarMapping classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
 			objectProperyVarTable, rdfVocVarTable, plainPropertyVarTable;
 
-	protected QueryTransform() {
+	protected AbstractMappedQueryTransform() {
 		classVarTable = new GeneralVarMapping();
 		individualVarTable = new GeneralVarMapping();
 		literalVarTable = new GeneralVarMapping();
@@ -29,30 +30,37 @@ public abstract class QueryTransform extends AbstractQueryRecommendationObservab
 		plainPropertyVarTable = new GeneralVarMapping();
 	}
 
+	@Override
 	public VarMapping getClassVarTable() {
 		return classVarTable;
 	}
 
+	@Override
 	public VarMapping getDatatypePropertyVarTable() {
 		return datatypePropertyVarTable;
 	}
 
+	@Override
 	public VarMapping getIndividualVarTable() {
 		return individualVarTable;
 	}
 
+	@Override
 	public VarMapping getLiteralVarTable() {
 		return literalVarTable;
 	}
 
+	@Override
 	public VarMapping getObjectProperyVarTable() {
 		return objectProperyVarTable;
 	}
 
+	@Override
 	public VarMapping getPlainProperyVarTable() {
 		return plainPropertyVarTable;
 	}
 
+	@Override
 	public VarMapping getRdfVocVarTable() {
 		return rdfVocVarTable;
 	}

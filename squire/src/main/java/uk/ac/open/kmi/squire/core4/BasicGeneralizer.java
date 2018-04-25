@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
-import uk.ac.open.kmi.squire.operation.SparqlQueryGeneralization;
+import uk.ac.open.kmi.squire.operation.GeneralizeNode;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
@@ -50,7 +50,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  * 
  * @author carloallocca
  */
-public class BasicGeneralizer extends QueryTransform implements Generalizer {
+public class BasicGeneralizer extends AbstractMappedQueryTransform implements Generalizer {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -69,7 +69,7 @@ public class BasicGeneralizer extends QueryTransform implements Generalizer {
 		// The generalized query is created from a clone of the original one.
 		Query qGeneral = QueryFactory.create(query);
 		// Instantiated once, applied wherever possible.
-		SparqlQueryGeneralization qg = new SparqlQueryGeneralization();
+		GeneralizeNode qg = new GeneralizeNode();
 		// SUBJECT
 		for (Node subj : getEntitySet(query, NodeRole.SUBJECT))
 			if (subj.isConcrete() && !subj.isBlank()) {
@@ -139,7 +139,7 @@ public class BasicGeneralizer extends QueryTransform implements Generalizer {
 			else return null;
 		} else if (obj.isLiteral()) {
 			varName = literalVarTable.getOrCreateVar(obj.getLiteralValue().toString(),
-					QueryTransform.TEMPLATE_VAR_LITERAL);
+					AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL);
 		} else return null;
 		if (varName == null) throw new IllegalStateException("Object node generated a null variable name.");
 		return Var.alloc(varName);
@@ -164,7 +164,7 @@ public class BasicGeneralizer extends QueryTransform implements Generalizer {
 				varName = individualVarTable.getOrCreateVar(sub, TEMPLATE_VAR_INDIVIDUAL);
 		} else if (subj.isLiteral()) {
 			varName = literalVarTable.getOrCreateVar(subj.getLiteralValue().toString(),
-					QueryTransform.TEMPLATE_VAR_LITERAL);
+					AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL);
 		} else return null;
 		if (varName == null) throw new IllegalStateException("Subject node generated a null variable name.");
 		return Var.alloc(varName);
@@ -227,7 +227,7 @@ public class BasicGeneralizer extends QueryTransform implements Generalizer {
 				log.debug(" ... is a plain property in <{}> and not in <{}>", rdfd1, rdfd2);
 				varName = plainPropertyVarTable.getOrCreateVar(p, TEMPLATE_VAR_PROP_PLAIN);
 			} else {
-				log.debug(" ... is present in target dataset <{}> and override is not enable. Will not generalize.",
+				log.debug(" ... is present in target dataset <{}> and override is not enabled. Will not generalize.",
 						rdfd2);
 				return null;
 			}

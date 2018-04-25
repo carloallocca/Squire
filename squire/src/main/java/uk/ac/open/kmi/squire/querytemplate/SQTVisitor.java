@@ -5,9 +5,9 @@
  */
 package uk.ac.open.kmi.squire.querytemplate;
 
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_CLASS;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_INDIVIDUAL;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_LITERAL;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_CLASS;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_INDIVIDUAL;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL;
 
 import java.util.ListIterator;
 

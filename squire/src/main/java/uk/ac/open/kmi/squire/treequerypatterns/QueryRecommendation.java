@@ -5,11 +5,11 @@
  */
 package uk.ac.open.kmi.squire.treequerypatterns;
 
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_CLASS;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_INDIVIDUAL;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_LITERAL;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_PROP_DT;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_PROP_OBJ;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_CLASS;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_INDIVIDUAL;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_DT;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_OBJ;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +38,9 @@ import uk.ac.open.kmi.squire.evaluation.QueryResultTypeSimilarity;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.ontologymatching.JaroWinklerSimilarity;
 import uk.ac.open.kmi.squire.operation.RemoveTriple;
-import uk.ac.open.kmi.squire.operation.SPARQLQueryInstantiation;
-import uk.ac.open.kmi.squire.operation.SPARQLQuerySatisfiable;
-import uk.ac.open.kmi.squire.operation.SparqlQueryGeneralization;
+import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
+import uk.ac.open.kmi.squire.operation.IsSparqlQuerySatisfiable;
+import uk.ac.open.kmi.squire.operation.GeneralizeNode;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.utils.TreeNodez;
 
@@ -134,7 +134,7 @@ public class QueryRecommendation<T> {
 		}
 		if (n.getData() != null) {
 
-			SPARQLQuerySatisfiable qsat = new SPARQLQuerySatisfiable();
+			IsSparqlQuerySatisfiable qsat = new IsSparqlQuerySatisfiable();
 			Query qRec = ((DataNode) n.getData()).getqR();
 
 			boolean querySatR1 = qsat.isSatisfiableWRTProjectVar(qRec);
@@ -247,7 +247,7 @@ public class QueryRecommendation<T> {
 		// of Objects: " +
 		// objects.toString());
 
-		SparqlQueryGeneralization qg = new SparqlQueryGeneralization();
+		GeneralizeNode qg = new GeneralizeNode();
 
 		// SUBJECT
 		for (Node subj : subjects) {
@@ -914,7 +914,7 @@ public class QueryRecommendation<T> {
 			// ((DataNode)
 			// n.getData()).getEntityqR().toString());
 			// TO DO.
-			SPARQLQuerySatisfiable qsat = new SPARQLQuerySatisfiable();
+			IsSparqlQuerySatisfiable qsat = new IsSparqlQuerySatisfiable();
 			Query qRec = ((DataNode) n.getData()).getqR();
 
 			boolean querySat = qsat.isSatisfiable(qRec, this.rdfd2);
@@ -1005,7 +1005,7 @@ public class QueryRecommendation<T> {
 			if (tp.getSubject().isVariable()) {
 				if (isTemplateVariable(tp.getSubject().getName())) {
 					String templateVarString = tp.getSubject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					// if (isClassTemplateVariable(tp.getSubject().getName())) {
 					if (isClassTemplateVariable(templateVarString)) {
@@ -1170,7 +1170,7 @@ public class QueryRecommendation<T> {
 
 					// System.out.println("[QueryRecommendation:: private void specialize(...)] "
 					// + "The predicate is a Template Variable that need to be instanciated");
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 					// It means that we need to instancited for all the properties of parentPL.
 					for (String property : parentPL) {
 
@@ -1242,7 +1242,7 @@ public class QueryRecommendation<T> {
 			if (tp.getObject().isVariable()) {
 				if (isTemplateVariable(tp.getObject().getName())) {
 					String templateVarString = tp.getObject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					if (isClassTemplateVariable(tp.getObject().getName())) {
 						// It means that we need to instancited for all the of parentCL.
@@ -1443,7 +1443,7 @@ public class QueryRecommendation<T> {
 			if (tp.getSubject().isVariable()) {
 				if (isTemplateVariable(tp.getSubject().getName())) {
 					String templateVarString = tp.getSubject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					// if (isClassTemplateVariable(tp.getSubject().getName())) {
 					if (isClassTemplateVariable(templateVarString)) {
@@ -1669,7 +1669,7 @@ public class QueryRecommendation<T> {
 
 					// System.out.println("[QueryRecommendation:: private void specialize(...)] "
 					// + "The predicate is a Template Variable that need to be instanciated");
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 					// It means that we need to instancited for all the properties of parentPL.
 					for (String property : parentPL) {
 
@@ -1742,7 +1742,7 @@ public class QueryRecommendation<T> {
 			if (tp.getObject().isVariable()) {
 				if (isTemplateVariable(tp.getObject().getName())) {
 					String templateVarString = tp.getObject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					if (isClassTemplateVariable(tp.getObject().getName())) {
 						// It means that we need to instancited for all the of parentCL.
@@ -2060,7 +2060,7 @@ public class QueryRecommendation<T> {
 			if (tp.getSubject().isVariable()) {
 				if (isTemplateVariable(tp.getSubject().getName())) {
 					String templateVarString = tp.getSubject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					// if (isClassTemplateVariable(tp.getSubject().getName())) {
 					if (isClassTemplateVariable(templateVarString)) {
@@ -2286,7 +2286,7 @@ public class QueryRecommendation<T> {
 
 					// System.out.println("[QueryRecommendation:: private void specialize(...)] "
 					// + "The predicate is a Template Variable that need to be instanciated");
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 					// It means that we need to instancited for all the properties of parentPL.
 					for (String property : parentPL) {
 
@@ -2360,7 +2360,7 @@ public class QueryRecommendation<T> {
 			if (tp.getObject().isVariable()) {
 				if (isTemplateVariable(tp.getObject().getName())) {
 					String templateVarString = tp.getObject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					if (isClassTemplateVariable(tp.getObject().getName())) {
 						// It means that we need to instancited for all the of parentCL.
@@ -2633,7 +2633,7 @@ public class QueryRecommendation<T> {
 			if (tp.getSubject().isVariable()) {
 				if (isTemplateVariable(tp.getSubject().getName())) {
 					String templateVarString = tp.getSubject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 					// if (isClassTemplateVariable(tp.getSubject().getName())) {
 					if (isClassTemplateVariable(templateVarString)) {
 						// It means that we need to instancited for all the of parentCL.
@@ -2867,7 +2867,7 @@ public class QueryRecommendation<T> {
 
 					// System.out.println("[QueryRecommendation:: private void specialize(...)] "
 					// + "The predicate is a Template Variable that need to be instanciated");
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 					// It means that we need to instancited for all the properties of parentPL.
 					for (String property : parentPL) {
 						// System.out.println("[QueryRecommendation::+parentPL.toString()" +
@@ -2942,7 +2942,7 @@ public class QueryRecommendation<T> {
 			if (tp.getObject().isVariable()) {
 				if (isTemplateVariable(tp.getObject().getName())) {
 					String templateVarString = tp.getObject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					if (isClassTemplateVariable(tp.getObject().getName())) {
 						// It means that we need to instancited for all the of parentCL.
@@ -3259,7 +3259,7 @@ public class QueryRecommendation<T> {
 			if (tp.getSubject().isVariable()) {
 				if (isTemplateVariable(tp.getSubject().getName())) {
 					String templateVarString = tp.getSubject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					// if (isClassTemplateVariable(tp.getSubject().getName())) {
 					if (isClassTemplateVariable(templateVarString)) {
@@ -3495,7 +3495,7 @@ public class QueryRecommendation<T> {
 			if (tp.getPredicate().isVariable()) {
 				if (isTemplateVariable(tp.getPredicate().getName())) {
 					String templateVarString = tp.getPredicate().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 					// It means that we need to instancited for all the properties of parentPL.
 					for (String property : parentPL) {
 						Var templateVar = Var.alloc(templateVarString);
@@ -3559,7 +3559,7 @@ public class QueryRecommendation<T> {
 			if (tp.getObject().isVariable()) {
 				if (isTemplateVariable(tp.getObject().getName())) {
 					String templateVarString = tp.getObject().getName();
-					SPARQLQueryInstantiation qi = new SPARQLQueryInstantiation();
+					InstantiateTemplateVar qi = new InstantiateTemplateVar();
 
 					if (isClassTemplateVariable(tp.getObject().getName())) {
 						// It means that we need to instancited for all the of parentCL.

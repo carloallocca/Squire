@@ -225,7 +225,7 @@ public class TestClassSignatureGeneralizer {
 	 * <em>nothing</em> in common with the original one, except for the rdf:type
 	 * property.
 	 * 
-	 * I have no idea what a generalized query that satisfies this case would look
+	 * I have no idea what a generalized query that satisfies this case should look
 	 * like.
 	 */
 	@Test

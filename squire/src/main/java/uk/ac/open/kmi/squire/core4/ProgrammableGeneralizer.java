@@ -14,7 +14,7 @@ import org.apache.jena.sparql.syntax.ElementWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.operation.SparqlQueryGeneralization;
+import uk.ac.open.kmi.squire.operation.GeneralizeNode;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
 /**
@@ -55,7 +55,7 @@ public class ProgrammableGeneralizer extends BasicGeneralizer {
 	}
 
 	private void generalizeStep(Query q, final Set<Query> results) {
-		SparqlQueryGeneralization op = new SparqlQueryGeneralization();
+		GeneralizeNode op = new GeneralizeNode();
 		ElementWalker.walk(q.getQueryPattern(), new ElementVisitorBase() {
 			@Override
 			public void visit(ElementPathBlock el) {

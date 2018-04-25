@@ -28,7 +28,7 @@ import uk.ac.open.kmi.squire.core2.QueryTempVarSolutionSpace;
 import uk.ac.open.kmi.squire.evaluation.Metrics;
 import uk.ac.open.kmi.squire.evaluation.QueryResultTypeSimilarity;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
-import uk.ac.open.kmi.squire.operation.SPARQLQueryInstantiation;
+import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
 import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.TemplateVariableScanner;
@@ -38,7 +38,7 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.TemplateVariableScanner;
  * @author alessandro
  *
  */
-public class BestFirstSpecializer extends QueryTransform {
+public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 
 	private final IRDFDataset dFrom, dTo;
 
@@ -149,7 +149,7 @@ public class BestFirstSpecializer extends QueryTransform {
 					int i = 0;
 					for (QuerySolution sol : qTsolTemp) {
 						log.debug("Solution {} : {}", i++, sol);
-						SPARQLQueryInstantiation instOP = new SPARQLQueryInstantiation();
+						InstantiateTemplateVar instOP = new InstantiateTemplateVar();
 						Query qClone = QueryFactory.create(qG);
 						for (Iterator<String> it = sol.varNames(); it.hasNext();) {
 							String v = it.next();

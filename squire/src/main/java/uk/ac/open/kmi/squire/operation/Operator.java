@@ -1,6 +1,6 @@
 package uk.ac.open.kmi.squire.operation;
 
-import uk.ac.open.kmi.squire.core4.QueryTransform;
+import uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform;
 
 /**
  * An operator that, once applied, returns an object that can be assimilated
@@ -8,7 +8,10 @@ import uk.ac.open.kmi.squire.core4.QueryTransform;
  * 
  * In general, operators do not implement policies, i.e. they do not "decide"
  * when to be applied and when not to. Operators blindly apply what is decided
- * by a {@link QueryTransform}.
+ * by a {@link AbstractMappedQueryTransform}.
+ * 
+ * Nothing is assumed as to whether the operator returns an altered object
+ * supplied to it, or a cloned one.
  *
  * @author carloallocca, Alessandro Adamou<alexdma@apache.org>
  */

@@ -49,14 +49,6 @@ public class QueryAndContextNode {
 
 	private List<QuerySolution> queryTempVarSolutionSpace;
 
-	public IRDFDataset getDataset1() {
-		return ds1;
-	}
-
-	public IRDFDataset getDataset2() {
-		return ds2;
-	}
-
 	/**
 	 * It can be either R (for Removal) or I (Instantiation).
 	 *
@@ -84,6 +76,14 @@ public class QueryAndContextNode {
 
 	public List<QuerySolution> getQueryTempVarSolutionSpace() {
 		return queryTempVarSolutionSpace;
+	}
+
+	public IRDFDataset getSourceDataset() {
+		return ds1;
+	}
+
+	public IRDFDataset getTargetDataset() {
+		return ds2;
 	}
 
 	public Query getTransformedQuery() {

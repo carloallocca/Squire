@@ -14,13 +14,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Performs a single generalization step replacing a node with a template
- * variable in a query. All three objects are taken as arguments by the
- * {@link #perform(Query, Node, Var)} method.
+ * An operator that performs a single generalization step, replacing every
+ * occurrence of a node with a template variable in a query. All three objects
+ * are taken as arguments by the {@link #perform(Query, Node, Var)} method.
+ *
+ * TODO make this an {@link Operator}.
  *
  * @author callocca
  */
-public class SparqlQueryGeneralization {
+public class GeneralizeNode {
 
 	private class SQGeneralizationVisitor extends ElementVisitorBase {
 

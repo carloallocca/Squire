@@ -5,9 +5,9 @@
  */
 package uk.ac.open.kmi.squire.sparqlqueryvisitor;
 
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_CLASS;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_PROP_DT;
-import static uk.ac.open.kmi.squire.core4.QueryTransform.TEMPLATE_VAR_PROP_OBJ;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_CLASS;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_DT;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_OBJ;
 
 import java.util.HashSet;
 import java.util.ListIterator;

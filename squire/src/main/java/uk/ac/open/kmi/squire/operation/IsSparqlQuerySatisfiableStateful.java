@@ -16,7 +16,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  * @author alessandro
  *
  */
-public class StatefulSPARQLQuerySatisfiable extends SPARQLQuerySatisfiable {
+public class IsSparqlQuerySatisfiableStateful extends IsSparqlQuerySatisfiable {
 
 	private IRDFDataset dataset;
 
@@ -24,13 +24,13 @@ public class StatefulSPARQLQuerySatisfiable extends SPARQLQuerySatisfiable {
 
 	private Map<Query, Boolean> satisfiables;
 
-	public StatefulSPARQLQuerySatisfiable(IRDFDataset dataset) {
+	public IsSparqlQuerySatisfiableStateful(IRDFDataset dataset) {
 		super();
 		this.satisfiables = new HashMap<>();
 		this.dataset = dataset;
 	}
 
-	public StatefulSPARQLQuerySatisfiable(IRDFDataset dataset, String token) {
+	public IsSparqlQuerySatisfiableStateful(IRDFDataset dataset, String token) {
 		this(dataset);
 		this.token = token;
 	}

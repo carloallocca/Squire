@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.ac.open.kmi.squire.operation;
 
 import java.io.FileInputStream;
@@ -34,17 +29,18 @@ import uk.ac.open.kmi.squire.utils.SparqlUtils;
 import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
 
 /**
+ * TODO make this an {@link Operator}.
  *
  * @author callocca
  */
-public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservable {
+public class IsSparqlQuerySatisfiable extends AbstractQueryRecommendationObservable {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	public SPARQLQuerySatisfiable() {
+	public IsSparqlQuerySatisfiable() {
 	}
 
-	public SPARQLQuerySatisfiable(String token) {
+	public IsSparqlQuerySatisfiable(String token) {
 		this();
 		this.token = token;
 	}
@@ -59,15 +55,10 @@ public class SPARQLQuerySatisfiable extends AbstractQueryRecommendationObservabl
 		// TO ADD: check if it is an instance of FileBasedRDFDataset or SPARQLEndPoint
 		if (d instanceof SparqlIndexedDataset) {
 			List<QuerySolution> resList;
-			// QueryExecution qexec = new QueryEngineHTTP((String) d.getEndPointURL(), q);
-			// ResultSet results = qexec.execSelect();
-			// resList = ResultSetFormatter.toList(results); //.out(, results, q);
-			// return resList.size() >= 1;
 			try {
 				QueryExecution qexec = QueryExecutionFactory.sparqlService(datasetPath, qTMP, (String) d.getGraph());
 				ResultSet results = qexec.execSelect();
-
-				resList = ResultSetFormatter.toList(results); // .out(, results, q);
+				resList = ResultSetFormatter.toList(results);
 				return resList.size() >= 1;
 			} catch (Exception ex) {
 				log.error("Query failed");
