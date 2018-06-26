@@ -139,15 +139,15 @@ public class TestGoldStandard {
 		d2 = new SparqlIndexedDataset(target_endpoint);
 
 		QueryRecommendatorForm4 R1 = new QueryRecommendatorForm4(qo, d1, d2, resultTypeSimilarityDegree,
-				queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree,
+				queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree, false,
 				Integer.toString(1));
 
 		R1.run();
 
 	}
 
-	private void runEvaluation(String source, String target, String[] queries, Config configuration, String key)
-			throws Exception {
+	private void runEvaluationNonStrict(String source, String target, String[] queries, Config configuration,
+			String key) throws Exception {
 		IRDFDataset d1 = new SparqlIndexedDataset(source), d2 = new SparqlIndexedDataset(target);
 		int nQ = 1;
 		String dir = "TestResults/";
@@ -155,7 +155,7 @@ public class TestGoldStandard {
 		for (String q : queries) {
 			QueryRecommendatorForm4 recom = new QueryRecommendatorForm4(q, d1, d2, configuration.wResultTypeSimilarity,
 					configuration.wQueryRootDistance, configuration.wResultSizeSimilarity,
-					configuration.wQuerySpecificityDistance, Integer.toString(1));
+					configuration.wQuerySpecificityDistance, false, Integer.toString(1));
 			ConsolidatingReporter rep = new ConsolidatingReporter(q, new URL(source), new URL(target));
 			String filename = key + "_q" + nQ++;
 			Tracer tracer = new Tracer(q, new URL(source), new URL(target),
@@ -182,7 +182,7 @@ public class TestGoldStandard {
 			assertTrue(v.getAsObject().hasKey("original"));
 			queries.add(v.getAsObject().get("original").getAsString().value());
 		}
-		runEvaluation(endpoint_src, endpoint_tgt, queries.toArray(new String[0]), this.config, key);
+		runEvaluationNonStrict(endpoint_src, endpoint_tgt, queries.toArray(new String[0]), this.config, key);
 	}
 
 }

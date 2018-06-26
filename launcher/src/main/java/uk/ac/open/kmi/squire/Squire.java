@@ -42,11 +42,14 @@ public class Squire {
 			options.addOption("d", "datafile", true, "Use a JSON data file to configure recommendations.");
 			options.addOption("f", "force", false, "Force reindexing (for 'index' task).");
 			options.addOption("h", "help", false, "Show this help.");
-			options.addOption("l", "log", false, "Log computation to file along with generating reports.");
+			options.addOption("l", "log", false, "Log computation to file, in addition to final reporting.");
 			options.addOption("s", "source", true, "SPARQL endpoint where the query is satisfiable"
 					+ " (required for 'recommend' unless option 'd/datafile' is specified).");
 			options.addOption("t", "target", true, "Target SPARQL endpoint to send the reformulated query"
 					+ " (required for 'recommend' unless option 'd/datafile' is specified').");
+			options.addOption("S", "strict", false,
+					"Forces properties of recommended queries to be of the same type as those of the original query -"
+							+ " \"Let object properties be object properties\".");
 		}
 
 		/**
@@ -71,6 +74,8 @@ public class Squire {
 						for (int i = 1; i < args.length; i++)
 							targetEndpoints[i - 1] = args[i];
 					} else if ("recommend".equals(args[0])) {
+						if (cmd.hasOption('S')) 
+							strict = true;
 						if (cmd.hasOption('l')) tracing = true;
 						if (cmd.hasOption('d')) {
 							log.info("Using datafile at {}", cmd.getOptionValue('d'));
@@ -129,7 +134,7 @@ public class Squire {
 
 	private static File datafile;
 
-	private static boolean forceIndexing = false, tracing = false;
+	private static boolean forceIndexing = false, strict = false, tracing = false;
 
 	private static Logger log = LoggerFactory.getLogger(Squire.class);
 
@@ -169,7 +174,7 @@ public class Squire {
 					System.exit(-2);
 				}
 			} else new RecommendationTask(query, sourceEndpoint, new HashSet<>(Arrays.asList(targetEndpoints)), null,
-					tracing).execute();
+					strict, tracing).execute();
 		}
 		log.info("All done.");
 		System.exit(0);
@@ -196,7 +201,7 @@ public class Squire {
 			else log.error("Field 'queries' expects an array of either strings or"
 					+ " objects containing the 'original' or 'query' field.");
 			if (q != null) new RecommendationTask(q, endpoint_src, Collections.singleton(endpoint_tgt),
-					key + "_q" + (++nQ), tracing).execute();
+					key + "_q" + (++nQ), strict, tracing).execute();
 		}
 
 	}

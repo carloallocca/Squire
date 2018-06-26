@@ -31,6 +31,7 @@ import org.junit.Test;
 
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.WritableRdfDataset;
+import uk.ac.open.kmi.squire.vocabulary.Bibo;
 
 public class TestClassSignatureGeneralizer {
 
@@ -84,26 +85,25 @@ public class TestClassSignatureGeneralizer {
 	 */
 	@BeforeClass
 	public static void setUp() throws Exception {
-		String patent = "http://purl.org/ontology/bibo/Patent";
 		datasets = DummyDatasets.populate("/signatures2.json");
 		assertEquals(2, datasets.size());
 		assertTrue(datasets.containsKey(prefix + "1"));
 		IRDFDataset ds = datasets.get(prefix + "1");
 		assertTrue(ds.getClassSet().contains(FOAF.Document.getURI()));
 		assertEquals(2, ds.getClassSignatures().get(FOAF.Document.getURI()).listPathOrigins().size());
-		assertTrue(ds.getClassSet().contains(patent));
-		assertEquals(5, ds.getClassSignatures().get(patent).listPathOrigins().size());
+		assertTrue(ds.getClassSet().contains(Bibo.Patent.getURI()));
+		assertEquals(5, ds.getClassSignatures().get(Bibo.Patent.getURI()).listPathOrigins().size());
 		assertTrue(datasets.containsKey(prefix + "2"));
 		ds = datasets.get(prefix + "2");
 		assertTrue(ds.getClassSet().contains(FOAF.Document.getURI()));
 		assertEquals(6, ds.getClassSignatures().get(FOAF.Document.getURI()).listPathOrigins().size());
-		assertTrue(ds.getClassSet().contains(patent));
-		assertEquals(9, ds.getClassSignatures().get(patent).listPathOrigins().size());
+		assertTrue(ds.getClassSet().contains(Bibo.Patent.getURI()));
+		assertEquals(9, ds.getClassSignatures().get(Bibo.Patent.getURI()).listPathOrigins().size());
 	}
 
 	private Generalizer _op;
 
-	private final NorT bibo_Patent = new NorT(NodeFactory.createURI("http://purl.org/ontology/bibo/Patent"));
+	private final NorT bibo_Patent = new NorT(NodeFactory.createURI(Bibo.Patent.getURI()));
 
 	private final NorT ol_Article = new NorT(
 			NodeFactory.createURI("http://data.open.ac.uk/openlearn/ontology/OpenLearnArticle"));
@@ -159,7 +159,7 @@ public class TestClassSignatureGeneralizer {
 		assertEquals(1, qG.size());
 		Query q1 = qG.iterator().next();
 		assertTrue(find(q1, var_s, rdf_type, bibo_Patent));
-		assertTrue(find(q1, var_s, new NorT(NodeFactory.createURI("http://purl.org/ontology/bibo/authorList")),
+		assertTrue(find(q1, var_s, new NorT(NodeFactory.createURI(Bibo.authorList.getURI())),
 				new NorT(NodeFactory.createVariable("author"))));
 		assertTrue(find(q1, var_s, new NorT(DCTerms.title.asNode()), var_title));
 		assertFalse(find(q1, var_s, type_var, null));
@@ -336,6 +336,22 @@ public class TestClassSignatureGeneralizer {
 		assertFalse(find(q1, var_s, rdf_type, ol_Article));
 	}
 
+	/**
+	 * A utility method for finding patterns in a query, whether their elements
+	 * match specific values or are of a specific type (Variable, URI, Literal
+	 * etc.). Useful for JUnit assertions.
+	 * 
+	 * @param q
+	 *            the query
+	 * @param s
+	 *            the subject node or node type
+	 * @param p
+	 *            the predicate node or node type
+	 * @param o
+	 *            the object node or node type
+	 * @return true iff at least one match of the pattern given by s, p and o was
+	 *         found in q.
+	 */
 	private boolean find(Query q, NorT s, NorT p, NorT o) {
 		final boolean[] found = new boolean[] { false };
 		q.getQueryPattern().visit(new ElementVisitorBase() {

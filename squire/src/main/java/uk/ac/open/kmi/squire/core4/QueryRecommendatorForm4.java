@@ -36,13 +36,15 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	private final float queryRootDistanceDegree, querySpecificityDistanceDegree, resultSizeSimilarityDegree,
 			resultTypeSimilarityDegree;
 
+	private final boolean strict;
+
 	private final String queryString;
 
 	private final IRDFDataset rdfd1, rdfd2;
 
 	public QueryRecommendatorForm4(String qString, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree,
-			String token) {
+			boolean strict, String token) {
 		this.token = token;
 		this.queryString = qString;
 		this.rdfd1 = d1;
@@ -51,6 +53,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		this.querySpecificityDistanceDegree = querySpecificityDistanceDegree;
 		this.resultSizeSimilarityDegree = resultSizeSimilarityDegree;
 		this.resultTypeSimilarityDegree = resultTypeSimilarityDegree;
+		this.strict = strict;
 	}
 
 	public void addListener(QueryRecommendationListener listener) {
@@ -99,6 +102,8 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		Query query;
 		log.info("Started recommendation process.");
 		log.debug(" (token={})", token);
+		if (this.strict) log.warn("Strict flag is set: only queries that preserve datatype properties and object"
+				+ " properties will be considered for recommendation.");
 		try {
 			query = QueryFactory.create(queryString);
 			log.info(" === Original query follows === ");
@@ -121,7 +126,7 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		if (satisfiable) try {
 			// Phase 3 : recommend
 			QueryRecommendator4 qR = new QueryRecommendator4(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
-					queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree);
+					queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree, strict);
 			RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
 			querySim.register(this);
 			float score = querySim.computeSim(rdfd1, rdfd2);

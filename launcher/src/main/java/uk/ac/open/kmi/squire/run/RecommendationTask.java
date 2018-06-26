@@ -25,21 +25,23 @@ public class RecommendationTask {
 
 	private String id;
 
-	private boolean withLogging = false;
+	private boolean withLogging = false, strict = false;
 
 	private Set<String> targetEndpoints;
 
 	public RecommendationTask(String query, String sourceEndpoint, Set<String> targetEndpoints, String id,
-			boolean logging) {
+			boolean strict, boolean logging) {
 		this.query = query;
 		this.sourceEndpoint = sourceEndpoint;
 		this.targetEndpoints = targetEndpoints;
 		this.withLogging = logging;
 		this.id = id;
+		this.strict = strict;
 	}
 
-	public RecommendationTask(String query, String sourceEndpoint, Set<String> targetEndpoints, String id) {
-		this(query, sourceEndpoint, targetEndpoints, id, false);
+	public RecommendationTask(String query, String sourceEndpoint, Set<String> targetEndpoints, String id,
+			boolean strict) {
+		this(query, sourceEndpoint, targetEndpoints, id, strict, false);
 	}
 
 	private Logger log = LoggerFactory.getLogger(getClass());
@@ -50,7 +52,8 @@ public class RecommendationTask {
 		new File(dir).mkdir();
 		for (String tgt : targetEndpoints) {
 			IRDFDataset d1 = new SparqlIndexedDataset(sourceEndpoint), d2 = new SparqlIndexedDataset(tgt);
-			QueryRecommendatorForm4 recom = new QueryRecommendatorForm4(query, d1, d2, 1, 1, 1, 1, Integer.toString(1));
+			QueryRecommendatorForm4 recom = new QueryRecommendatorForm4(query, d1, d2, 1, 1, 1, 1, strict,
+					Integer.toString(1));
 
 			URL uS, uT;
 			try {

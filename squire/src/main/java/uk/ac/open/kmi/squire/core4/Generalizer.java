@@ -15,12 +15,10 @@ import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
 import org.apache.jena.vocabulary.RDF;
 
-import uk.ac.open.kmi.squire.operation.GeneralizeNode;
-
 /**
- * The {@link BasicGeneralizer} is in charge of deciding which nodes in a query
- * pattern are turned into template variables and which are not, and then
- * applies a {@link GeneralizeNode} to the designated nodes.
+ * The Generalizer is in charge of deciding which nodes in a query pattern are
+ * turned into template variables and which are not, and then applies a
+ * generalization operation to the designated nodes.
  * 
  * @author carloallocca, Alessandro Adamou<alexdma@apache.org>
  */

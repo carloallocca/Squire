@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
-public class TestSpecialize {
+public class TestBestFirstSpecializer {
 
 	private String qsOrig = "SELECT DISTINCT  ?mod ?title ?code ?regulation WHERE {"
 			+ "?mod a <http://purl.org/vocab/aiiso/schema#Module>" + " ; <http://purl.org/dc/terms/title> ?title"
@@ -19,7 +19,7 @@ public class TestSpecialize {
 	public void bestFirst() throws Exception {
 		BestFirstSpecializer op = new BestFirstSpecializer(QueryFactory.create(qsOrig), QueryFactory.create(qsGen),
 				new SparqlIndexedDataset("http://data.open.ac.uk/query", false),
-				new SparqlIndexedDataset("https://data.ox.ac.uk/sparql/", false));
+				new SparqlIndexedDataset("https://data.ox.ac.uk/sparql/", false), false);
 		op.specialize();
 	}
 

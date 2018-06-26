@@ -73,16 +73,18 @@ public class Tracer extends Reporter {
 
 	@Override
 	public void satisfiabilityChecked(Query query, IRDFDataset targetDataset, boolean satisfiable) {
-		out.println("*****************");
-		out.println("**** WARNING ****");
-		out.println("*****************");
-		out.println("A recommendation candidate was found to be unsatisfiable with the target dataset.");
-		out.println("Endpoint : " + targetDataset.getEndPointURL());
-		out.println("Query:");
-		out.println(query);
-		out.println("*****************");
-		out.println();
-		out.flush();
+		if (!satisfiable) {
+			out.println("*****************");
+			out.println("**** WARNING ****");
+			out.println("*****************");
+			out.println("A recommendation candidate was found to be unsatisfiable with the target dataset.");
+			out.println("Endpoint : " + targetDataset.getEndPointURL());
+			out.println("Query:");
+			out.println(query);
+			out.println("*****************");
+			out.println();
+			out.flush();
+		}
 	}
 
 }

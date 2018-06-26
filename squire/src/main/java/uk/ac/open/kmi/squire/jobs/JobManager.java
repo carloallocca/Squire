@@ -76,7 +76,7 @@ public class JobManager implements IQueryRecommendationObserver {
 			map.put(strToken, new RecommendationJobStatus());
 		}
 		QueryRecommendatorForm4 R1 = new QueryRecommendatorForm4(qString, d1, d2, resultTypeSimilarityDegree,
-				queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree,
+				queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree, false,
 				Integer.toString(tokenCounter));
 		R1.register(this);
 		log.debug("Active threads before submission: {} (completed: {})", this.threadPool.getActiveCount(),

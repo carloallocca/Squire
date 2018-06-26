@@ -37,9 +37,9 @@ import uk.ac.open.kmi.squire.evaluation.QueryGPESim;
 import uk.ac.open.kmi.squire.evaluation.QueryResultTypeSimilarity;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.ontologymatching.JaroWinklerSimilarity;
-import uk.ac.open.kmi.squire.operation.RemoveTriple;
 import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
 import uk.ac.open.kmi.squire.operation.IsSparqlQuerySatisfiableStateful;
+import uk.ac.open.kmi.squire.operation.RemoveTriple;
 import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
@@ -48,23 +48,25 @@ import uk.ac.open.kmi.squire.utils.PowerSetFactory;
 
 /**
  * 
- * XXX for a {@link AbstractMappedQueryTransform} in itself, this class has too much
- * control over other operations.
+ * XXX for a {@link AbstractMappedQueryTransform} in itself, this class has too
+ * much control over other operations.
  *
  * @author carloallocca
  */
 public class Specializer extends AbstractMappedQueryTransform {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
+	private static String OPID_INSTANTIATE = "I";
+	private static String OPID_TP_REMOVE = "R";
 
 	/**
 	 * How many specializations before printing the log.
 	 */
 	private int logFreq = 20;
 
-	private static String OPID_INSTANTIATE = "I";
-	private static String OPID_TP_REMOVE = "R";
-
-	private final Logger log = LoggerFactory.getLogger(getClass());
-
+	private final boolean strict;
+	
 	private final Query qO, qR;
 
 	private Map<String, Query> queryIndex = new HashMap<>();
@@ -84,9 +86,11 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, MappedQueryTransform previousOp,
 			float resultTypeSimilarityDegree, float queryRootDistanceDegree, float resultSizeSimilarityDegree,
-			float querySpecificityDistanceDegree, String token) {
+			float querySpecificityDistanceDegree, boolean strict, String token) {
 		super();
 
+		this.strict = strict;
+		
 		this.qO = QueryFactory.create(qo.toString());
 		this.qR = QueryFactory.create(qr.toString());
 
@@ -107,6 +111,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 		this.token = token;
 
+		log.info("Computing scores for generalized query wrt. original...");
 		// A. Compute the query recommentedQueryScore:
 		// 1)...QueryRootDistance ... we start with both value set to 0
 		float queryRootDist = 0;
@@ -139,11 +144,17 @@ public class Specializer extends AbstractMappedQueryTransform {
 		 * This is working as it should but it does not consider the similarity distance
 		 * between the replaced entities
 		 */
-		float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim)
+		float recommendedQueryScore = ((queryRootDistanceDegree * queryRootDistSim)
 				+ (resultTypeSimilarityDegree * resultTypeSim) + (querySpecificityDistanceDegree * (qSpecificitySim)));
-		String op = ""; // It can be either R (for Removal) or I (Instantiation).
+
+		log.info(" - query specificity distance wrt variables = {}", qSpecDistVar);
+		log.info(" - query specificity distance wrt triple patterns = {}", qSpecDistTP);
+		log.info(" - query specificity similarity = {}", resultTypeSim);
+		log.info(" - result type similarity = {}", resultTypeSim);
+		log.info(" - overall score = {}", recommendedQueryScore);
 
 		// B. Compute the qRTemplateVariableSet and qRTriplePatternSet
+		String op = ""; // It can be either R (for Removal) or I (Instantiation).
 
 		Set<Var> qRTemplateVariableSet = getQueryTemplateVariableSet(this.qR);
 		Set<TriplePath> qRTriplePatternSet = getQueryTriplePathSet(this.qR);
@@ -152,13 +163,13 @@ public class Specializer extends AbstractMappedQueryTransform {
 		List<QuerySolution> qTsol;
 		try {
 			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-			qTsol = temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2);
+			qTsol = temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2, strict);
 			qTsol = eliminateDuplicateBindings(qTsol);
 		} catch (TooGeneralException gex) {
 			log.warn("Query is too general to execute safely. Assuming solution exists.");
 			log.warn(" * Query : '{}'", gex.getQuery());
 			qTsol = new ArrayList<>();
-			qTsol.add(new QuerySolutionMap());
+			qTsol.add(new QuerySolutionMap()); // Add an empty solution, just not to make it fail.
 		}
 
 		// Map<Var, Set<RDFNode>>
@@ -188,24 +199,21 @@ public class Specializer extends AbstractMappedQueryTransform {
 		qAndcNode.setQueryRootDistance(queryRootDist);
 		// qAndcNode.setQuerySpecificityDistanceSimilarity(qSpecDistVar + qSpecDistTP);
 		qAndcNode.setQuerySpecificityDistance(qSpecificitySim);
-		qAndcNode.setqRScore(recommentedQueryScore);
-		qAndcNode.setOp(op);
+		qAndcNode.setqRScore(recommendedQueryScore);
+		qAndcNode.setLastOperation(op);
 		// qAndcNode.setqRTemplateVariableSet(qRTemplateVariableSet);
 		// qAndcNode.setqRTriplePathSet(qRTriplePatternSet);
 		// ...set the QueryTempVarSolutionSpace
 		qAndcNode.setSolutionSpace(qTsol);
 		// qAndcNode.setQueryTempVarValueMap(qTsolMap);
 
-		// E. Sorted Insert of the QueryAndContextNode into the
-		// specializableQueryAndContextNodeList
-		// if(qTsol.size()>=1){
+		// E. Create a sorted list of "specializable" queries
+		// NOTE: This implementation only produces singletons.
 		this.specializables.add(qAndcNode);
 		Collections.sort(this.specializables, new QueryAndContextNode.QRScoreComparator());
-
-		// this.recommandedQueryList.add(qAndcNode);
 	}
 
-	public List<QueryAndContextNode> getRecommendations() {
+	public List<QueryAndContextNode> getSpecializations() {
 		return recommendations;
 	}
 
@@ -233,7 +241,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 	 * <li>It does not account for the case where the general query has a solution
 	 * in the target dataset, but the solution does not include the query we are
 	 * looking for (see e.g. the third query of the egov_1 gold standard: the
-	 * properties match, but not for the type School): in the current
+	 * properties match, but never for the type School): in the current
 	 * implementation, no removal/powerset operation is performed and the desired
 	 * query will not be recommended at all.
 	 * <li>Because the powerset/removal operations might be needed in such
@@ -257,13 +265,23 @@ public class Specializer extends AbstractMappedQueryTransform {
 			log.debug(" - solution space size = {}", singleQctx.getQueryTempVarSolutionSpace().size());
 			log.debug(" - has template variables that can be instantiated: {}",
 					canBeInstantiated(singleQctx) ? "YES" : "NO");
-			if (singleQctx.getQueryTempVarSolutionSpace().isEmpty() && canBeInstantiated(singleQctx)) {
 
-				// log.info("WE WILL START THE SUB PROCESS SPECIALIZATION...");
-				// 1. Get and Remove the QueryAndContextNode with qRScore max
+			/*
+			 * Worst case: the generalized query has no solution but it does have template
+			 * variables. This may happen for example because the assumptions made in the
+			 * generalization, such as the co-occurrence of two or more properties, were
+			 * incorrect. This case expands on all the possible combinations of templated
+			 * triple patterns.
+			 */
+			if (singleQctx.getQueryTempVarSolutionSpace().isEmpty() && canBeInstantiated(singleQctx)) {
+				log.warn("Specializable query has no solution!"
+						+ " This is usually a consequence of bad assumptions from the generalization process.");
+				log.warn("Fallback is to expand the specializable query as the power set of its query patterns.");
+				log.warn("This has a high computational load.");
+
 				QueryAndContextNode parentQctx = popTopScoredQueryCtx(this.specializables);
 				// ADD the code for generating the subqueries with removed triple patterns
-				// (QueryAndContextNode)
+
 				// The power set of the triple pattern set.
 				// P.S. Look at the code down in the section 3.
 				Query parentqRCopy = QueryFactory.create(parentQctx.getTransformedQuery());
@@ -275,7 +293,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 				log.debug("Size of triple path power set: {}", tpPowerSet.size());
 
 				for (List<TriplePath> triplePathSubSet : tpPowerSet) {
-					log.debug("triplePathSubSet ::" + triplePathSubSet.toString());
+					log.debug("triplePathSubSet :: {}", triplePathSubSet);
 					if (!triplePathSubSet.isEmpty()) {
 						SelectBuilder sb = new SelectBuilder();
 						// adding the triple patterns
@@ -291,7 +309,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 						// a node child from the node parent
 						// Check if it is alredy indexed and therefore generated
 						log.debug("subQuery Remove operation::: " + subQuery.toString());
-						if (!(isQueryIndexed(subQuery))) {
+						if (!isQueryIndexed(subQuery)) {
 							// ...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 							boolean sat = false;
 							try {
@@ -343,7 +361,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 				// this.notifyQueryRecommendation(parentQueryAndContextNode.getqR(),
 				// parentQueryAndContextNode.getqRScore());
 
-				// 4. check if we can apply a instantiation operation;
+				// 4. check if we can apply an instantiation operation;
 				if (canBeInstantiated(parentNode)) {
 					Query queryChild = QueryFactory.create(parentNode.getTransformedQuery());
 					log.debug("Child query: {}", queryChild);
@@ -378,7 +396,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 							} else log.error("Unexpected state of node {} for template variable '{}'", node, tv);
 						}
 						if (childQueryCopyInstanciated != null) {
-							// 4.1.2. Check if it is alredy indexed and therefore generated
+							// 4.1.2. Check if it is already indexed and therefore generated
 							if (!isQueryIndexed(childQueryCopyInstanciated)) {
 								// add qWithoutTriple to the index
 								addQueryToIndexIFAbsent(childQueryCopyInstanciated);
@@ -624,7 +642,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// The following is no longer being done:
 		// - set class, object/datatype property sets etc. on the node
 		// - keep track of the operations list on each node (was not being used)
-		node.setOp(OPID_INSTANTIATE);
+		node.setLastOperation(OPID_INSTANTIATE);
 
 		// ...set the score measurements
 		computeCommonScores(node, parentNode);
@@ -696,7 +714,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 			// Compute the QueryTempVarSolutionSpace
 			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-			List<QuerySolution> qTsolTMP = temVarValueSpace.computeTempVarSolutionSpace(queryPostOp, this.rdfd2);
+			List<QuerySolution> qTsolTMP = temVarValueSpace.computeTempVarSolutionSpace(queryPostOp, this.rdfd2, strict);
 
 			// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
 			// <http://purl.org/dc/terms/title> ),
@@ -710,7 +728,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// The following is no longer being done:
 		// - set class, object/datatype property sets etc. on the node
 		// - keep track of the operations list on each node (was not being used)
-		node.setOp(OPID_TP_REMOVE);
+		node.setLastOperation(OPID_TP_REMOVE);
 
 		// ...set the score measurements
 		computeCommonScores(node, parentNode);

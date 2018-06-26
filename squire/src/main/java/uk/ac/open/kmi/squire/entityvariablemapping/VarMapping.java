@@ -6,6 +6,8 @@ public interface VarMapping {
 
 	public void clear();
 
+	public void init();
+
 	public String getOrCreateVar(String uri, String varPrefix);
 
 	public String getValueFromVar(String varString);

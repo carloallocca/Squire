@@ -5,6 +5,9 @@
  */
 package uk.ac.open.kmi.squire.core2;
 
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_DT;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_OBJ;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,19 +21,24 @@ import java.util.Set;
 
 import org.apache.jena.atlas.json.JsonParseException;
 import org.apache.jena.graph.Node;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.ObjectProperty;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
 import org.apache.jena.sparql.resultset.ResultSetException;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementFilter;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementVisitorBase;
 import org.apache.jena.sparql.syntax.ElementWalker;
+import org.apache.jena.sparql.util.ExprUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,20 +85,23 @@ public class QueryTempVarSolutionSpace {
 	 * 
 	 * @param qChild
 	 * @param rdfd2
+	 * @param strict
+	 *            consider only the solutions that preserve property types.
+	 * @param projectToThese
 	 * @return
 	 * @throws TooGeneralException
 	 *             if the query is too general (e.g. too many variables and few
-	 *             URIs) to be safely executed.
+	 *             concrete nodes) to be safely executed.
 	 */
-	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2, Var... projectToThese)
-			throws TooGeneralException {
+	public List<QuerySolution> computeTempVarSolutionSpace(Query qChild, IRDFDataset rdfd2, boolean strict,
+			Var... projectToThese) throws TooGeneralException {
 		List<QuerySolution> qTsol = new ArrayList<>();
 		// Defer the check for template variables to the templatizeAndReduce() function.
 		String res = null;
 		Query qT = qChild;
 		try {
 			// 1. Transform the query qChild so that only template variables are projected.
-			qT = templatizeAndReduce(qChild, projectToThese);
+			qT = templatizeAndReduce(qChild, strict, projectToThese);
 			// 1a. Check if the resulting query is not too general to be executed.
 			checkGenerality(qT);
 			// 2. Compute the solution space for the templated (and possibly reduced) query.
@@ -155,14 +166,11 @@ public class QueryTempVarSolutionSpace {
 		for (Var v : reductions.keySet()) {
 			// If the key is filtered in, copy the whole value
 			if (projv.contains(v)) filtered.put(v, new HashSet<>(reductions.get(v)));
-			else {
-				for (Var r : reductions.get(v))
-					if (projv.contains(r)) {
-						if (!filtered.containsKey(v)) filtered.put(v, new HashSet<>());
-						filtered.get(v).add(r);
-					}
-			}
-
+			else for (Var r : reductions.get(v))
+				if (projv.contains(r)) {
+					if (!filtered.containsKey(v)) filtered.put(v, new HashSet<>());
+					filtered.get(v).add(r);
+				}
 		}
 		return filtered;
 	}
@@ -187,8 +195,40 @@ public class QueryTempVarSolutionSpace {
 	 * @param queryOrig
 	 * @return
 	 */
-	private Query templatizeAndReduce(Query queryOrig, Var... projectToThese) throws NotTemplatedException {
-		log.debug("Original query: {}", queryOrig);
+	private Query templatizeAndReduce(Query queryOrig, boolean strict, Var... projectToThese)
+			throws NotTemplatedException {
+
+		/**
+		 * Utility class used as key for unique (subject,propertyType) pairs.
+		 * 
+		 * @author alessandro
+		 *
+		 */
+		class NodeAndPropType {
+
+			Node node;
+			Class<? extends Property> propertyType;
+
+			NodeAndPropType(Node node, Class<? extends Property> propertyType) {
+				this.node = node;
+				this.propertyType = propertyType;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj) return true;
+				if (obj instanceof NodeAndPropType) return node.equals(((NodeAndPropType) obj).node)
+						&& propertyType.equals(((NodeAndPropType) obj).propertyType);
+				return false;
+			}
+
+			@Override
+			public int hashCode() {
+				return Arrays.hashCode(new Object[] { node, propertyType });
+			}
+		}
+
+		log.debug("Query before reduction:\r\n{}", queryOrig);
 		Set<Var> templateVars = getTemplateVariables(queryOrig);
 		if (projectToThese.length > 0) {
 			log.debug("Projection forced to the following variables: {}", (Object[]) projectToThese);
@@ -199,7 +239,7 @@ public class QueryTempVarSolutionSpace {
 		/*
 		 * The subject node and the corresponding TP that we choose to keep.
 		 */
-		final Map<Node, TriplePath> subjectsWithGenericTPs = new HashMap<>();
+		final Map<NodeAndPropType, TriplePath> subjectsWithGenericTPs = new HashMap<>();
 		Element qp = queryOrig.getQueryPattern();
 		final ElementGroup qpNu = new ElementGroup();
 		ElementWalker.walk(qp, new ElementVisitorBase() {
@@ -225,10 +265,18 @@ public class QueryTempVarSolutionSpace {
 					TriplePath tp = it.next();
 					// For each subject, only keep the first trivial TP (i.e. where both predicate
 					// and object are variables) that we haven't already kept.
+					// If we are being strict, keep one for each (subject, propertyType)
 					Node s = tp.getSubject();
 					if (tp.getPredicate().isVariable() && tp.getObject().isVariable()) {
 						Var p = (Var) tp.getPredicate(), o = (Var) tp.getObject();
-						if (!subjectsWithGenericTPs.containsKey(s)) {
+						Class<? extends Property> propType;
+						if (strict) {
+							if (p.getName().startsWith(TEMPLATE_VAR_PROP_DT)) propType = DatatypeProperty.class;
+							else if (p.getName().startsWith(TEMPLATE_VAR_PROP_OBJ)) propType = DatatypeProperty.class;
+							else propType = Property.class;
+						} else propType = Property.class;
+						NodeAndPropType key = new NodeAndPropType(s, propType);
+						if (!subjectsWithGenericTPs.containsKey(key)) {
 							try {
 								keep(tp, pathBlock);
 							} catch (NotTemplatedException ex) {
@@ -236,7 +284,7 @@ public class QueryTempVarSolutionSpace {
 							}
 						} else {
 							// memorize the variables for the other trivial TPs.
-							TriplePath kept = subjectsWithGenericTPs.get(s);
+							TriplePath kept = subjectsWithGenericTPs.get(key);
 							reductions.get((Var) kept.getPredicate()).add(p);
 							reductions.get((Var) kept.getObject()).add(o);
 						}
@@ -255,7 +303,14 @@ public class QueryTempVarSolutionSpace {
 					throw new NotTemplatedException(queryOrig);
 				Node s = tp.getSubject();
 				Var p = (Var) tp.getPredicate(), o = (Var) tp.getObject();
-				subjectsWithGenericTPs.put(s, tp);
+				Class<? extends Property> pt;
+				if (strict) {
+					String nam = p.getName();
+					if (nam.startsWith(TEMPLATE_VAR_PROP_DT)) pt = DatatypeProperty.class;
+					else if (nam.startsWith(TEMPLATE_VAR_PROP_OBJ)) pt = ObjectProperty.class;
+					else pt = Property.class;
+				} else pt = Property.class;
+				subjectsWithGenericTPs.put(new NodeAndPropType(s, pt), tp);
 				pathBlock.addTriple(tp);
 				usedVars.add(p);
 				if (!reductions.containsKey(p)) reductions.put(p, new HashSet<>());
@@ -268,10 +323,42 @@ public class QueryTempVarSolutionSpace {
 
 		Query qT = QueryFactory.create();
 		qT.setDistinct(true);
-		qT.setQueryPattern(qpNu);
 		qT.setQuerySelectType();
 		for (Var tv : templateVars)
 			if (usedVars.contains(tv)) qT.addResultVar(tv.getName());
+
+		if (strict) {
+			String exp = "";
+			Set<String> projected = new HashSet<>(qT.getResultVars());
+			List<String> conds = new ArrayList<>();
+			ElementWalker.walk(qpNu, new ElementVisitorBase() {
+				@Override
+				public void visit(ElementPathBlock el) {
+					for (Iterator<TriplePath> it = el.patternElts(); it.hasNext();) {
+						TriplePath tp = it.next();
+						if (tp.getPredicate().isVariable() && tp.getObject().isVariable()
+								&& projected.contains(tp.getPredicate().getName())) {
+							String nam = tp.getPredicate().getName();
+							if (nam.startsWith(TEMPLATE_VAR_PROP_DT)) {
+								conds.add("isLiteral(?" + tp.getObject().getName() + ")");
+								projected.remove(nam);
+							} else if (nam.startsWith(TEMPLATE_VAR_PROP_OBJ)) {
+								conds.add("isIRI(?" + tp.getObject().getName() + ")");
+								projected.remove(nam);
+							}
+						}
+					}
+				}
+			});
+			for (int i = 0; i < conds.size(); i++) {
+				if (i > 0) exp += " && ";
+				exp += conds.get(i);
+			}
+			log.debug(exp);
+			qpNu.addElementFilter(new ElementFilter(ExprUtils.parse(exp)));
+		}
+		qT.setQueryPattern(qpNu);
+
 		log.debug("Reduced query: {}", qT);
 		return qT;
 	}

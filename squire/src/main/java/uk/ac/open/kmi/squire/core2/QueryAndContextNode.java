@@ -98,7 +98,7 @@ public class QueryAndContextNode {
 		this.ds2 = rdfD2;
 	}
 
-	public void setOp(String op) {
+	public void setLastOperation(String op) {
 		this.op = op;
 	}
 

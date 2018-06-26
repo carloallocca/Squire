@@ -12,6 +12,12 @@ import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
+import org.apache.jena.sparql.expr.E_IsBlank;
+import org.apache.jena.sparql.expr.E_IsLiteral;
+import org.apache.jena.sparql.expr.E_IsURI;
+import org.apache.jena.sparql.expr.E_LogicalAnd;
+import org.apache.jena.sparql.expr.Expr;
+import org.apache.jena.sparql.util.ExprUtils;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.junit.Test;
 
@@ -20,6 +26,28 @@ import org.junit.Test;
  * the implementation to work, are confirmed/preserved.
  */
 public class TestJenaAssumptions {
+
+	/**
+	 * A logical AND of node checks is parsed correctly.
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void eNodeTypeChecks() throws Exception {
+		String s = "isUri(?obj1) && isLiteral(?obj2) && isBlank(?obj3)";
+		Expr expr = ExprUtils.parse(s);
+		assertTrue(expr instanceof E_LogicalAnd);
+		Set<Var> vars = expr.getVarsMentioned();
+		assertEquals(3, vars.size());
+		assertTrue(vars.contains(Var.alloc("obj1")));
+		assertTrue(vars.contains(Var.alloc("obj2")));
+		assertTrue(vars.contains(Var.alloc("obj3")));
+		assertTrue(((E_LogicalAnd) expr).getArg1() instanceof E_LogicalAnd);
+		assertTrue(((E_LogicalAnd) expr).getArg2() instanceof E_IsBlank);
+		E_LogicalAnd and = (E_LogicalAnd) ((E_LogicalAnd) expr).getArg1();
+		assertTrue(and.getArg1() instanceof E_IsURI);
+		assertTrue(and.getArg2() instanceof E_IsLiteral);
+	}
 
 	/*
 	 * Two query solutions with equivalent content are equivalent.

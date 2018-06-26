@@ -149,7 +149,7 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 					groupsBySize.get(group.size()).add(group);
 				}
 				// Produce the final generalized queries from the largest groups.
-				if (groupsBySize.isEmpty()) log.warn("Sorry, no suitable property grouping was created.");
+				if (groupsBySize.isEmpty()) log.warn("Sorry, no suitable property grouping could be created.");
 				else {
 					log.debug("Picking the largest groups:");
 					for (Set<String> group : groupsBySize.firstEntry().getValue()) {
@@ -177,6 +177,7 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 		int i = 0;
 		for (Iterator<Query> it = generalized.iterator(); it.hasNext(); i++)
 			log.debug(" - q{} : {}", i, it.next());
+		
 		return Collections.unmodifiableSet(generalized);
 	}
 

@@ -13,9 +13,7 @@ public class GeneralVarMapping implements VarMapping {
 	protected Map<String, String> varToValue;
 
 	public GeneralVarMapping() {
-		valueToVar = new HashMap<>();
-		varToValue = new HashMap<>();
-		index = 1;
+		init();
 	}
 
 	@Override
@@ -54,6 +52,13 @@ public class GeneralVarMapping implements VarMapping {
 	@Override
 	public Map<String, String> getVarToValueTable() {
 		return this.varToValue;
+	}
+
+	@Override
+	public void init() {
+		valueToVar = new HashMap<>();
+		varToValue = new HashMap<>();
+		index = 1;
 	}
 
 }
