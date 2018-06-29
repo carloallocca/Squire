@@ -4,18 +4,18 @@ import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 
 public interface MappedQueryTransform {
 
-	public VarMapping getClassVarTable();
+	public VarMapping<String,String> getClassVarTable();
 
-	public VarMapping getDatatypePropertyVarTable();
+	public VarMapping<String,String> getDatatypePropertyVarTable();
 
-	public VarMapping getIndividualVarTable();
+	public VarMapping<String,String> getIndividualVarTable();
 
-	public VarMapping getLiteralVarTable();
+	public VarMapping<String,String> getLiteralVarTable();
 
-	public VarMapping getObjectProperyVarTable();
+	public VarMapping<String,String> getObjectProperyVarTable();
 
-	public VarMapping getPlainProperyVarTable();
+	public VarMapping<String,String> getPlainProperyVarTable();
 
-	public VarMapping getRdfVocVarTable();
+	public VarMapping<String,String> getRdfVocVarTable();
 
 }

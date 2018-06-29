@@ -17,7 +17,7 @@ public abstract class AbstractMappedQueryTransform extends AbstractQueryRecommen
 	public static final String TEMPLATE_VAR_PROP_OBJ = "opt";
 	public static final String TEMPLATE_VAR_PROP_PLAIN = "ppt";
 
-	protected VarMapping classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
+	protected VarMapping<String,String> classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
 			objectProperyVarTable, rdfVocVarTable, plainPropertyVarTable;
 
 	protected AbstractMappedQueryTransform() {
@@ -31,37 +31,37 @@ public abstract class AbstractMappedQueryTransform extends AbstractQueryRecommen
 	}
 
 	@Override
-	public VarMapping getClassVarTable() {
+	public VarMapping<String,String> getClassVarTable() {
 		return classVarTable;
 	}
 
 	@Override
-	public VarMapping getDatatypePropertyVarTable() {
+	public VarMapping<String,String> getDatatypePropertyVarTable() {
 		return datatypePropertyVarTable;
 	}
 
 	@Override
-	public VarMapping getIndividualVarTable() {
+	public VarMapping<String,String> getIndividualVarTable() {
 		return individualVarTable;
 	}
 
 	@Override
-	public VarMapping getLiteralVarTable() {
+	public VarMapping<String,String> getLiteralVarTable() {
 		return literalVarTable;
 	}
 
 	@Override
-	public VarMapping getObjectProperyVarTable() {
+	public VarMapping<String,String> getObjectProperyVarTable() {
 		return objectProperyVarTable;
 	}
 
 	@Override
-	public VarMapping getPlainProperyVarTable() {
+	public VarMapping<String,String> getPlainProperyVarTable() {
 		return plainPropertyVarTable;
 	}
 
 	@Override
-	public VarMapping getRdfVocVarTable() {
+	public VarMapping<String,String> getRdfVocVarTable() {
 		return rdfVocVarTable;
 	}
 

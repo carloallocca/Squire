@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package uk.ac.open.kmi.squire.core2;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -37,25 +33,35 @@ public class QueryAndContextNode {
 
 	}
 
-	private IRDFDataset ds1, ds2;
+	private float bindingCollapseRate, queryRootDistance, querySpecDist_Tp, querySpecDist_Var, resultTypeSimilarity;
 
-	private String op;
+	private IRDFDataset ds1, ds2;
 
 	private Query qO, qR;
 
 	private float qRScore;
-	private float queryRootDistance;
-	private float querySpecificityDistance;
 
 	private List<QuerySolution> queryTempVarSolutionSpace;
 
-	/**
-	 * It can be either R (for Removal) or I (Instantiation).
-	 *
-	 * @return
-	 */
-	public String getLastOperation() {
-		return op;
+	public QueryAndContextNode(Query transformedQuery) {
+		this.qR = transformedQuery;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof QueryAndContextNode)) return false;
+		QueryAndContextNode qctx = (QueryAndContextNode) obj;
+		return getOriginalQuery().equals(qctx.getOriginalQuery())
+				&& getTransformedQuery().equals(qctx.getTransformedQuery())
+				&& getSourceDataset().equals(qctx.getSourceDataset())
+				&& getTargetDataset().equals(qctx.getTargetDataset()) && getqRScore() == qctx.getqRScore();
+		// TODO consider the detailed measures rather than the score
+	}
+
+	public float getBindingCollapseRate() {
+		return bindingCollapseRate;
 	}
 
 	public Query getOriginalQuery() {
@@ -70,12 +76,20 @@ public class QueryAndContextNode {
 		return queryRootDistance;
 	}
 
-	public float getQuerySpecificityDistance() {
-		return querySpecificityDistance;
+	public float getQuerySpecificityDistanceTP() {
+		return querySpecDist_Tp;
+	}
+
+	public float getQuerySpecificityDistanceVar() {
+		return querySpecDist_Var;
 	}
 
 	public List<QuerySolution> getQueryTempVarSolutionSpace() {
 		return queryTempVarSolutionSpace;
+	}
+
+	public float getResultTypeSimilarity() {
+		return resultTypeSimilarity;
 	}
 
 	public IRDFDataset getSourceDataset() {
@@ -90,16 +104,22 @@ public class QueryAndContextNode {
 		return qR;
 	}
 
+	@Override
+	public int hashCode() {
+		// TODO consider the detailed measures rather than the score
+		return Arrays.hashCode(new Object[] { qO, qR, ds1, ds2, qRScore });
+	}
+
+	public void setBindingCollapseRate(float bindingCollapseRate) {
+		this.bindingCollapseRate = bindingCollapseRate;
+	}
+
 	public void setDataset1(IRDFDataset rdfD1) {
 		this.ds1 = rdfD1;
 	}
 
 	public void setDataset2(IRDFDataset rdfD2) {
 		this.ds2 = rdfD2;
-	}
-
-	public void setLastOperation(String op) {
-		this.op = op;
 	}
 
 	public void setOriginalQuery(Query qO) {
@@ -114,8 +134,16 @@ public class QueryAndContextNode {
 		this.queryRootDistance = queryRootDistance;
 	}
 
-	public void setQuerySpecificityDistance(float querySpecificityDistance) {
-		this.querySpecificityDistance = querySpecificityDistance;
+	public void setQuerySpecificityDistanceTP(float value) {
+		this.querySpecDist_Tp = value;
+	}
+
+	public void setQuerySpecificityDistanceVar(float value) {
+		this.querySpecDist_Var = value;
+	}
+
+	public void setResultTypeSimilarity(float resultTypeSimilarity) {
+		this.resultTypeSimilarity = resultTypeSimilarity;
 	}
 
 	public void setSolutionSpace(List<QuerySolution> queryTempVarSolutionSpace) {

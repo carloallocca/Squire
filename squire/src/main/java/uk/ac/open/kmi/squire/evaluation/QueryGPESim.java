@@ -12,7 +12,6 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.ElementWalker;
-import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionAggregator;
 
@@ -26,31 +25,35 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.SQGraphPatternExpressionAggregat
  */
 public class QueryGPESim {
 
-	private final org.slf4j.Logger log = LoggerFactory.getLogger(getClass());
-
-	public QueryGPESim() {
-		super();
-
-	}
-
-	public float computeQueryPatternsSim(Query qO, Query qR) {
+	/**
+	 * A measure of the number of triple patterns that are lost from one query to
+	 * another.
+	 * 
+	 * If the transformed query were to GAIN triple patterns, the similarity would
+	 * be negative. If it neither gained nor lost triple patterns, it would be zero.
+	 * 
+	 * @param qO
+	 * @param qR
+	 * @return
+	 */
+	public float computeQueryPatternLoss(Query qO, Query qR) {
 		// ...get the GPE of qOri
-		SQGraphPatternExpressionAggregator gpeVisitorO = new SQGraphPatternExpressionAggregator();
-		ElementWalker.walk(qO.getQueryPattern(), gpeVisitorO);
-		Set<TriplePath> qOGPE = gpeVisitorO.getMembersInQuery();
+		SQGraphPatternExpressionAggregator visitor = new SQGraphPatternExpressionAggregator();
+		ElementWalker.walk(qO.getQueryPattern(), visitor);
+		Set<TriplePath> qOGPE = visitor.getMembersInQuery();
 		// log.info("qOGPE : " +qOGPE.toString());
 
 		// ...get the GPE of qRec
-		SQGraphPatternExpressionAggregator gpeVisitorR = new SQGraphPatternExpressionAggregator();
-		ElementWalker.walk(qR.getQueryPattern(), gpeVisitorR);
-		Set<TriplePath> qRGPE = gpeVisitorR.getMembersInQuery();
+		visitor = new SQGraphPatternExpressionAggregator();
+		ElementWalker.walk(qR.getQueryPattern(), visitor);
+		Set<TriplePath> qRGPE = visitor.getMembersInQuery();
 		// log.info("qRGPE : " +qRGPE.toString());
 
 		// this is as it was before 13-04-2017
 		if (qRGPE.size() > 0 && qOGPE.size() > 0) {
-			return 1 - ((float) (((1.0) * qRGPE.size()) / ((1.0) * qOGPE.size())));
+			return 1 - ((float) ((1.0 * qRGPE.size()) / (1.0 * qOGPE.size())));
 		}
-		return (float) 0.0;
+		return 0f;
 
 		// this is the new one, after 13-04-2017
 		// float r = 1 - computeSim(qOGPE, qRGPE);
@@ -81,28 +84,16 @@ public class QueryGPESim {
 		return r;
 	}
 
-	private float computeSim(Set<TriplePath> qOGPE, Set<TriplePath> qRGPE) {
-		if (!(qOGPE.isEmpty() && !(qRGPE.isEmpty()))) {
-			float commonTriplePattern = computeCommonTriplePattern(qOGPE, qRGPE);
-			float weighedNoNCommonTriplePattern = computeWeighedNonCommonTriplePattern(qOGPE, qRGPE);
-			return commonTriplePattern + weighedNoNCommonTriplePattern;
-		}
-		return 0;
-	}
-
 	private float computeCommonTriplePattern(Set<TriplePath> qOGPE, Set<TriplePath> qRGPE) {
 
 		float sim = (float) 0;
 		int cardSignatureQo = qOGPE.size();
 		int cardSignatureQr = qRGPE.size();
 
-		if (!(cardSignatureQo == 0) && !(cardSignatureQr == 0)) {
+		if (cardSignatureQo != 0 && cardSignatureQr != 0) {
 			int intersection = 0;
-			for (TriplePath tp : qOGPE) {
-				if (contains(qRGPE, tp)) {
-					intersection = intersection + 1;
-				}
-			}
+			for (TriplePath tp : qOGPE)
+				if (qRGPE.contains(tp)) intersection = intersection + 1;
 			// log.info("computeCommonTriplePattern::intersection : " + intersection);
 			// sim =(float) (1.0*(((1.0*qOvarList.size())/(1.0*qRvarList.size()))));
 
@@ -113,8 +104,43 @@ public class QueryGPESim {
 		return sim;
 	}
 
-	private boolean contains(Set<TriplePath> qRGPE, TriplePath tp) {
-		return qRGPE.contains(tp);
+	/**
+	 * URIs weigh 0.5, template variables weigh 0.1, other variables weigh 0.4,
+	 * everything else weight 0.
+	 * 
+	 * @param n
+	 * @return
+	 */
+	private float computeNodeWeight(Node n) {
+		if (n.isURI()) return 0.5f;
+		else if (n.isVariable()) {
+			String na = n.getName();
+			if (na.startsWith("ct") || na.startsWith("opt") || na.startsWith("dtp")) return 0.1f;
+			else return 0.4f;
+		}
+		return 0;
+	}
+
+	private float computeSim(Set<TriplePath> qOGPE, Set<TriplePath> qRGPE) {
+		if (!(qOGPE.isEmpty() && !(qRGPE.isEmpty()))) {
+			float commonTriplePattern = computeCommonTriplePattern(qOGPE, qRGPE);
+			float weighedNoNCommonTriplePattern = computeWeighedNonCommonTriplePattern(qOGPE, qRGPE);
+			return commonTriplePattern + weighedNoNCommonTriplePattern;
+		}
+		return 0;
+	}
+
+	/**
+	 * The weight of a triple pattern is the average weight of its elements.
+	 * 
+	 * @param tp
+	 * @return
+	 */
+	private float computeTpWeight(TriplePath tp) {
+		float weight = computeNodeWeight(tp.getSubject()) + computeNodeWeight(tp.getPredicate())
+				+ computeNodeWeight(tp.getObject());
+		return weight / 3;
+
 	}
 
 	private float computeWeighedNonCommonTriplePattern(Set<TriplePath> qOGPE, Set<TriplePath> qRGPE) {
@@ -125,23 +151,19 @@ public class QueryGPESim {
 		if (!(cardSignatureQo == 0) && !(cardSignatureQr == 0)) {
 			// compute qOGPEComplementaryqRGPE
 			Set<WeighedTriplePath> weighedTriplePathSetqoqr = new HashSet<>();
-			for (TriplePath tp : qOGPE) {
-				if (!(contains(qRGPE, tp))) {
+			for (TriplePath tp : qOGPE)
+				if (!qRGPE.contains(tp)) {
 					// qOGPEComplqRGPECardinality = qOGPEComplqRGPECardinality + 1;
-					float tpWeigh = computeTriplePatternWeigh(tp);
-					WeighedTriplePath wtp = new WeighedTriplePath(tp, tpWeigh);
-					weighedTriplePathSetqoqr.add(wtp);
+					float tpWeigh = computeTpWeight(tp);
+					weighedTriplePathSetqoqr.add(new WeighedTriplePath(tp, tpWeigh));
 				}
-			}
 			// compute qRGPEComplementaryqOGPE
 			Set<WeighedTriplePath> weighedTriplePathSetqrqo = new HashSet<>();
-			for (TriplePath tp : qRGPE) {
-				if (!(contains(qOGPE, tp))) {
-					float tpWeigh = computeTriplePatternWeigh(tp);
-					WeighedTriplePath wtp = new WeighedTriplePath(tp, tpWeigh);
-					weighedTriplePathSetqrqo.add(wtp);
+			for (TriplePath tp : qRGPE)
+				if (!qOGPE.contains(tp)) {
+					float tpWeigh = computeTpWeight(tp);
+					weighedTriplePathSetqrqo.add(new WeighedTriplePath(tp, tpWeigh));
 				}
-			}
 			float qoqr = sumWeighedTriplePathSet(weighedTriplePathSetqoqr);
 			float qrqo = sumWeighedTriplePathSet(weighedTriplePathSetqrqo);
 			sim = (float) ((1.0 * qrqo) / (1.0 * qoqr));
@@ -152,61 +174,10 @@ public class QueryGPESim {
 	}
 
 	private float sumWeighedTriplePathSet(Set<WeighedTriplePath> weighedTriplePathSetqoqr) {
-		float sum = (float) 0;
-		for (WeighedTriplePath wtp : weighedTriplePathSetqoqr) {
-			sum = sum + wtp.getWeigh();
-		}
+		float sum = 0f;
+		for (WeighedTriplePath wtp : weighedTriplePathSetqoqr)
+			sum += wtp.getWeigh();
 		return sum;
-	}
-
-	private float computeTriplePatternWeigh(TriplePath tp) {
-		float weigh = (float) 0;
-
-		Node sub = tp.getSubject();
-		Node pred = tp.getPredicate();
-		Node obj = tp.getObject();
-
-		if (sub.isURI()) {
-			weigh = (float) (weigh + 0.5);
-		} else {
-			if (sub.isVariable()) {
-				if (sub.getName().startsWith("ct") || sub.getName().startsWith("opt")
-						|| sub.getName().startsWith("dtp")) {
-					weigh = (float) (weigh + 0.1);
-				} else {
-					weigh = (float) (weigh + 0.4);
-				}
-			}
-		}
-
-		if (pred.isURI()) {
-			weigh = (float) (weigh + 0.5);
-		} else {
-			if (pred.isVariable()) {
-				if (pred.getName().startsWith("ct") || pred.getName().startsWith("opt")
-						|| pred.getName().startsWith("dtp")) {
-					weigh = (float) (weigh + 0.1);
-				} else {
-					weigh = (float) (weigh + 0.4);
-				}
-			}
-		}
-
-		if (obj.isURI()) {
-			weigh = (float) (weigh + 0.5);
-		} else {
-			if (obj.isVariable()) {
-				if (obj.getName().startsWith("ct") || obj.getName().startsWith("opt")
-						|| obj.getName().startsWith("dtp")) {
-					weigh = (float) (weigh + 0.1);
-				} else {
-					weigh = (float) (weigh + 0.4);
-				}
-			}
-		}
-
-		return weigh / 3;
-
 	}
 
 }

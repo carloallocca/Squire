@@ -31,11 +31,11 @@ public class SQTVisitor extends ElementVisitorBase implements IQueryVisitor {
 
 	private IRDFDataset rdfd1, rdfd2;
 
-	private VarMapping literalVarTable;
-	private VarMapping classVarTable;
-	private VarMapping datatypePropertyVarTable;
-	private VarMapping individualVarTable;
-	private VarMapping objectProperyVarTable;
+	private VarMapping<String, String> literalVarTable;
+	private VarMapping<String, String> classVarTable;
+	private VarMapping<String, String> datatypePropertyVarTable;
+	private VarMapping<String, String> individualVarTable;
+	private VarMapping<String, String> objectProperyVarTable;
 
 	public SQTVisitor(IRDFDataset d1, IRDFDataset d2) {
 		rdfd1 = d1;

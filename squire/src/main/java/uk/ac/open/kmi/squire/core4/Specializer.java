@@ -31,10 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
 import uk.ac.open.kmi.squire.core2.QueryTempVarSolutionSpace;
-import uk.ac.open.kmi.squire.core2.VarTemplateAndEntityQoQr;
 import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 import uk.ac.open.kmi.squire.evaluation.QueryGPESim;
-import uk.ac.open.kmi.squire.evaluation.QueryResultTypeSimilarity;
+import uk.ac.open.kmi.squire.evaluation.QueryResultTypeDistance;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.ontologymatching.JaroWinklerSimilarity;
 import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
@@ -55,18 +54,40 @@ import uk.ac.open.kmi.squire.utils.PowerSetFactory;
  */
 public class Specializer extends AbstractMappedQueryTransform {
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
+	/**
+	 * A record of transforming every instance of one RDF node into another,
+	 * including (and especially) SPARQL variables.
+	 * 
+	 * @author carloallocca
+	 *
+	 */
+	private class NodeTransformation {
 
-	private static String OPID_INSTANTIATE = "I";
-	private static String OPID_TP_REMOVE = "R";
+		private String entityQo;
+		private String entityQr;
+
+		public NodeTransformation(String originalNode, String transformedNode) {
+			this.entityQo = originalNode;
+			this.entityQr = transformedNode;
+		}
+
+		public String getOriginalNode() {
+			return entityQo;
+		}
+
+		public String getTransformedNode() {
+			return entityQr;
+		}
+
+	}
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 
 	/**
 	 * How many specializations before printing the log.
 	 */
 	private int logFreq = 20;
 
-	private final boolean strict;
-	
 	private final Query qO, qR;
 
 	private Map<String, Query> queryIndex = new HashMap<>();
@@ -84,13 +105,15 @@ public class Specializer extends AbstractMappedQueryTransform {
 	 */
 	private final List<QueryAndContextNode> specializables = new ArrayList<>();
 
+	private final boolean strict;
+
 	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, MappedQueryTransform previousOp,
 			float resultTypeSimilarityDegree, float queryRootDistanceDegree, float resultSizeSimilarityDegree,
 			float querySpecificityDistanceDegree, boolean strict, String token) {
 		super();
 
 		this.strict = strict;
-		
+
 		this.qO = QueryFactory.create(qo.toString());
 		this.qR = QueryFactory.create(qr.toString());
 
@@ -124,7 +147,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		float qSpecificitySim = 1 - (qSpecDistVar + qSpecDistTP);
 
 		// 3)...QueryResultTypeSimilarity
-		QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
+		QueryResultTypeDistance qRTS = new QueryResultTypeDistance();
 		float resulTtypeDist = qRTS.computeQueryResultTypeDistance(this.qO, this.rdfd1, this.qR, this.rdfd2);
 		float resultTypeSim = 1 - resulTtypeDist;
 
@@ -175,9 +198,8 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// Map<Var, Set<RDFNode>>
 		// qTsolMap=temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2, null);
 		// D. Build the QueryAndContextNode from the query
-		QueryAndContextNode qAndcNode = new QueryAndContextNode();
+		QueryAndContextNode qAndcNode = new QueryAndContextNode(qr);
 		qAndcNode.setOriginalQuery(qo);
-		qAndcNode.setTransformedQuery(qr);
 		qAndcNode.setDataset1(d1);
 		qAndcNode.setDataset2(d2);
 
@@ -198,9 +220,10 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// ...set the score measurements
 		qAndcNode.setQueryRootDistance(queryRootDist);
 		// qAndcNode.setQuerySpecificityDistanceSimilarity(qSpecDistVar + qSpecDistTP);
-		qAndcNode.setQuerySpecificityDistance(qSpecificitySim);
+		qAndcNode.setQuerySpecificityDistanceTP(qSpecDistTP);
+		qAndcNode.setQuerySpecificityDistanceVar(qSpecDistVar);
 		qAndcNode.setqRScore(recommendedQueryScore);
-		qAndcNode.setLastOperation(op);
+		// qAndcNode.setLastOperation(op);
 		// qAndcNode.setqRTemplateVariableSet(qRTemplateVariableSet);
 		// qAndcNode.setqRTriplePathSet(qRTriplePatternSet);
 		// ...set the QueryTempVarSolutionSpace
@@ -271,7 +294,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 			 * variables. This may happen for example because the assumptions made in the
 			 * generalization, such as the co-occurrence of two or more properties, were
 			 * incorrect. This case expands on all the possible combinations of templated
-			 * triple patterns.
+			 * triple patterns. It also seems to be the only one where removal takes place.
 			 */
 			if (singleQctx.getQueryTempVarSolutionSpace().isEmpty() && canBeInstantiated(singleQctx)) {
 				log.warn("Specializable query has no solution!"
@@ -381,7 +404,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 						// this contains all the tuples <varName, entityQo, entityQr> for each varName
 						// that is going to be instantiated
-						List<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList = new ArrayList<>();
+						List<NodeTransformation> templVarEntityQoQrInstanciatedList = new ArrayList<>();
 						for (Var tv : qTempVarSet) {
 							RDFNode node = sol.get(tv.getName());
 							if (node != null && node.asNode().isURI()) {
@@ -391,7 +414,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 										node.asNode());
 								String entityQo = getEntityQo(tv);
 								String entityQr = node.asNode().getURI(); // Expected to be concrete and named
-								VarTemplateAndEntityQoQr item = new VarTemplateAndEntityQoQr(tv, entityQo, entityQr);
+								NodeTransformation item = new NodeTransformation(entityQo, entityQr);
 								templVarEntityQoQrInstanciatedList.add(item);
 							} else log.error("Unexpected state of node {} for template variable '{}'", node, tv);
 						}
@@ -482,7 +505,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 			// 1. Remove the TriplePath tp from the qRCopy
 			Query qWithoutTriple = new RemoveTriple(qRCopy, tp.asTriple()).apply();
 
-			// 2. Check if it is alredy indexed and therefore generated
+			// 2. Check if it is already indexed and therefore generated
 			if (!(isQueryIndexed(qWithoutTriple))) {
 
 				// // BUILD A NEW QueryAndContextNode
@@ -551,8 +574,8 @@ public class Specializer extends AbstractMappedQueryTransform {
 				node.getTransformedQuery());
 		float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(node.getOriginalQuery(),
 				node.getTransformedQuery());
-		float qSpecificitySim = 1 - (qSpecDistSimVar + qSpecDistSimTriplePattern);
-		node.setQuerySpecificityDistance(qSpecificitySim);
+		node.setQuerySpecificityDistanceTP(qSpecDistSimTriplePattern);
+		node.setQuerySpecificityDistanceVar(qSpecDistSimVar);
 
 		// 4)...QueryResultSizeSimilarity
 		float queryResultSizeSimilarity = 0;
@@ -571,49 +594,65 @@ public class Specializer extends AbstractMappedQueryTransform {
 		return node;
 	}
 
-	private float computeInstanciateOperationCost(String entityqO, String entityqR) {
-		if (entityqO == null || entityqR == null) return (float) 0.0;
-		JaroWinklerSimilarity jwSim = new JaroWinklerSimilarity();
-		float sim = jwSim.computeMatchingScore(entityqO, entityqR);
-		// return (float) (1.0 - sim);
-		return sim;
-	}
-
-	private float computeInstanciationOperationCost(List<VarTemplateAndEntityQoQr> templVarEntityQoQrInstanciatedList) {
+	/**
+	 * Implemented as the complement of the average Jaro-Winkler similarity...
+	 * 
+	 * @param templVarEntityQoQrInstanciatedList
+	 * @return
+	 */
+	private float computeInstantiationCost(List<NodeTransformation> templVarEntityQoQrInstanciatedList) {
 		int size = templVarEntityQoQrInstanciatedList.size();
 		float nodeCost = 0;
 		if (size > 0) {
-			for (VarTemplateAndEntityQoQr item : templVarEntityQoQrInstanciatedList) {
-				String entityqO_TMP = getLocalName(item.getEntityQo());
-				String entityqR_TMP = getLocalName(item.getEntityQr());
-				nodeCost = nodeCost + computeInstanciateOperationCost(entityqO_TMP, entityqR_TMP);
+			for (NodeTransformation item : templVarEntityQoQrInstanciatedList) {
+				String entityqO_TMP = getLocalName(item.getOriginalNode());
+				String entityqR_TMP = getLocalName(item.getTransformedNode());
+				nodeCost += computeInstantiationCost(entityqO_TMP, entityqR_TMP);
 			}
 			return (float) 1 - (nodeCost / size); // we divide by size as we want the value to be between 0 and 1.
 		}
 		return 0;
 	}
 
+	/**
+	 * Instantiating an entity into another costs the Jaro-Winkler similarity of
+	 * their respective names...
+	 * 
+	 * @param entityqO
+	 * @param entityqR
+	 * @return
+	 */
+	private float computeInstantiationCost(String entityqO, String entityqR) {
+		if (entityqO == null || entityqR == null) {
+			log.warn("Instantiation to or from a null entity has no cost (from: {} , to: {}).", entityqO, entityqR);
+			return 0f;
+		}
+		JaroWinklerSimilarity jwSim = new JaroWinklerSimilarity();
+		float sim = jwSim.computeMatchingScore(entityqO, entityqR);
+		// return (float) (1.0 - sim);
+		return sim;
+	}
+
 	private float computeRemoveOperationCost(Query originalQuery, Query childQuery) {
 		QueryGPESim queryGPEsim = new QueryGPESim();
-		float sim = queryGPEsim.computeQueryPatternsSim(originalQuery, childQuery);
-		return (float) 1.0 - sim;
+		float sim = queryGPEsim.computeQueryPatternLoss(originalQuery, childQuery);
+		return 1f - sim;
 	}
 
 	private QueryAndContextNode createNoOpQctx(Query qo) {
-		QueryAndContextNode qCtx = new QueryAndContextNode();
+		QueryAndContextNode qCtx = new QueryAndContextNode(QueryFactory.create(qo));
 		qCtx.setOriginalQuery(QueryFactory.create(qo));
-		qCtx.setTransformedQuery(QueryFactory.create(qo));
 		qCtx.setqRScore(1);
 		return qCtx;
 	}
 
 	private QueryAndContextNode createQctxForInstantiation(Query queryPostOp, QueryAndContextNode parentNode,
-			List<VarTemplateAndEntityQoQr> tplVarEntityQoQrInstantiated) {
-		QueryAndContextNode node = new QueryAndContextNode();
+			List<NodeTransformation> tplVarEntityQoQrInstantiated) {
+
+		QueryAndContextNode node = new QueryAndContextNode(queryPostOp.cloneQuery());
 
 		// (a) Set the queries on the node
 		node.setOriginalQuery(QueryFactory.create(parentNode.getOriginalQuery()));
-		node.setTransformedQuery(QueryFactory.create(queryPostOp.toString()));
 
 		// (b) Set the (cloned) datasets on the node
 		// XXX cloning the dataset object for the child nodes, why?
@@ -642,25 +681,27 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// The following is no longer being done:
 		// - set class, object/datatype property sets etc. on the node
 		// - keep track of the operations list on each node (was not being used)
-		node.setLastOperation(OPID_INSTANTIATE);
+		// node.setLastOperation(OPID_INSTANTIATE);
 
 		// ...set the score measurements
 		computeCommonScores(node, parentNode);
 
 		// 1)...QueryRootDistance
+		// AA: it seems to maximize the average Jaro-Winkler similarity of all the
+		// instantiations.
 		float newQueryRootDist = parentNode.getQueryRootDistance()
-				+ computeInstanciationOperationCost(tplVarEntityQoQrInstantiated);
+				+ computeInstantiationCost(tplVarEntityQoQrInstantiated);
 		node.setQueryRootDistance(newQueryRootDist);
 		float queryRootDistSim = 1 - newQueryRootDist;
 
 		// 3)...QueryResultTypeSimilarity
-		QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
+		QueryResultTypeDistance qRTS = new QueryResultTypeDistance();
 		float newResulttypeSim = qRTS.computeQueryResultTypeDistance(node.getOriginalQuery(), this.rdfd1,
 				node.getTransformedQuery(), this.rdfd2);
 
 		float recommendedQueryScore = (queryRootDistanceDegree * queryRootDistSim)
-				+ (resultTypeSimilarityDegree * newResulttypeSim)
-				+ (querySpecificityDistanceDegree * node.getQuerySpecificityDistance());
+				+ (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree
+						* (1 - (node.getQuerySpecificityDistanceTP() + node.getQuerySpecificityDistanceVar())));
 
 		// float recommentedQueryScore = (newResulttypeSim +
 		// (qSpecDistSimVar+qSpecDistSimTriplePattern));
@@ -675,13 +716,13 @@ public class Specializer extends AbstractMappedQueryTransform {
 	}
 
 	private QueryAndContextNode createQctxForRemoval(Query queryPostOp, QueryAndContextNode parentNode) {
-		QueryAndContextNode node = new QueryAndContextNode();
+
+		QueryAndContextNode node = new QueryAndContextNode(queryPostOp.cloneQuery());
+
 		// ...set the original query and the recommendated query;
 		Query clonedqO = QueryFactory.create(parentNode.getOriginalQuery());
 		node.setOriginalQuery(clonedqO);
 
-		Query clonedqR = QueryFactory.create(queryPostOp.toString());
-		node.setTransformedQuery(clonedqR);
 		// ..set the RDF dataset 1
 		IRDFDataset d1 = parentNode.getSourceDataset();
 		if (d1 instanceof SparqlIndexedDataset) {
@@ -710,11 +751,12 @@ public class Specializer extends AbstractMappedQueryTransform {
 			// childQueryAndContextNode.setQueryTempVarValueMap(qTsolMap);
 			// List<QuerySolution> qTsol =
 			// parentQueryAndContextNode.getQueryTempVarSolutionSpace();
-			List<QuerySolution> qTsolChild = new ArrayList();
+			List<QuerySolution> qTsolChild = new ArrayList<>();
 
 			// Compute the QueryTempVarSolutionSpace
 			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-			List<QuerySolution> qTsolTMP = temVarValueSpace.computeTempVarSolutionSpace(queryPostOp, this.rdfd2, strict);
+			List<QuerySolution> qTsolTMP = temVarValueSpace.computeTempVarSolutionSpace(queryPostOp, this.rdfd2,
+					strict);
 
 			// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
 			// <http://purl.org/dc/terms/title> ),
@@ -728,7 +770,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// The following is no longer being done:
 		// - set class, object/datatype property sets etc. on the node
 		// - keep track of the operations list on each node (was not being used)
-		node.setLastOperation(OPID_TP_REMOVE);
+		// node.setLastOperation(OPID_TP_REMOVE);
 
 		// ...set the score measurements
 		computeCommonScores(node, parentNode);
@@ -741,7 +783,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		float queryRootDistSim = 1 - newQueryRootDist;
 
 		// 3)...QueryResultTypeSimilarity
-		QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
+		QueryResultTypeDistance qRTS = new QueryResultTypeDistance();
 		float resulTtypeDist = qRTS.computeQueryResultTypeDistance(this.qO, this.rdfd1, this.qR, this.rdfd2);
 		float resultTypeSim = 1 - resulTtypeDist;
 
@@ -756,8 +798,8 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// float recommentedQueryScore = (resultTypeSimilarityDegree * resultTypeSim);
 
 		float recommendedQueryScore = (queryRootDistanceDegree * queryRootDistSim)
-				+ (resultTypeSimilarityDegree * resultTypeSim)
-				+ (querySpecificityDistanceDegree * node.getQuerySpecificityDistance());
+				+ (resultTypeSimilarityDegree * resultTypeSim) + (querySpecificityDistanceDegree
+						* (1 - (node.getQuerySpecificityDistanceTP() + node.getQuerySpecificityDistanceVar())));
 		// float recommentedQueryScore = ((queryRootDistanceDegree * queryRootDistSim)
 		// + (resultTypeSimilarityDegree * resultTypeSim)
 		// + (querySpecificityDistanceDegree * (qSpecificitySim)));
@@ -799,7 +841,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 	private String getEntityQo(Var tv) {
 		String varName = tv.getVarName();
-		VarMapping map;
+		VarMapping<String, String> map;
 		if (varName.startsWith(TEMPLATE_VAR_CLASS)) map = this.classVarTable;
 		else if (varName.startsWith(TEMPLATE_VAR_PROP_OBJ)) map = this.objectProperyVarTable;
 		else if (varName.startsWith(TEMPLATE_VAR_PROP_DT)) map = this.datatypePropertyVarTable;

@@ -93,7 +93,7 @@ public class QueryResultSizeDistance {
 			qexec.close();
 			return card;
 		} catch (FileNotFoundException ex) {
-			Logger.getLogger(QueryResultTypeSimilarity.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(QueryResultTypeDistance.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return card;
 	}
@@ -190,7 +190,7 @@ public class QueryResultSizeDistance {
 
 			}
 		} catch (FileNotFoundException ex) {
-			Logger.getLogger(QueryResultTypeSimilarity.class.getName()).log(Level.SEVERE, null, ex);
+			Logger.getLogger(QueryResultTypeDistance.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		return cardinality;
 	}

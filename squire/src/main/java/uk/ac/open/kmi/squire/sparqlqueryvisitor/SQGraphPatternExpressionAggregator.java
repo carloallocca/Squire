@@ -11,6 +11,7 @@ import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
 
 /**
+ * Remember this is stateful.
  *
  * @author carloallocca
  */

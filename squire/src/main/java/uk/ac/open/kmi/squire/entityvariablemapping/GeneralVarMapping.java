@@ -3,7 +3,7 @@ package uk.ac.open.kmi.squire.entityvariablemapping;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GeneralVarMapping implements VarMapping {
+public class GeneralVarMapping implements VarMapping<String, String> {
 
 	/**
 	 * This is appended to the next template variable when it is generated.
@@ -26,7 +26,7 @@ public class GeneralVarMapping implements VarMapping {
 	@Override
 	public String getOrCreateVar(String uri, String varPrefix) {
 		if (valueToVar == null || index == 0)
-			throw new IllegalStateException("The mapping table needs to be initialized before use.");
+			throw new IllegalStateException("The mapping table needs to be initialized before use. Call init() first.");
 		if (!valueToVar.containsKey(uri)) {
 			// this.classVar = "ct"+Integer.toString(++index);
 			String tmp = varPrefix + Integer.toString(index++);
@@ -39,7 +39,7 @@ public class GeneralVarMapping implements VarMapping {
 	@Override
 	public String getValueFromVar(String varString) {
 		if (varToValue == null)
-			throw new IllegalStateException("The mapping table needs to be initialized before use.");
+			throw new IllegalStateException("The mapping table needs to be initialized before use. Call init() first.");
 		if (!varToValue.containsKey(varString)) return null;
 		else return varToValue.get(varString);
 	}

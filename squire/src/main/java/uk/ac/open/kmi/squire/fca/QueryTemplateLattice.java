@@ -20,7 +20,7 @@ import uk.ac.open.kmi.squire.sparqlqueryvisitor.TemplateVariableScanner;
 
 public class QueryTemplateLattice extends Lattice<GeneralizedQuery, Var> {
 
-	private static Map<Set<Var>, Concept<GeneralizedQuery, Var>> conceptTable;
+	private static Map<Set<Var>, GQVConcept> conceptTable;
 
 	/**
 	 * The operator should be stateless now, but XXX double-check just in case.
@@ -37,7 +37,7 @@ public class QueryTemplateLattice extends Lattice<GeneralizedQuery, Var> {
 		// From each of the solutions, work your way down from the general query
 		int c = 0, i = 1;
 		GeneralizedQuery topGQ = new GeneralizedQuery(generalQuery);
-		Concept<GeneralizedQuery, Var> top = new Concept<GeneralizedQuery, Var>(tplVars);
+		GQVConcept top = new GQVConcept(tplVars);
 		top.addInstance(topGQ);
 		l.setTop(top);
 		log.debug("Setting top concept {}", top);
@@ -70,7 +70,7 @@ public class QueryTemplateLattice extends Lattice<GeneralizedQuery, Var> {
 			Set<Var> intInf = new HashSet<>(intension);
 			intInf.remove(v);
 			final Concept<GeneralizedQuery, Var> conc;
-			if (!conceptTable.containsKey(intInf)) conceptTable.put(intInf, new Concept<>(intInf));
+			if (!conceptTable.containsKey(intInf)) conceptTable.put(intInf, new GQVConcept(intInf));
 			conc = conceptTable.get(intInf);
 			if (!step.hasInferior(intInf)) {
 				step.addInferior(conc);

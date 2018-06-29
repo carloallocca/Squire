@@ -17,9 +17,11 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 public class Measures {
 
 	public enum Metrics {
-		QUERY_ROOT_DISTANCE, QUERY_SPECIFICITY_DISTANCE, QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN, QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE, RESULT_SIZE_SIMILARITY, RESULT_TYPE_SIMILARITY
+		QUERY_BINDING_COLLAPSE_RATE, QUERY_ROOT_DISTANCE, QUERY_SPECIFICITY_DISTANCE, QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN, QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE, RESULT_SIZE_SIMILARITY, RESULT_TYPE_SIMILARITY
 	}
 
+	public float queryBindingCollapseRate = 1.0f;
+	
 	public float queryRootDistanceCoefficient = 1.0f;
 
 	public float querySpecificityDistanceCoefficient = 1.0f;
@@ -34,16 +36,19 @@ public class Measures {
 
 	private QueryRootDistance qRootDist;
 
-	private QueryResultTypeSimilarity qRTS;
+	private QueryResultTypeDistance qRTS;
 
 	private QuerySpecificityDistance qSpecDist;
+	
+	private QueryBindingCollapse qColl;
 
 	private IRDFDataset srcDs, tgtDs;
 
 	public Measures() {
 		qSpecDist = new QuerySpecificityDistance();
 		qRootDist = new QueryRootDistance();
-		qRTS = new QueryResultTypeSimilarity();
+		qRTS = new QueryResultTypeDistance();
+		qColl = new QueryBindingCollapse();
 	}
 
 	public Measures(float resultTypeSimilarityCoefficient, float queryRootDistanceCoefficient,
@@ -57,6 +62,12 @@ public class Measures {
 	public float compute(Metrics metric) {
 		float score = 0.0f;
 		switch (metric) {
+		case QUERY_BINDING_COLLAPSE_RATE:
+			if (getOriginalQuery() == null || getTransformedQuery() == null) throw new IllegalArgumentException(
+					"Query specificity measures require that both the original and the transformed query be set."
+							+ " Please do so by calling setOriginalQuery() and setTransformedQuery().");
+			score = qColl.compute(getOriginalQuery(), getTransformedQuery());
+			break;
 		case QUERY_ROOT_DISTANCE:
 			log.warn("Query Root distance implementation is empty! returning default score", score);
 			break;
@@ -89,6 +100,8 @@ public class Measures {
 			float resulTtypeDist = qRTS.computeQueryResultTypeDistance(getOriginalQuery(), getSourceDataset(),
 					getTransformedQuery(), getTargetDataset());
 			score = 1 - resulTtypeDist;
+			break;
+		default:
 			break;
 		}
 		return score;

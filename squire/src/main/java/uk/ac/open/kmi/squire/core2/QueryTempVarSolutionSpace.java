@@ -404,7 +404,6 @@ public class QueryTempVarSolutionSpace {
 		} catch (JsonParseException ex) {
 			log.error("Malformed JSON returned at index ({},{}).", ex.getLine(), ex.getColumn());
 			log.error("Content follows:\r\n{}", res);
-			log.error("Stopping iteration and keeping previous results.");
 			error = true;
 		} catch (ResultSetException ex) {
 			log.error("Returned JSON does not seem to be a SPARQL result set. Reason: {}", ex.getMessage());

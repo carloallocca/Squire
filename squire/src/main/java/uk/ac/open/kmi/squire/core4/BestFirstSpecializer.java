@@ -1,44 +1,33 @@
 package uk.ac.open.kmi.squire.core4;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.core.Var;
-import org.apache.jena.sparql.syntax.Element;
-import org.apache.jena.sparql.syntax.ElementGroup;
-import org.apache.jena.sparql.syntax.ElementPathBlock;
-import org.apache.jena.sparql.syntax.ElementVisitor;
-import org.apache.jena.sparql.syntax.ElementVisitorBase;
-import org.mksmart.squire.websquire.v1.resources.QueryStringScorePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
 import uk.ac.open.kmi.squire.core2.QueryTempVarSolutionSpace;
+import uk.ac.open.kmi.squire.evaluation.InfMap;
 import uk.ac.open.kmi.squire.evaluation.Measures;
 import uk.ac.open.kmi.squire.evaluation.Measures.Metrics;
-import uk.ac.open.kmi.squire.evaluation.QueryResultTypeSimilarity;
+import uk.ac.open.kmi.squire.evaluation.QueryResultTypeDistance;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.fca.Concept;
 import uk.ac.open.kmi.squire.fca.Lattice;
 import uk.ac.open.kmi.squire.fca.QueryTemplateLattice;
-import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
 import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.sparqlqueryvisitor.TemplateVariableScanner;
 
 /**
  * 
@@ -82,7 +71,7 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 		float qSpecDistTP = qSpecDist.computeQSDwrtQueryTP(this.qO, qTransformed);
 		float qSpecificitySim = 1 - (qSpecDistVar + qSpecDistTP);
 		// 3)...QueryResultTypeSimilarity
-		QueryResultTypeSimilarity qRTS = new QueryResultTypeSimilarity();
+		QueryResultTypeDistance qRTS = new QueryResultTypeDistance();
 		// float resulTtypeDist = qRTS.computeQueryResultTypeDistance(this.qO,
 		// this.dFrom, qTransformed, this.dTo);
 		// float resultTypeSim = 1 - resulTtypeDist;
@@ -125,18 +114,103 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 				log.debug(" -- {}", gq.getQuery());
 			}
 
+			float min_bind_coll = 128.0f; // minimize
+			float min_qdist_tp = 128.0f; // minimize
+			float min_qdist_var = 128.0f; // minimize
+			float max_rt_sim = 0.0f; // maximize
+			InfMap bestMap = new InfMap();
+
+			Map<Query, Set<Concept<GeneralizedQuery, Var>>> queriesToConcepts = new HashMap<>();
+
 			for (Concept<GeneralizedQuery, Var> inf : top.getInferiors()) {
 				log.debug("Concept {}", inf.getIntension());
 				log.debug(" - extension size = {}", inf.getExtension().size());
 				for (GeneralizedQuery gq : inf.getExtension()) {
+
+					if (!queriesToConcepts.containsKey(gq.getQuery()))
+						queriesToConcepts.put(gq.getQuery(), new HashSet<>());
+					queriesToConcepts.get(gq.getQuery()).add(inf);
 					log.debug(" -- {}", gq.getQuery());
 					base.setTransformedQuery(gq.getQuery());
-					log.debug(" - Query spec. dist. (Var) = {}",
-							base.compute(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE));
-					log.debug(" - Query spec. dist. (TP) = {}",
-							base.compute(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN));
-					log.debug(" - Res. type sim. = {}", base.compute(Metrics.RESULT_TYPE_SIMILARITY));
+
+					float qdist_tp = base.compute(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE);
+					float qdist_var = base.compute(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN);
+					float rt_sim = base.compute(Metrics.RESULT_TYPE_SIMILARITY);
+					base.setOriginalQuery(this.qG); // FIXME should I set the original query to be the generalised one for all?
+					float bind_coll = base.compute(Metrics.QUERY_BINDING_COLLAPSE_RATE);
+					
+					log.debug(" - Binding collapse rate = {}", bind_coll);
+					log.debug(" - Query spec. dist. (Var) = {}", qdist_tp);
+					log.debug(" - Query spec. dist. (TP) = {}", qdist_var);
+					log.debug(" - Res. type sim. = {}", rt_sim);
+
+					QueryAndContextNode qctx = new QueryAndContextNode(gq.getQuery());
+					qctx.setDataset1(dFrom);
+					qctx.setDataset2(dTo);
+					qctx.setOriginalQuery(qO);
+					qctx.setBindingCollapseRate(bind_coll);
+					qctx.setQuerySpecificityDistanceTP(qdist_tp);
+					qctx.setQuerySpecificityDistanceVar(qdist_var);
+					qctx.setResultTypeSimilarity(rt_sim);
+					if (bind_coll <= min_bind_coll) {
+						if (bind_coll != min_bind_coll && bestMap.containsKey(Metrics.QUERY_BINDING_COLLAPSE_RATE))
+							bestMap.get(Metrics.QUERY_BINDING_COLLAPSE_RATE).clear();
+						bestMap.addOptimalNode(Metrics.QUERY_BINDING_COLLAPSE_RATE, qctx);
+						min_bind_coll = bind_coll;
+						log.debug("NEW candidate for LOWEST Binding collapse rate.");
+					}
+					if (qdist_tp <= min_qdist_tp) {
+						if (qdist_tp != min_qdist_tp
+								&& bestMap.containsKey(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN))
+							bestMap.get(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN).clear();
+						bestMap.addOptimalNode(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN, qctx);
+						min_qdist_tp = qdist_tp;
+						log.debug("NEW candidate for LOWEST Query spec. dist TP.");
+					}
+					if (qdist_var <= min_qdist_var) {
+						if (qdist_var != min_qdist_var
+								&& bestMap.containsKey(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE))
+							bestMap.get(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE).clear();
+						bestMap.addOptimalNode(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE, qctx);
+						min_qdist_var = qdist_var;
+						log.debug("NEW candidate for LOWEST Query spec. dist Var.");
+					}
+					if (rt_sim >= max_rt_sim) {
+						if (rt_sim != max_rt_sim && bestMap.containsKey(Metrics.RESULT_TYPE_SIMILARITY))
+							bestMap.get(Metrics.RESULT_TYPE_SIMILARITY).clear();
+						bestMap.addOptimalNode(Metrics.RESULT_TYPE_SIMILARITY, qctx);
+						max_rt_sim = rt_sim;
+						log.debug("NEW candidate for HIGHEST Res. type Sim");
+					}
 				}
+			}
+
+			Set<QueryAndContextNode> optimals = new HashSet<>();
+
+			log.debug("Inspecting best candidates for each metric:");
+			for (Metrics metric : bestMap.keySet()) {
+				log.debug("Metric {} ({} queries)", metric, bestMap.getOptimalNodes(metric).size());
+				for (QueryAndContextNode qctx : bestMap.getOptimalNodes(metric)) {
+					log.debug("Query:\r\n{}", qctx.getTransformedQuery());
+					log.debug(" - Binding collapse rate = {}", qctx.getBindingCollapseRate());
+					log.debug(" - Query spec. dist. (Var) = {}", qctx.getQuerySpecificityDistanceVar());
+					log.debug(" - Query spec. dist. (TP) = {}", qctx.getQuerySpecificityDistanceTP());
+					log.debug(" - Res. type sim. = {}", qctx.getResultTypeSimilarity());
+					log.debug(" - part of concepts : {}", queriesToConcepts.get(qctx.getTransformedQuery()));
+					if (max_rt_sim == qctx.getResultTypeSimilarity() && min_bind_coll == qctx.getBindingCollapseRate()
+							&& min_qdist_tp == qctx.getQuerySpecificityDistanceTP()
+							&& min_qdist_var == qctx.getQuerySpecificityDistanceVar())
+						optimals.add(qctx);
+				}
+			}
+			log.debug("Recall the original query: {}", qO);
+			if (optimals.isEmpty()) log.warn("No ideal branch was found, need to find a strategy for the visit plan!");
+			else {
+				log.debug("Best-scored candidates follow:");
+				for (QueryAndContextNode qctx : optimals) {
+					log.debug("query: {}", qctx.getTransformedQuery());
+				}
+
 			}
 
 		} catch (TooGeneralException gex) {
@@ -145,93 +219,6 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 			qTsol = new ArrayList<>();
 			qTsol.add(new QuerySolutionMap());
 		}
-		log.debug("{}", qG.getQueryPattern());
-
-	}
-
-	public void specialize_stub() {
-
-		/**
-		 * What I want to do here:
-		 *
-		 * <li>Select one (templated) triple pattern from the generalized query.
-		 * <li>Get the solutions for that (i.e. project on the templates for that TP
-		 * only).
-		 * <li>Score each (partially templated?) resulting query.
-		 * <li>If a new high score is attained, branch to that node
-		 */
-		Measures base = new Measures();
-		List<QuerySolution> qTsol;
-		try {
-			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-			qTsol = temVarValueSpace.computeTempVarSolutionSpace(this.qG, this.dTo, this.strict);
-			// Not doing this optimization now (didn't seem to work anyway)
-			// // e.g. ( ?opt2 = dc:title ) ( ?opt1 = dc:title )
-			log.debug("Solution space size BEFORE = {}", qTsol.size());
-			qTsol = eliminateSolutionsBoundToSameValue(qTsol);
-			log.debug("Solution space size AFTER = {}", qTsol.size());
-		} catch (TooGeneralException gex) {
-			log.warn("Query is too general to execute safely. Assuming solution exists.");
-			log.warn(" * Query : '{}'", gex.getQuery());
-			qTsol = new ArrayList<>();
-			qTsol.add(new QuerySolutionMap());
-		}
-		log.debug("{}", qG.getQueryPattern());
-
-		ElementVisitor vis = new ElementVisitorBase() {
-			@Override
-			public void visit(ElementGroup el) {
-				for (Element e : el.getElements())
-					e.visit(this);
-			}
-
-			@Override
-			public void visit(ElementPathBlock el) {
-				TemplateVariableScanner scan = new TemplateVariableScanner();
-				Iterator<TriplePath> triples = el.patternElts();
-				while (triples.hasNext()) {
-					TriplePath tp = triples.next();
-
-					final SortedSet<QueryStringScorePair> rank = new TreeSet<>();
-
-					List<QuerySolution> qTsolTemp;
-					log.debug("Triple pattern : {}", tp);
-					Set<Var> tempVar4Tp = scan.extractTemplateVariables(tp);
-					for (Var v : tempVar4Tp) {
-						log.debug(" ... has template variable {}", v);
-					}
-					QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-					try {
-						qTsolTemp = temVarValueSpace.computeTempVarSolutionSpace(qG, dTo, strict,
-								tempVar4Tp.toArray(new Var[0]));
-					} catch (TooGeneralException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						qTsolTemp = Collections.emptyList();
-					}
-					int i = 0;
-					for (QuerySolution sol : qTsolTemp) {
-						log.debug("Solution {} : {}", i++, sol);
-						InstantiateTemplateVar instOP = new InstantiateTemplateVar();
-						Query qClone = QueryFactory.create(qG);
-						for (Iterator<String> it = sol.varNames(); it.hasNext();) {
-							String v = it.next();
-							log.debug("Instantiating on {}", v);
-							qClone = instOP.instantiateVarTemplate(qClone, Var.alloc(v), sol.get(v).asNode());
-							log.debug("{}", qClone);
-						}
-						float score = score(base, qClone);
-						log.debug(" - score = {}", score);
-						rank.add(new QueryStringScorePair(qClone.toString(), score));
-					}
-					log.debug("Top-ranked intermediate queries:");
-					for (QueryStringScorePair pair : rank)
-						log.debug("{} : {}", pair.getScore(), pair.getQuery());
-				}
-			}
-		};
-
-		qG.getQueryPattern().visit(vis);
 
 	}
 

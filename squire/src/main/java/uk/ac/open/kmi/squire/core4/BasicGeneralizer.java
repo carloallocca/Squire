@@ -210,7 +210,7 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 			// what kind of property it shall be.
 			if (!onlyIfNotInTargetDS) {
 				String prefix;
-				VarMapping table;
+				VarMapping<String,String> table;
 				if (rdfd2.isInObjectPropertySet(p)) {
 					prefix = TEMPLATE_VAR_PROP_OBJ;
 					table = objectProperyVarTable;
