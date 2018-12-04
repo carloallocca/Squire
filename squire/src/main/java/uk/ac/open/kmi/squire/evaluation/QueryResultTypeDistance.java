@@ -69,10 +69,12 @@ public class QueryResultTypeDistance {
 		List<VarTypeMap> qOri_d1_signature, qRec_d2_signature;
 		if (d1 instanceof FileBasedRDFDataset)
 			qOri_d1_signature = computeQueryVariableSignature(qOri, (FileBasedRDFDataset) d1);
-		else qOri_d1_signature = computeQueryVariableSignature(qOri, (SparqlIndexedDataset) d1);
+		else
+			qOri_d1_signature = computeQueryVariableSignature(qOri, (SparqlIndexedDataset) d1);
 		if (d2 instanceof FileBasedRDFDataset)
 			qRec_d2_signature = computeQueryVariableSignature(qRec, (FileBasedRDFDataset) d2);
-		else qRec_d2_signature = computeQueryVariableSignature(qRec, (SparqlIndexedDataset) d2);
+		else
+			qRec_d2_signature = computeQueryVariableSignature(qRec, (SparqlIndexedDataset) d2);
 		dist = 1 - rtqOverlapRate(qOri_d1_signature, qRec_d2_signature);
 		return dist;
 	}
@@ -100,9 +102,8 @@ public class QueryResultTypeDistance {
 						} else if (varValue.isLiteral()) {
 							RDFDatatype literalValue = varValue.asLiteral().getDatatype();
 							varType = literalValue.getURI();
-						} else {
+						} else
 							varType = "";
-						}
 						VarTypeMap vtm = new VarTypeMap(varName, varType);
 						signature.add(vtm);
 					}
@@ -139,11 +140,13 @@ public class QueryResultTypeDistance {
 				final String varName = it.next();
 				final String varType;
 				RDFNode varValue = firstSol.get(varName);
-				if (varValue.isURIResource()) varType = TYPE_OF_URI;
+				if (varValue.isURIResource())
+					varType = TYPE_OF_URI;
 				else if (varValue.isLiteral()) {
 					RDFDatatype literalValue = varValue.asLiteral().getDatatype();
 					varType = literalValue.getURI();
-				} else varType = "";
+				} else
+					varType = "";
 				VarTypeMap vtm = new VarTypeMap(varName, varType);
 				signature.add(vtm);
 			}
@@ -168,7 +171,8 @@ public class QueryResultTypeDistance {
 		for (VarTypeMap map1 : qRec_d2_signature) {
 			String varName1 = map1.getVarName();
 			String varType1 = map1.getVarType();
-			if (varName.equals(varName1) && varType.equals(varType1)) return true;
+			if (varName.equals(varName1) && varType.equals(varType1))
+				return true;
 		}
 		return false;
 	}
@@ -180,9 +184,9 @@ public class QueryResultTypeDistance {
 	 * query solutions. The more variables preserve their bindings to the URI type
 	 * or to datatypes, the higher the value.
 	 * 
-	 * @param qOvars
-	 * @param qRvars
-	 * @return
+	 * @param qOri_d1_signature
+	 * @param qRec_d2_signature
+	 * @return the computed signature overlap rate.
 	 */
 	private float rtqOverlapRate(List<VarTypeMap> qOri_d1_signature, List<VarTypeMap> qRec_d2_signature) {
 		if (qOri_d1_signature.isEmpty() || qOri_d1_signature.isEmpty()) {
@@ -191,7 +195,8 @@ public class QueryResultTypeDistance {
 		}
 		int intersection = 0;
 		for (VarTypeMap map : qOri_d1_signature)
-			if (contains(qRec_d2_signature, map)) intersection++;
+			if (contains(qRec_d2_signature, map))
+				intersection++;
 		int cardUnionSignature = qOri_d1_signature.size() + qRec_d2_signature.size() - intersection;
 		return (float) ((1.0 * intersection) / (1.0 * cardUnionSignature));
 	}

@@ -73,6 +73,14 @@ public class InstantiateTemplateVar {
 
 	}
 
+	/**
+	 * Warning: this changes the query q, so if you need to keep the original be sure to have cloned it!
+	 * 
+	 * @param q
+	 * @param tplVar
+	 * @param n
+	 * @return
+	 */
 	public Query instantiateVarTemplate(Query q, Var tplVar, Node n) {
 		if (q == null || n == null || tplVar == null) throw new IllegalArgumentException(
 				"Neither the query, nor the template variable to be instantiated, nor the instance node can be null.");

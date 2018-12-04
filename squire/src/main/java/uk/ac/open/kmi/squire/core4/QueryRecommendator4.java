@@ -56,7 +56,10 @@ public class QueryRecommendator4 extends AbstractQueryRecommender {
 		// SPECIALIZE...
 		List<QueryAndContextNode> recoms = new LinkedList<>();
 		for (Query q : this.qTemplate) {
-			Specializer spec = new Specializer(getQuery(), q, d1, d2, genOp,
+			Specializer spec = new 
+					 Specializer
+					//GraphSearchSpecializer
+					( getQuery(), q, d1, d2, genOp,
 					getMetrics().resultTypeSimilarityCoefficient, getMetrics().queryRootDistanceCoefficient,
 					getMetrics().resultSizeSimilarityCoefficient, getMetrics().querySpecificityDistanceCoefficient,
 					strict, this.token);

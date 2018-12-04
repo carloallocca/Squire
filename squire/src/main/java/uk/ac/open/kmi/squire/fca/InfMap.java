@@ -1,10 +1,11 @@
-package uk.ac.open.kmi.squire.evaluation;
+package uk.ac.open.kmi.squire.fca;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
+import uk.ac.open.kmi.squire.evaluation.Measures;
 import uk.ac.open.kmi.squire.evaluation.Measures.Metrics;
 
 /**

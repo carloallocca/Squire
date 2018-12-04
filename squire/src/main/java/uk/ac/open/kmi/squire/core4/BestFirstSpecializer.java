@@ -18,12 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
 import uk.ac.open.kmi.squire.core2.QueryTempVarSolutionSpace;
-import uk.ac.open.kmi.squire.evaluation.InfMap;
 import uk.ac.open.kmi.squire.evaluation.Measures;
 import uk.ac.open.kmi.squire.evaluation.Measures.Metrics;
 import uk.ac.open.kmi.squire.evaluation.QueryResultTypeDistance;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.fca.Concept;
+import uk.ac.open.kmi.squire.fca.InfMap;
 import uk.ac.open.kmi.squire.fca.Lattice;
 import uk.ac.open.kmi.squire.fca.QueryTemplateLattice;
 import uk.ac.open.kmi.squire.operation.TooGeneralException;
@@ -136,17 +136,16 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 					float qdist_tp = base.compute(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE);
 					float qdist_var = base.compute(Metrics.QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN);
 					float rt_sim = base.compute(Metrics.RESULT_TYPE_SIMILARITY);
-					base.setOriginalQuery(this.qG); // FIXME should I set the original query to be the generalised one for all?
+					base.setOriginalQuery(this.qG); // FIXME should I set the original query to be the generalised one
+													// for all?
 					float bind_coll = base.compute(Metrics.QUERY_BINDING_COLLAPSE_RATE);
-					
+
 					log.debug(" - Binding collapse rate = {}", bind_coll);
 					log.debug(" - Query spec. dist. (Var) = {}", qdist_tp);
 					log.debug(" - Query spec. dist. (TP) = {}", qdist_var);
 					log.debug(" - Res. type sim. = {}", rt_sim);
 
 					QueryAndContextNode qctx = new QueryAndContextNode(gq.getQuery());
-					qctx.setDataset1(dFrom);
-					qctx.setDataset2(dTo);
 					qctx.setOriginalQuery(qO);
 					qctx.setBindingCollapseRate(bind_coll);
 					qctx.setQuerySpecificityDistanceTP(qdist_tp);
@@ -204,7 +203,8 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 				}
 			}
 			log.debug("Recall the original query: {}", qO);
-			if (optimals.isEmpty()) log.warn("No ideal branch was found, need to find a strategy for the visit plan!");
+			if (optimals.isEmpty())
+				log.warn("No ideal branch was found, need to find a strategy for the visit plan!");
 			else {
 				log.debug("Best-scored candidates follow:");
 				for (QueryAndContextNode qctx : optimals) {
@@ -228,10 +228,12 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 
 		Set<Map<String, RDFNode>> kept = new HashSet<>();
 		List<QuerySolution> output = new ArrayList<>();
-		if (qSolList.isEmpty()) return qSolList;
+		if (qSolList.isEmpty())
+			return qSolList;
 
 		for (QuerySolution qs : qSolList) {
-			if (qs instanceof QuerySolutionMap && kept.contains(((QuerySolutionMap) qs).asMap())) continue;
+			if (qs instanceof QuerySolutionMap && kept.contains(((QuerySolutionMap) qs).asMap()))
+				continue;
 			List<String> valuesList = new ArrayList<>();
 			Iterator<String> varIter = qs.varNames();
 			while (varIter.hasNext()) {
@@ -240,7 +242,8 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 			}
 			if (valuesList.size() == 1) {
 				output.add(qs);
-				if (qs instanceof QuerySolutionMap) kept.add(((QuerySolutionMap) qs).asMap());
+				if (qs instanceof QuerySolutionMap)
+					kept.add(((QuerySolutionMap) qs).asMap());
 			} else {
 				String firstValue = valuesList.get(0);
 				valuesList.remove(0);
@@ -248,11 +251,13 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 				Iterator<String> varValueIter = valuesList.iterator();
 				while (varValueIter.hasNext() && isAllDifferent) {
 					String varValue = varValueIter.next();
-					if (varValue.equals(firstValue)) isAllDifferent = false;
+					if (varValue.equals(firstValue))
+						isAllDifferent = false;
 				}
 				if (isAllDifferent) {
 					output.add(qs);
-					if (qs instanceof QuerySolutionMap) kept.add(((QuerySolutionMap) qs).asMap());
+					if (qs instanceof QuerySolutionMap)
+						kept.add(((QuerySolutionMap) qs).asMap());
 				}
 			}
 		}

@@ -28,23 +28,16 @@ public class QuerySpecificityDistance {
 	 * @param qR
 	 * @return
 	 */
-	public float computeQSDwrtQueryTP(Query originalQuery, Query qR) {
+	public float computeQSDwrtQueryTP(Query originalQuery, Query recommendedQuery) {
 		float dist;
 
-		// QueryGPESim simQuery= new QueryGPESim();
-		// sim = simQuery.computeQueryPatternsSim(originalQuery, qR);
-		//
-		//// sim=simQuery.computeQueryPatternsSimWithWeighedNonCommonTriplePattern(qR,
-		// qR);
-		// return sim;
-
-		// ...get the GPE of qOri
+		// ...get the GPE of originalQuery
 		SQGraphPatternExpressionAggregator gpeVisitorO = new SQGraphPatternExpressionAggregator();
 		ElementWalker.walk(originalQuery.getQueryPattern(), gpeVisitorO);
 		Set<TriplePath> qOGPE = gpeVisitorO.getMembersInQuery();
-		// ...get the GPE of qRec
+		// ...get the GPE of recommendedQuery
 		SQGraphPatternExpressionAggregator gpeVisitorR = new SQGraphPatternExpressionAggregator();
-		ElementWalker.walk(qR.getQueryPattern(), gpeVisitorR);
+		ElementWalker.walk(recommendedQuery.getQueryPattern(), gpeVisitorR);
 		Set<TriplePath> qRGPE = gpeVisitorR.getMembersInQuery();
 
 		dist = 1 - tpOverlapRate(qOGPE, qRGPE);
@@ -98,7 +91,8 @@ public class QuerySpecificityDistance {
 	private boolean contains(Set<TriplePath> qRGPE, TriplePath tp) {
 		String tpAsString = tp.toString();
 		for (TriplePath tp1 : qRGPE)
-			if (tp1.toString().compareTo(tpAsString) == 0) return true;
+			if (tp1.toString().compareTo(tpAsString) == 0)
+				return true;
 		return false;
 	}
 
@@ -119,7 +113,8 @@ public class QuerySpecificityDistance {
 		}
 		int intersectionTPCardinality = 0; // # TPs from original query also present in transformed query.
 		for (TriplePath tp : qOGPE)
-			if (qRGPE.contains(tp)) intersectionTPCardinality++;
+			if (qRGPE.contains(tp))
+				intersectionTPCardinality++;
 		// Cardinality of the union of both sets
 		int unionTPCardinality = qOGPE.size() + qRGPE.size() - intersectionTPCardinality;
 		return (float) ((1.0 * intersectionTPCardinality) / unionTPCardinality);
@@ -141,7 +136,8 @@ public class QuerySpecificityDistance {
 		}
 		int intersectionVarCardinality = 0; // # Variables from original query also present in transformed query.
 		for (String st : qOvars)
-			if (qRvars.contains(st)) intersectionVarCardinality++;
+			if (qRvars.contains(st))
+				intersectionVarCardinality++;
 		// Cardinality of the union of both sets
 		float unionVarCardinality = qOvars.size() + qRvars.size() - intersectionVarCardinality;
 		return (float) ((1.0 * intersectionVarCardinality) / unionVarCardinality);

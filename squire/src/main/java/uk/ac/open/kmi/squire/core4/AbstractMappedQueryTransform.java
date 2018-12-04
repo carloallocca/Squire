@@ -1,6 +1,9 @@
 package uk.ac.open.kmi.squire.core4;
 
-import uk.ac.open.kmi.squire.entityvariablemapping.GeneralVarMapping;
+import org.apache.jena.graph.Node;
+import org.apache.jena.sparql.core.Var;
+
+import uk.ac.open.kmi.squire.entityvariablemapping.RdfVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 
 public abstract class AbstractMappedQueryTransform extends AbstractQueryRecommendationObservable
@@ -17,51 +20,51 @@ public abstract class AbstractMappedQueryTransform extends AbstractQueryRecommen
 	public static final String TEMPLATE_VAR_PROP_OBJ = "opt";
 	public static final String TEMPLATE_VAR_PROP_PLAIN = "ppt";
 
-	protected VarMapping<String,String> classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
+	protected VarMapping<Var, Node> classVarTable, datatypePropertyVarTable, individualVarTable, literalVarTable,
 			objectProperyVarTable, rdfVocVarTable, plainPropertyVarTable;
 
 	protected AbstractMappedQueryTransform() {
-		classVarTable = new GeneralVarMapping();
-		individualVarTable = new GeneralVarMapping();
-		literalVarTable = new GeneralVarMapping();
-		objectProperyVarTable = new GeneralVarMapping();
-		datatypePropertyVarTable = new GeneralVarMapping();
-		rdfVocVarTable = new GeneralVarMapping();
-		plainPropertyVarTable = new GeneralVarMapping();
+		classVarTable = new RdfVarMapping();
+		individualVarTable = new RdfVarMapping();
+		literalVarTable = new RdfVarMapping();
+		objectProperyVarTable = new RdfVarMapping();
+		datatypePropertyVarTable = new RdfVarMapping();
+		rdfVocVarTable = new RdfVarMapping();
+		plainPropertyVarTable = new RdfVarMapping();
 	}
 
 	@Override
-	public VarMapping<String,String> getClassVarTable() {
+	public VarMapping<Var, Node> getClassVarTable() {
 		return classVarTable;
 	}
 
 	@Override
-	public VarMapping<String,String> getDatatypePropertyVarTable() {
+	public VarMapping<Var, Node> getDatatypePropertyVarTable() {
 		return datatypePropertyVarTable;
 	}
 
 	@Override
-	public VarMapping<String,String> getIndividualVarTable() {
+	public VarMapping<Var, Node> getIndividualVarTable() {
 		return individualVarTable;
 	}
 
 	@Override
-	public VarMapping<String,String> getLiteralVarTable() {
+	public VarMapping<Var, Node> getLiteralVarTable() {
 		return literalVarTable;
 	}
 
 	@Override
-	public VarMapping<String,String> getObjectProperyVarTable() {
+	public VarMapping<Var, Node> getObjectProperyVarTable() {
 		return objectProperyVarTable;
 	}
 
 	@Override
-	public VarMapping<String,String> getPlainProperyVarTable() {
+	public VarMapping<Var, Node> getPlainProperyVarTable() {
 		return plainPropertyVarTable;
 	}
 
 	@Override
-	public VarMapping<String,String> getRdfVocVarTable() {
+	public VarMapping<Var, Node> getRdfVocVarTable() {
 		return rdfVocVarTable;
 	}
 

@@ -23,6 +23,7 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.RDFDatasetSimilarity;
 
 /**
+ * TODO this class seems redundant, see if it can be removed.
  *
  * @author carloallocca
  */
@@ -71,8 +72,9 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		} catch (Exception ex) {
 			if (ex instanceof ClosedByInterruptException)
 				log.warn(" A task with token {} was interrupted. This may have been requested by a client.", token);
-			else log.error("Caught exception of type " + ex.getClass().getName() + " : " + ex.getMessage()
-					+ " - doing nothing with it.", ex);
+			else
+				log.error("Caught exception of type " + ex.getClass().getName() + " : " + ex.getMessage()
+						+ " - doing nothing with it.", ex);
 		}
 	}
 
@@ -102,8 +104,9 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		Query query;
 		log.info("Started recommendation process.");
 		log.debug(" (token={})", token);
-		if (this.strict) log.warn("Strict flag is set: only queries that preserve datatype properties and object"
-				+ " properties will be considered for recommendation.");
+		if (this.strict)
+			log.warn("Strict flag is set: only queries that preserve datatype properties and object"
+					+ " properties will be considered for recommendation.");
 		try {
 			query = QueryFactory.create(queryString);
 			log.info(" === Original query follows === ");
@@ -123,20 +126,21 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 		fireSatisfiabilityChecked(query, satisfiable);
 		notifyQuerySatisfiableValue(query, satisfiable); // FIXME legacy
 		// Phase 2 : check dataset similarity
-		if (satisfiable) try {
-			// Phase 3 : recommend
-			QueryRecommendator4 qR = new QueryRecommendator4(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
-					queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree, strict);
-			RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
-			querySim.register(this);
-			float score = querySim.computeSim(rdfd1, rdfd2);
-			qR.register(this);
+		if (satisfiable)
+			try {
+				// Phase 3 : recommend
+				QueryRecommendator4 qR = new QueryRecommendator4(query, rdfd1, rdfd2, resultTypeSimilarityDegree,
+						queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree, strict);
+				RDFDatasetSimilarity querySim = new RDFDatasetSimilarity(this.token);
+				querySim.register(this);
+				float score = querySim.computeSim(rdfd1, rdfd2);
+				qR.register(this);
 
-			log.info("Building recommended query tree");
-			qR.buildRecommendation();
-		} catch (Exception ex) {
-			log.error("Exception caught while building recommendation.", ex);
-		}
+				log.info("Building recommended query tree");
+				qR.buildRecommendation();
+			} catch (Exception ex) {
+				log.error("Exception caught while building recommendation.", ex);
+			}
 		return Collections.emptyList();
 	}
 

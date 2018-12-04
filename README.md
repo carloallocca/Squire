@@ -21,7 +21,7 @@ When all unit tests work offline, we will stop recommending the `-Dmaven.test.sk
 
 If you want to build only some modules individually:
 
-* __`squire`__ : the core implementation, build this first.
+* __`squire`__ : the core library, build this first.
 * __`launcher`__ : command-line Java application as executable JAR file, depends on squire
 * __`websquire`__ : Web Service version with HTTP API available as a WAR archive.
 

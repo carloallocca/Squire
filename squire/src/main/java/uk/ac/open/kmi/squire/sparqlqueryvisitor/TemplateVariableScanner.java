@@ -25,30 +25,47 @@ import org.apache.jena.sparql.syntax.ElementVisitorBase;
  */
 public class TemplateVariableScanner extends ElementVisitorBase {
 
-	private final Set<Var> templateVariables = new HashSet<>();
+	private Set<Var> templateVariables = null;
 
 	public Set<Var> extractTemplateVariables(TriplePath bgp) {
 		Set<Var> res = new HashSet<>();
 		Node subject = bgp.getSubject();
-		if (isTemplateVar(subject)) res.add((Var) subject);
+		if (isTemplateVar(subject))
+			res.add((Var) subject);
 		Node predicate = bgp.getPredicate();
-		if (isTemplateVar(predicate)) res.add((Var) predicate);
+		if (isTemplateVar(predicate))
+			res.add((Var) predicate);
 		Node object = bgp.getObject();
-		if (isTemplateVar(object)) res.add((Var) object);
+		if (isTemplateVar(object))
+			res.add((Var) object);
 		return res;
 	}
 
 	public Set<Var> getTemplateVariables() {
+		if (templateVariables == null)
+			throw new IllegalStateException("Called getTemplateVariables() before they were extracted.");
 		return templateVariables;
 	}
 
+	public Set<Var> getTemplateVariables(String[] prefixes) {
+		Set<Var> res = new HashSet<>();
+		for (Var v : getTemplateVariables())
+			for (String prefix : prefixes)
+				if (v.getName().startsWith(prefix))
+					res.add(v);
+		return res;
+	}
+
 	public void reset() {
-		this.templateVariables.clear();
+		this.templateVariables = null;
 	}
 
 	@Override
 	public void visit(ElementPathBlock el) {
-		if (el == null) throw new IllegalArgumentException("Element path block cannot be null.");
+		if (el == null)
+			throw new IllegalArgumentException("Element path block cannot be null.");
+		if (this.templateVariables == null)
+			this.templateVariables = new HashSet<>();
 		ListIterator<TriplePath> it = el.getPattern().iterator();
 		while (it.hasNext()) {
 			final TriplePath tp = it.next();
@@ -57,7 +74,8 @@ public class TemplateVariableScanner extends ElementVisitorBase {
 	}
 
 	private boolean isTemplateVar(Node node) {
-		if (node.isConcrete()) return false;
+		if (node.isConcrete())
+			return false;
 		String name = ((Var) node).getName();
 		return name.startsWith(TEMPLATE_VAR_CLASS) || name.startsWith(TEMPLATE_VAR_PROP_OBJ)
 				|| name.startsWith(TEMPLATE_VAR_PROP_DT);

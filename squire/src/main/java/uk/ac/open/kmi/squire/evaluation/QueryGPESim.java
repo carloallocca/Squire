@@ -5,6 +5,10 @@
  */
 package uk.ac.open.kmi.squire.evaluation;
 
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_CLASS;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_DT;
+import static uk.ac.open.kmi.squire.core4.AbstractMappedQueryTransform.TEMPLATE_VAR_PROP_OBJ;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -93,7 +97,8 @@ public class QueryGPESim {
 		if (cardSignatureQo != 0 && cardSignatureQr != 0) {
 			int intersection = 0;
 			for (TriplePath tp : qOGPE)
-				if (qRGPE.contains(tp)) intersection = intersection + 1;
+				if (qRGPE.contains(tp))
+					intersection = intersection + 1;
 			// log.info("computeCommonTriplePattern::intersection : " + intersection);
 			// sim =(float) (1.0*(((1.0*qOvarList.size())/(1.0*qRvarList.size()))));
 
@@ -112,11 +117,15 @@ public class QueryGPESim {
 	 * @return
 	 */
 	private float computeNodeWeight(Node n) {
-		if (n.isURI()) return 0.5f;
+		if (n.isURI())
+			return 0.5f;
 		else if (n.isVariable()) {
 			String na = n.getName();
-			if (na.startsWith("ct") || na.startsWith("opt") || na.startsWith("dtp")) return 0.1f;
-			else return 0.4f;
+			if (na.startsWith(TEMPLATE_VAR_CLASS) || na.startsWith(TEMPLATE_VAR_PROP_OBJ)
+					|| na.startsWith(TEMPLATE_VAR_PROP_DT))
+				return 0.1f;
+			else
+				return 0.4f;
 		}
 		return 0;
 	}

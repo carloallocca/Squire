@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.TriplePath;
@@ -59,13 +60,15 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 	public BasicGeneralizer(IRDFDataset d1, IRDFDataset d2) {
 		super();
 		this.rdfd1 = d1;
-		if (d2 == null) throw new IllegalArgumentException("Target dataset cannot be null.");
+		if (d2 == null)
+			throw new IllegalArgumentException("Target dataset cannot be null.");
 		this.rdfd2 = d2;
 	}
 
 	@Override
 	public Set<Query> generalize(Query query) {
-		if (query == null) throw new IllegalArgumentException("Query cannot be null.");
+		if (query == null)
+			throw new IllegalArgumentException("Query cannot be null.");
 		// The generalized query is created from a clone of the original one.
 		Query qGeneral = QueryFactory.create(query);
 		// Instantiated once, applied wherever possible.
@@ -74,21 +77,24 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 		for (Node subj : getEntitySet(query, NodeRole.SUBJECT))
 			if (subj.isConcrete() && !subj.isBlank()) {
 				Var tplVar = ifSubjectIsNotD2ThenGenerateVariableNew(subj);
-				if (tplVar != null) qGeneral = qg.perform(qGeneral, subj, tplVar);
+				if (tplVar != null)
+					qGeneral = qg.perform(qGeneral, subj, tplVar);
 			}
 		// PREDICATE
 		for (Node pred : getEntitySet(query, NodeRole.PREDICATE))
 			if (pred.isConcrete() && !pred.isBlank()) {
 				if (!this.rdfd2.getRDFVocabulary().contains(pred.getURI())) {
 					Var tplVar = makeTplVariableFromPredicate(pred, true);
-					if (tplVar != null) qGeneral = qg.perform(qGeneral, pred, tplVar);
+					if (tplVar != null)
+						qGeneral = qg.perform(qGeneral, pred, tplVar);
 				}
 			}
 		// OBJECT
 		for (Node obj : getEntitySet(query, NodeRole.OBJECT))
 			if (obj.isConcrete() && !obj.isBlank()) {
 				Var tplVar = ifObjectIsNotD2ThenGenerateVariableNew(obj);
-				if (tplVar != null) qGeneral = qg.perform(qGeneral, obj, tplVar);
+				if (tplVar != null)
+					qGeneral = qg.perform(qGeneral, obj, tplVar);
 			}
 		return Collections.singleton(qGeneral);
 	}
@@ -116,7 +122,8 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 					default:
 						n = null;
 					}
-					if (n != null) objects.add(n);
+					if (n != null)
+						objects.add(n);
 				}
 			}
 		});
@@ -124,49 +131,56 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 	}
 
 	protected Var ifObjectIsNotD2ThenGenerateVariableNew(Node obj) {
-		if (obj == null) throw new IllegalArgumentException("Object node cannot be null.");
-		final String varName;
+		if (obj == null)
+			throw new IllegalArgumentException("Object node cannot be null.");
+		final Var varName;
 		if (obj.isURI()) {
 			String o = obj.getURI();
-			if (rdfd1.getClassSet().contains(o) && !rdfd2.getClassSet().contains(o))
-				varName = classVarTable.getOrCreateVar(o, TEMPLATE_VAR_CLASS);
+			if (rdfd1.getClassSet().contains(obj) && !rdfd2.getClassSet().contains(obj))
+				varName = classVarTable.getOrCreateVar(obj, TEMPLATE_VAR_CLASS);
 			else if (rdfd1.isInObjectPropertySet(o) && !rdfd2.isInObjectPropertySet(o))
-				varName = objectProperyVarTable.getOrCreateVar(o, TEMPLATE_VAR_PROP_OBJ);
+				varName = objectProperyVarTable.getOrCreateVar(obj, TEMPLATE_VAR_PROP_OBJ);
 			else if (rdfd1.isInDatatypePropertySet(o) && !rdfd2.isInDatatypePropertySet(o))
-				varName = datatypePropertyVarTable.getOrCreateVar(o, TEMPLATE_VAR_PROP_DT);
+				varName = datatypePropertyVarTable.getOrCreateVar(obj, TEMPLATE_VAR_PROP_DT);
 			else if (rdfd1.isInRDFVocabulary(o) && !rdfd2.isInRDFVocabulary(o))
-				varName = rdfVocVarTable.getOrCreateVar(o, "rdf");
-			else return null;
+				varName = rdfVocVarTable.getOrCreateVar(obj, "rdf");
+			else
+				return null;
 		} else if (obj.isLiteral()) {
-			varName = literalVarTable.getOrCreateVar(obj.getLiteralValue().toString(),
-					AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL);
-		} else return null;
-		if (varName == null) throw new IllegalStateException("Object node generated a null variable name.");
+			Node lit = NodeFactory.createLiteral(obj.getLiteral());
+			varName = literalVarTable.getOrCreateVar(lit, AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL);
+		} else
+			return null;
+		if (varName == null)
+			throw new IllegalStateException("Object node generated a null variable name.");
 		return Var.alloc(varName);
 	}
 
 	protected Var ifSubjectIsNotD2ThenGenerateVariableNew(Node subj) {
-		if (subj == null) throw new IllegalArgumentException("Subject node cannot be null.");
-		final String varName;
+		if (subj == null)
+			throw new IllegalArgumentException("Subject node cannot be null.");
+		final Node varName;
 		if (subj.isURI()) {
 			String sub = subj.getURI();
 			if (rdfd1.getClassSet().contains(sub) && !rdfd2.getClassSet().contains(sub))
-				varName = classVarTable.getOrCreateVar(sub, TEMPLATE_VAR_CLASS);
+				varName = classVarTable.getOrCreateVar(subj, TEMPLATE_VAR_CLASS);
 			else if (rdfd1.isInObjectPropertySet(sub) && !rdfd2.isInObjectPropertySet(sub))
-				varName = objectProperyVarTable.getOrCreateVar(sub, TEMPLATE_VAR_PROP_OBJ);
+				varName = objectProperyVarTable.getOrCreateVar(subj, TEMPLATE_VAR_PROP_OBJ);
 			else if (rdfd1.isInDatatypePropertySet(sub) && !rdfd2.isInDatatypePropertySet(sub))
-				varName = datatypePropertyVarTable.getOrCreateVar(sub, TEMPLATE_VAR_PROP_DT);
+				varName = datatypePropertyVarTable.getOrCreateVar(subj, TEMPLATE_VAR_PROP_DT);
 			else if (rdfd1.isInRDFVocabulary(sub) && !rdfd2.isInRDFVocabulary(sub))
-				varName = rdfVocVarTable.getOrCreateVar(sub, "rdf");
+				varName = rdfVocVarTable.getOrCreateVar(subj, "rdf");
 			else
 				// We assume by exclusion that sub is an individual.
 				// XXX is that assumption correct?
-				varName = individualVarTable.getOrCreateVar(sub, TEMPLATE_VAR_INDIVIDUAL);
+				varName = individualVarTable.getOrCreateVar(subj, TEMPLATE_VAR_INDIVIDUAL);
 		} else if (subj.isLiteral()) {
-			varName = literalVarTable.getOrCreateVar(subj.getLiteralValue().toString(),
-					AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL);
-		} else return null;
-		if (varName == null) throw new IllegalStateException("Subject node generated a null variable name.");
+			Node lit = NodeFactory.createLiteral(subj.getLiteral());
+			varName = literalVarTable.getOrCreateVar(lit, AbstractMappedQueryTransform.TEMPLATE_VAR_LITERAL);
+		} else
+			return null;
+		if (varName == null)
+			throw new IllegalStateException("Subject node generated a null variable name.");
 		return Var.alloc(varName);
 	}
 
@@ -187,10 +201,12 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 	 * @return
 	 */
 	protected Var makeTplVariableFromPredicate(Node predicate, boolean onlyIfNotInTargetDS) {
-		if (predicate == null) throw new IllegalArgumentException("Predicate node cannot be null.");
+		if (predicate == null)
+			throw new IllegalArgumentException("Predicate node cannot be null.");
 		log.trace("Presence of properties in target dataset {} matter", onlyIfNotInTargetDS ? "DOES" : "does NOT");
-		final String varName;
-		if (!predicate.isURI()) return null;
+		final Node varName;
+		if (!predicate.isURI())
+			return null;
 		String p = predicate.getURI();
 		log.debug("Inspecting predicate '{}' for generalization.", p);
 		log.trace("rdfd1 object property list : {}", rdfd1.getObjectPropertySet());
@@ -201,16 +217,16 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 		// XXX what if the property exist in the other dataset but is used as an
 		// object/data property unlike the first dataset?
 		if (rdfd1.isInObjectPropertySet(p) && (!onlyIfNotInTargetDS || !rdfd2.isInObjectPropertySet(p)))
-			varName = objectProperyVarTable.getOrCreateVar(p, TEMPLATE_VAR_PROP_OBJ);
+			varName = objectProperyVarTable.getOrCreateVar(predicate, TEMPLATE_VAR_PROP_OBJ);
 		else if (rdfd1.isInDatatypePropertySet(p) && (!onlyIfNotInTargetDS || !rdfd2.isInDatatypePropertySet(p)))
-			varName = datatypePropertyVarTable.getOrCreateVar(p, TEMPLATE_VAR_PROP_DT);
+			varName = datatypePropertyVarTable.getOrCreateVar(predicate, TEMPLATE_VAR_PROP_DT);
 		else if (rdfd1.isInPropertySet(p)) {
 			// If we don't care if the property exists in the target dataset, generate the
 			// template variable, but do take a peek at the target dataset anyway, to decide
 			// what kind of property it shall be.
 			if (!onlyIfNotInTargetDS) {
 				String prefix;
-				VarMapping<String,String> table;
+				VarMapping<Var, Node> table;
 				if (rdfd2.isInObjectPropertySet(p)) {
 					prefix = TEMPLATE_VAR_PROP_OBJ;
 					table = objectProperyVarTable;
@@ -221,11 +237,11 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 					prefix = TEMPLATE_VAR_PROP_PLAIN;
 					table = plainPropertyVarTable;
 				}
-				varName = table.getOrCreateVar(p, prefix);
+				varName = table.getOrCreateVar(predicate, prefix);
 			} else if (!(rdfd2.isInPropertySet(p) || rdfd2.isInObjectPropertySet(p)
 					|| rdfd2.isInDatatypePropertySet(p))) {
 				log.debug(" ... is a plain property in <{}> and not in <{}>", rdfd1, rdfd2);
-				varName = plainPropertyVarTable.getOrCreateVar(p, TEMPLATE_VAR_PROP_PLAIN);
+				varName = plainPropertyVarTable.getOrCreateVar(predicate, TEMPLATE_VAR_PROP_PLAIN);
 			} else {
 				log.debug(" ... is present in target dataset <{}> and override is not enabled. Will not generalize.",
 						rdfd2);
@@ -238,7 +254,8 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 					rdfd2);
 			return null;
 		}
-		if (varName == null) throw new IllegalStateException("Predicate node generated a null variable name.");
+		if (varName == null)
+			throw new IllegalStateException("Predicate node generated a null variable name.");
 		return Var.alloc(varName);
 	}
 

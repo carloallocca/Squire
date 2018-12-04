@@ -74,6 +74,28 @@ public class SparqlUtils {
 
 	}
 
+	public static class SparqlResultException extends Exception {
+
+		private static final long serialVersionUID = -7102834742711938343L;
+
+		private String responseBody;
+
+		public SparqlResultException(String message, String responseBody) {
+			super(message);
+			this.responseBody = responseBody;
+		}
+
+		public SparqlResultException(Throwable cause, String responseBody) {
+			super(cause);
+			this.responseBody = responseBody;
+		}
+
+		public String getResponseBody() {
+			return responseBody;
+		}
+
+	}
+
 	private static Logger log = LoggerFactory.getLogger(SparqlUtils.class);
 
 	/**
@@ -101,8 +123,9 @@ public class SparqlUtils {
 	 *             if anything happens other than receiving a HTTP 200 OK
 	 */
 	public static String doRawQuery(String queryString, String endpoint, int timeout) throws SparqlException {
-		if (timeout < 1) throw new IllegalArgumentException(
-				"Sorry, waiting forever is disallowed. Timeout must be a positive integer.");
+		if (timeout < 1)
+			throw new IllegalArgumentException(
+					"Sorry, waiting forever is disallowed. Timeout must be a positive integer.");
 		log.debug("About to execute the following:");
 		log.debug(" * endpoint: {}", endpoint);
 		log.debug(" * query: {}", queryString.replaceAll("\\s+", " "));
@@ -185,7 +208,8 @@ public class SparqlUtils {
 		return output;
 	}
 
-	public static List<String> extractSelectVariableValues(String sparqlResultJson, String variable) {
+	public static List<String> extractSelectVariableValues(String sparqlResultJson, String variable)
+			throws SparqlResultException {
 		return extractSelectVariableValues(sparqlResultJson, variable, false);
 	}
 
@@ -199,15 +223,21 @@ public class SparqlUtils {
 	 *            the name of the variable to extract bindings from.
 	 * @return
 	 */
-	public static List<String> extractSelectVariableValues(String sparqlResultJson, String variable,
-			boolean mustBeUris) {
+	public static List<String> extractSelectVariableValues(String sparqlResultJson, String variable, boolean mustBeUris)
+			throws SparqlResultException {
 		List<String> output = new ArrayList<>();
-		JsonArray results = JSON.parse(sparqlResultJson).get("results").getAsObject().get("bindings").getAsArray();
+		JsonObject jResp = JSON.parse(sparqlResultJson);
+		if (!jResp.hasKey("results"))
+			throw new SparqlResultException(
+					"Key 'results' missing from reponse body expected to be in application/sparql-results+json",
+					sparqlResultJson);
+		JsonArray results = jResp.get("results").getAsObject().get("bindings").getAsArray();
 		for (JsonValue res : results) {
 			JsonObject bind = res.getAsObject().get(variable).getAsObject();
 			String value = bind.get("value").getAsString().value();
 			try {
-				if (mustBeUris) new URI(value); // To test the syntax
+				if (mustBeUris)
+					new URI(value); // To test the syntax
 				output.add(value);
 			} catch (URISyntaxException ex) {
 				log.error("Bad URI synax for string '{}'", value);
@@ -250,10 +280,13 @@ public class SparqlUtils {
 			QuerySolutionMap keptSlice = new QuerySolutionMap();
 			for (Iterator<String> it = sol.varNames(); it.hasNext();) {
 				String v = it.next();
-				if (reducedVars.containsKey(Var.alloc(v))) keptSlice.add(v, sol.get(v));
-				else fixedSlice.add(v, sol.get(v));
+				if (reducedVars.containsKey(Var.alloc(v)))
+					keptSlice.add(v, sol.get(v));
+				else
+					fixedSlice.add(v, sol.get(v));
 			}
-			if (!fixed2kept.containsKey(fixedSlice.asMap())) fixed2kept.put(fixedSlice.asMap(), new HashSet<>());
+			if (!fixed2kept.containsKey(fixedSlice.asMap()))
+				fixed2kept.put(fixedSlice.asMap(), new HashSet<>());
 			fixed2kept.get(fixedSlice.asMap()).add(keptSlice.asMap());
 		}
 
@@ -268,15 +301,16 @@ public class SparqlUtils {
 					log.trace(" ..... added: {} - {}", entry.getKey(), entry.getValue());
 				}
 				log.trace(" ... kept: {}", kepts);
-				if (kepts.isEmpty()) inflated.add(solNu);
+				if (kepts.isEmpty())
+					inflated.add(solNu);
 				else
 					// Process every "kept" variable from the expandable part
 					for (Entry<String, RDFNode> entry : kepts.entrySet()) {
-					// First add the kept value
-					solNu.add(entry.getKey(), entry.getValue());
-					log.trace(" ..... added: {} - {}", entry.getKey(), entry.getValue());
-					// Then iteratively expand every reduced variable over the kept one
-					inflateSolution(solNu, reducedVars, fixed2kept, fixed, inflated);
+						// First add the kept value
+						solNu.add(entry.getKey(), entry.getValue());
+						log.trace(" ..... added: {} - {}", entry.getKey(), entry.getValue());
+						// Then iteratively expand every reduced variable over the kept one
+						inflateSolution(solNu, reducedVars, fixed2kept, fixed, inflated);
 					}
 			}
 		}
@@ -351,7 +385,8 @@ public class SparqlUtils {
 				// Add the retained binding if not present.
 				// Iterate over e.g. { y1:X } , { y2:Y }
 				log.trace(" ... processing binding: {} - {}", var, entry.getValue());
-				if (!solution.contains(var)) solution.add(var, entry.getValue());
+				if (!solution.contains(var))
+					solution.add(var, entry.getValue());
 				// Recursively expand the solution by re-adding the value for the variables that
 				// were reduced into the kept one.
 				for (Var kept : reducedVars.keySet()) {

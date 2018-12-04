@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.jena.arq.querybuilder.SelectBuilder;
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
@@ -41,7 +42,6 @@ import uk.ac.open.kmi.squire.operation.IsSparqlQuerySatisfiableStateful;
 import uk.ac.open.kmi.squire.operation.RemoveTriple;
 import uk.ac.open.kmi.squire.operation.TooGeneralException;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
-import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 import uk.ac.open.kmi.squire.sparqlqueryvisitor.TemplateVariableScanner;
 import uk.ac.open.kmi.squire.utils.PowerSetFactory;
 
@@ -61,61 +61,72 @@ public class Specializer extends AbstractMappedQueryTransform {
 	 * @author carloallocca
 	 *
 	 */
-	private class NodeTransformation {
+	protected class NodeTransformation {
 
-		private String entityQo;
-		private String entityQr;
+		private Node entityQo;
+		private Node entityQr;
 
-		public NodeTransformation(String originalNode, String transformedNode) {
+		public NodeTransformation(Node originalNode, Node transformedNode) {
 			this.entityQo = originalNode;
 			this.entityQr = transformedNode;
 		}
 
-		public String getOriginalNode() {
+		public Node getOriginalNode() {
 			return entityQo;
 		}
 
-		public String getTransformedNode() {
+		public Node getTransformedNode() {
 			return entityQr;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder s = new StringBuilder();
+			s.append("{");
+			s.append(getOriginalNode());
+			s.append("<-");
+			s.append(getTransformedNode());
+			s.append("}");
+			return s.toString();
 		}
 
 	}
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	/**
-	 * How many specializations before printing the log.
-	 */
-	private int logFreq = 20;
-
-	private final Query qO, qR;
-
 	private Map<String, Query> queryIndex = new HashMap<>();
-
-	private IRDFDataset rdfd1, rdfd2;
 
 	private final List<QueryAndContextNode> recommendations = new ArrayList<>();
 
 	private float resultTypeSimilarityDegree, queryRootDistanceDegree, resultSizeSimilarityDegree,
 			querySpecificityDistanceDegree;
 
+	private final boolean strict;
+
+	/**
+	 * How many specializations before printing the log.
+	 */
+	protected int logFreq = 20;
+
+	protected final Query qO, qR;
+
+	protected IRDFDataset rdfd1, rdfd2;
+
 	/**
 	 * List of query and context nodes that are still _left_ to specialize: it is
 	 * emptied as the process goes on.
 	 */
-	private final List<QueryAndContextNode> specializables = new ArrayList<>();
+	protected final List<QueryAndContextNode> specializables = new ArrayList<>();
 
-	private final boolean strict;
-
-	public Specializer(Query qo, Query qr, IRDFDataset d1, IRDFDataset d2, MappedQueryTransform previousOp,
-			float resultTypeSimilarityDegree, float queryRootDistanceDegree, float resultSizeSimilarityDegree,
-			float querySpecificityDistanceDegree, boolean strict, String token) {
+	public Specializer(Query originalQuery, Query generalQuery, IRDFDataset d1, IRDFDataset d2,
+			MappedQueryTransform previousOp, float resultTypeSimilarityDegree, float queryRootDistanceDegree,
+			float resultSizeSimilarityDegree, float querySpecificityDistanceDegree, boolean strict, String token) {
 		super();
 
 		this.strict = strict;
 
-		this.qO = QueryFactory.create(qo.toString());
-		this.qR = QueryFactory.create(qr.toString());
+		this.qO = QueryFactory.create(originalQuery.toString());
+		this.qR = QueryFactory.create(generalQuery.toString());
 
 		this.rdfd1 = d1;
 		this.rdfd2 = d2;
@@ -186,7 +197,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		List<QuerySolution> qTsol;
 		try {
 			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-			qTsol = temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2, strict);
+			qTsol = temVarValueSpace.computeTempVarSolutionSpace(generalQuery, this.rdfd2, strict);
 			qTsol = eliminateDuplicateBindings(qTsol);
 		} catch (TooGeneralException gex) {
 			log.warn("Query is too general to execute safely. Assuming solution exists.");
@@ -195,28 +206,9 @@ public class Specializer extends AbstractMappedQueryTransform {
 			qTsol.add(new QuerySolutionMap()); // Add an empty solution, just not to make it fail.
 		}
 
-		// Map<Var, Set<RDFNode>>
-		// qTsolMap=temVarValueSpace.computeTempVarSolutionSpace(qr, this.rdfd2, null);
 		// D. Build the QueryAndContextNode from the query
-		QueryAndContextNode qAndcNode = new QueryAndContextNode(qr);
-		qAndcNode.setOriginalQuery(qo);
-		qAndcNode.setDataset1(d1);
-		qAndcNode.setDataset2(d2);
-
-		//// ...SET THE CLASS, OBJECT AND DATATYPE PROPERTIES SETs...;
-		// qAndcNode.setcSetD2(d2.getClassSet());
-		// qAndcNode.setDpSetD2(d2.getDatatypePropertySet());
-		// qAndcNode.setOpSetD2(d2.getObjectPropertySet());
-		// qAndcNode.setlSetD2(d2.getLiteralSet());
-		// qAndcNode.setIndSetD2(d2.getIndividualSet());
-		//// // As we have the issue of indexing long String when merging dpPropertySet
-		//// and opPropertySet, I do not index and I do their merging here
-		// ArrayList<String> propertySet = new ArrayList();
-		// propertySet.addAll(d2.getDatatypePropertySet());
-		// propertySet.addAll(d2.getObjectPropertySet());
-		// d2.setPropertySet(propertySet);
-		// qAndcNode.setpSetD2(propertySet);
-		// qAndcNode.setRdfVD2(d2.getRDFVocabulary());
+		QueryAndContextNode qAndcNode = new QueryAndContextNode(generalQuery);
+		qAndcNode.setOriginalQuery(originalQuery);
 		// ...set the score measurements
 		qAndcNode.setQueryRootDistance(queryRootDist);
 		// qAndcNode.setQuerySpecificityDistanceSimilarity(qSpecDistVar + qSpecDistTP);
@@ -227,7 +219,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// qAndcNode.setqRTemplateVariableSet(qRTemplateVariableSet);
 		// qAndcNode.setqRTriplePathSet(qRTriplePatternSet);
 		// ...set the QueryTempVarSolutionSpace
-		qAndcNode.setSolutionSpace(qTsol);
+		qAndcNode.setTplVarSolutionSpace(qTsol);
 		// qAndcNode.setQueryTempVarValueMap(qTsolMap);
 
 		// E. Create a sorted list of "specializable" queries
@@ -283,11 +275,12 @@ public class Specializer extends AbstractMappedQueryTransform {
 		IsSparqlQuerySatisfiableStateful satisfiability = new IsSparqlQuerySatisfiableStateful(this.rdfd2);
 
 		if (this.specializables.size() == 1) {
-			QueryAndContextNode singleQctx = this.specializables.get(0);
+			QueryAndContextNode qctx = this.specializables.get(0);
+			List<QuerySolution> spc = qctx.getTplVarSolutionSpace();
+			boolean isTpl = isQueryTemplated(qctx);
 			log.debug("Single specializable node:");
-			log.debug(" - solution space size = {}", singleQctx.getQueryTempVarSolutionSpace().size());
-			log.debug(" - has template variables that can be instantiated: {}",
-					canBeInstantiated(singleQctx) ? "YES" : "NO");
+			log.debug(" - solution space size = {}", spc.size());
+			log.debug(" - has template variables that can be instantiated: {}", isTpl ? "YES" : "NO");
 
 			/*
 			 * Worst case: the generalized query has no solution but it does have template
@@ -295,8 +288,10 @@ public class Specializer extends AbstractMappedQueryTransform {
 			 * generalization, such as the co-occurrence of two or more properties, were
 			 * incorrect. This case expands on all the possible combinations of templated
 			 * triple patterns. It also seems to be the only one where removal takes place.
+			 * 
+			 * TODO an avoidance strategy is probably better than dealing with the case.
 			 */
-			if (singleQctx.getQueryTempVarSolutionSpace().isEmpty() && canBeInstantiated(singleQctx)) {
+			if (spc.isEmpty() && isTpl) {
 				log.warn("Specializable query has no solution!"
 						+ " This is usually a consequence of bad assumptions from the generalization process.");
 				log.warn("Fallback is to expand the specializable query as the power set of its query patterns.");
@@ -308,10 +303,10 @@ public class Specializer extends AbstractMappedQueryTransform {
 				// The power set of the triple pattern set.
 				// P.S. Look at the code down in the section 3.
 				Query parentqRCopy = QueryFactory.create(parentQctx.getTransformedQuery());
-				Set<TriplePath> triplePathSet = getQueryTriplePathSet(parentqRCopy);
+				Set<TriplePath> triplePaths = getQueryTriplePathSet(parentqRCopy);
 				List<String> qRTemplateVariableSet = parentqRCopy.getResultVars();
-				log.debug("Initial size of triple path set in query: {}", triplePathSet.size());
-				List<List<TriplePath>> tpPowerSet = PowerSetFactory.powerset(triplePathSet);
+				log.debug("Initial size of triple path set in query: {}", triplePaths.size());
+				List<List<TriplePath>> tpPowerSet = PowerSetFactory.powerset(triplePaths);
 				tpPowerSet = PowerSetFactory.order(tpPowerSet);
 				log.debug("Size of triple path power set: {}", tpPowerSet.size());
 
@@ -332,7 +327,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 						// a node child from the node parent
 						// Check if it is alredy indexed and therefore generated
 						log.debug("subQuery Remove operation::: " + subQuery.toString());
-						if (!isQueryIndexed(subQuery)) {
+						if (!isCached(subQuery)) {
 							// ...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 							boolean sat = false;
 							try {
@@ -344,8 +339,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 							if (sat) {
 								log.debug("subQuery Remove operation::: " + subQuery);
 								QueryAndContextNode childNode = createQctxForRemoval(subQuery, parentQctx);
-								log.debug("childNode Solution List... "
-										+ childNode.getQueryTempVarSolutionSpace().size());
+								log.debug("childNode Solution List... " + childNode.getTplVarSolutionSpace().size());
 								this.specializables.add(childNode);
 							}
 							// add qWithoutTriple to the index
@@ -359,13 +353,14 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 		if (this.specializables.size() == 1) {
 			QueryAndContextNode spec = this.specializables.get(0);
-			if (spec.getQueryTempVarSolutionSpace().isEmpty()
-					&& satisfiability.isSatisfiableWrtResults(spec.getOriginalQuery())) {
-				QueryAndContextNode childNode = createNoOpQctx(spec.getOriginalQuery());
+			Query q0 = spec.getOriginalQuery();
+			if (spec.getTplVarSolutionSpace().isEmpty() && satisfiability.isSatisfiableWrtResults(q0)) {
+				// Create a node for no operation
+				QueryAndContextNode childNode = createNoOpQctx(q0);
 				this.specializables.add(childNode);
 				Collections.sort(this.specializables, new QueryAndContextNode.QRScoreComparator());
 				this.recommendations.add(childNode);
-				notifyQueryRecommendation(spec.getOriginalQuery(), 1);
+				notifyQueryRecommendation(q0, 1);
 				notifyQueryRecommendationCompletion(true);
 				return this.recommendations;
 			}
@@ -385,10 +380,10 @@ public class Specializer extends AbstractMappedQueryTransform {
 				// parentQueryAndContextNode.getqRScore());
 
 				// 4. check if we can apply an instantiation operation;
-				if (canBeInstantiated(parentNode)) {
+				if (isQueryTemplated(parentNode)) {
 					Query queryChild = QueryFactory.create(parentNode.getTransformedQuery());
 					log.debug("Child query: {}", queryChild);
-					List<QuerySolution> qSolList = parentNode.getQueryTempVarSolutionSpace();
+					List<QuerySolution> qSolList = parentNode.getTplVarSolutionSpace();
 					log.debug("queryChild Instantiation step: {}", queryChild.toString());
 					log.debug("qSolList size = {} ", qSolList.size());
 					int c = 0, csat = 0;
@@ -397,39 +392,37 @@ public class Specializer extends AbstractMappedQueryTransform {
 					for (QuerySolution sol : qSolList) {
 						log.trace("Solution {}: {}", c++, sol);
 						Query childQueryCopy = QueryFactory.create(queryChild.toString());
-						// [ REPLACED ] Query childQueryCopyInstanciated=
-						// applyInstanciationOP(childQueryCopy, sol);
-						Set<Var> qTempVarSet = getQueryTemplateVariableSet(childQueryCopy);
-						Query childQueryCopyInstanciated = null;
+						Set<Var> qTplVars = getQueryTemplateVariableSet(childQueryCopy);
+						Query qInst = null;
 
 						// this contains all the tuples <varName, entityQo, entityQr> for each varName
 						// that is going to be instantiated
-						List<NodeTransformation> templVarEntityQoQrInstanciatedList = new ArrayList<>();
-						for (Var tv : qTempVarSet) {
+						List<NodeTransformation> instantiationList = new ArrayList<>();
+						for (Var tv : qTplVars) {
 							RDFNode node = sol.get(tv.getName());
 							if (node != null && node.asNode().isURI()) {
 								// XXX The operator is stateful so we have to re-instantiate it...
 								InstantiateTemplateVar op_inst = new InstantiateTemplateVar();
-								childQueryCopyInstanciated = op_inst.instantiateVarTemplate(childQueryCopy, tv,
-										node.asNode());
-								String entityQo = getEntityQo(tv);
-								String entityQr = node.asNode().getURI(); // Expected to be concrete and named
+								qInst = op_inst.instantiateVarTemplate(childQueryCopy, tv, node.asNode());
+								Node entityQo = getEntityQo(tv);
+								Node entityQr = node.asNode(); // Expected to be concrete and named
 								NodeTransformation item = new NodeTransformation(entityQo, entityQr);
-								templVarEntityQoQrInstanciatedList.add(item);
-							} else log.error("Unexpected state of node {} for template variable '{}'", node, tv);
+								instantiationList.add(item);
+							} else
+								log.error("Unexpected state of node {} for template variable '{}'", node, tv);
 						}
-						if (childQueryCopyInstanciated != null) {
+						if (qInst != null) {
 							// 4.1.2. Check if it is already indexed and therefore generated
-							if (!isQueryIndexed(childQueryCopyInstanciated)) {
+							if (!isCached(qInst)) {
 								// add qWithoutTriple to the index
-								addQueryToIndexIFAbsent(childQueryCopyInstanciated);
+								addQueryToIndexIFAbsent(qInst);
 
 								// ...checking if the qWithoutTriple is satisfiable w.r.t. D2 ...
 
-								if (satisfiability.isSatisfiableWrtResults(childQueryCopyInstanciated)) {
+								if (satisfiability.isSatisfiableWrtResults(qInst)) {
 									csat++;
-									QueryAndContextNode childNode = createQctxForInstantiation(
-											childQueryCopyInstanciated, parentNode, templVarEntityQoQrInstanciatedList);
+									QueryAndContextNode childNode = createQctxForInstantiation(qInst, parentNode,
+											instantiationList);
 
 									// ======
 									// Ho commentato questa riga perche non ha un senso logico. Non c'e' motivo
@@ -448,9 +441,9 @@ public class Specializer extends AbstractMappedQueryTransform {
 									notifyQueryRecommendation(childNode.getTransformedQuery(), childNode.getqRScore());
 
 									// add qWithoutTriple to the index
-									addQueryToIndexIFAbsent(childQueryCopyInstanciated);
+									addQueryToIndexIFAbsent(qInst);
 								} else {
-									addQueryToIndexIFAbsent(childQueryCopyInstanciated);
+									addQueryToIndexIFAbsent(qInst);
 								}
 							}
 						}
@@ -465,14 +458,6 @@ public class Specializer extends AbstractMappedQueryTransform {
 		} // end while
 		this.notifyQueryRecommendationCompletion(true);
 		return this.recommendations;
-	}
-
-	private void addQueryToIndexIFAbsent(Query qWithoutTriple) {
-		Set<TriplePath> triplePathCollection = getQueryTriplePathSet(qWithoutTriple);
-		ArrayList<String> s = new ArrayList<>(); // and use Collections.sort()
-		for (TriplePath tp : triplePathCollection)
-			s.add(tp.toString());
-		queryIndex.putIfAbsent(s.toString(), qWithoutTriple);
 	}
 
 	private Query applyInstanciationOP(Query queryChild, QuerySolution sol) {
@@ -506,7 +491,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 			Query qWithoutTriple = new RemoveTriple(qRCopy, tp.asTriple()).apply();
 
 			// 2. Check if it is already indexed and therefore generated
-			if (!(isQueryIndexed(qWithoutTriple))) {
+			if (!isCached(qWithoutTriple)) {
 
 				// // BUILD A NEW QueryAndContextNode
 				// // 2.1. Clone the QueryAndContextNode with qRScore max so it can be processed
@@ -543,20 +528,6 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 		}
 
-	}
-
-	/**
-	 * A query can be instantiated if and only if it is "templated", i.e. there is
-	 * at least one template variable in the query pattern, even if that variable is
-	 * not in the projection.
-	 * 
-	 * @param node
-	 * @return true iff there is at least one template variable in the transformed
-	 *         query.
-	 */
-	private boolean canBeInstantiated(QueryAndContextNode queryNode) {
-		Set<Var> tempVarSet = getQueryTemplateVariableSet(queryNode.getTransformedQuery());
-		return tempVarSet.size() > 0;
 	}
 
 	/**
@@ -605,8 +576,8 @@ public class Specializer extends AbstractMappedQueryTransform {
 		float nodeCost = 0;
 		if (size > 0) {
 			for (NodeTransformation item : templVarEntityQoQrInstanciatedList) {
-				String entityqO_TMP = getLocalName(item.getOriginalNode());
-				String entityqR_TMP = getLocalName(item.getTransformedNode());
+				String entityqO_TMP = getLocalName(item.getOriginalNode().toString());
+				String entityqR_TMP = getLocalName(item.getTransformedNode().toString());
 				nodeCost += computeInstantiationCost(entityqO_TMP, entityqR_TMP);
 			}
 			return (float) 1 - (nodeCost / size); // we divide by size as we want the value to be between 0 and 1.
@@ -639,44 +610,75 @@ public class Specializer extends AbstractMappedQueryTransform {
 		return 1f - sim;
 	}
 
-	private QueryAndContextNode createNoOpQctx(Query qo) {
+	// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
+	// <http://purl.org/dc/terms/title> )
+	private List<QuerySolution> eliminateDuplicateBindings(List<QuerySolution> qSolList) {
+		List<QuerySolution> output = new ArrayList<>();
+		if (qSolList.isEmpty())
+			return qSolList;
+		for (QuerySolution qs : qSolList) {
+			List<String> valuesList = new ArrayList<>();
+			Iterator<String> varIter = qs.varNames();
+			while (varIter.hasNext()) {
+				String varName = varIter.next();
+				valuesList.add(qs.get(varName).toString());
+			}
+			if (valuesList.size() == 1)
+				output.add(qs);
+			else {
+				String firstValue = valuesList.get(0);
+				valuesList.remove(0);
+				boolean isAllDifferent = true;
+				Iterator<String> varValueIter = valuesList.iterator();
+				while (varValueIter.hasNext() && isAllDifferent) {
+					String varValue = varValueIter.next();
+					if (varValue.equals(firstValue))
+						isAllDifferent = false;
+				}
+				if (isAllDifferent)
+					output.add(qs);
+			}
+		}
+		return output;
+	}
+
+	private String getLocalName(String entityqO) {
+		String localName = "";
+		if (entityqO.startsWith("http://") || entityqO.startsWith("https://")) {
+			if (entityqO.contains("#")) {
+				localName = entityqO.substring(entityqO.indexOf("#") + 1, entityqO.length());
+				return localName;
+			}
+			localName = entityqO.substring(entityqO.lastIndexOf("/") + 1, entityqO.length());
+			return localName;
+		} else
+			return entityqO;
+	}
+
+	protected void addQueryToIndexIFAbsent(Query qWithoutTriple) {
+		Set<TriplePath> triplePathCollection = getQueryTriplePathSet(qWithoutTriple);
+		ArrayList<String> s = new ArrayList<>(); // and use Collections.sort()
+		for (TriplePath tp : triplePathCollection)
+			s.add(tp.toString());
+		queryIndex.putIfAbsent(s.toString(), qWithoutTriple);
+	}
+
+	protected QueryAndContextNode createNoOpQctx(Query qo) {
 		QueryAndContextNode qCtx = new QueryAndContextNode(QueryFactory.create(qo));
 		qCtx.setOriginalQuery(QueryFactory.create(qo));
 		qCtx.setqRScore(1);
 		return qCtx;
 	}
 
-	private QueryAndContextNode createQctxForInstantiation(Query queryPostOp, QueryAndContextNode parentNode,
-			List<NodeTransformation> tplVarEntityQoQrInstantiated) {
+	protected QueryAndContextNode createQctxForInstantiation(Query queryPostOp, QueryAndContextNode parentNode,
+			List<NodeTransformation> entityTransformations) {
 
 		QueryAndContextNode node = new QueryAndContextNode(queryPostOp.cloneQuery());
 
 		// (a) Set the queries on the node
 		node.setOriginalQuery(QueryFactory.create(parentNode.getOriginalQuery()));
 
-		// (b) Set the (cloned) datasets on the node
-		// XXX cloning the dataset object for the child nodes, why?
-		IRDFDataset d1 = parentNode.getSourceDataset();
-		if (d1 instanceof SparqlIndexedDataset) {
-			// IRDFDataset clone = new SparqlIndexedDataset((String)
-			// parentNode.getRdfD1().getEndPointURL(),
-			// (String) parentNode.getRdfD1().getGraph());
-			// node.setRdfD1(clone);
-			node.setDataset1(d1); // Not cloning to save memory
-
-		} else { // TO ADD the case of FILEBASED dataset
-		}
-		IRDFDataset d2 = parentNode.getTargetDataset();
-		if (d2 instanceof SparqlIndexedDataset) {
-			// IRDFDataset clone = new SparqlIndexedDataset(((String)
-			// parentNode.getRdfD2().getEndPointURL()),
-			// (String) parentNode.getRdfD2().getGraph());
-			// node.setRdfD2(clone);
-			node.setDataset2(d2);
-			// Clone the solution space (XXX why?)
-			node.setSolutionSpace(new ArrayList<>(parentNode.getQueryTempVarSolutionSpace()));
-		} else { // TO ADD the case of FILEBASED dataset
-		}
+		node.setTplVarSolutionSpace(new ArrayList<>(parentNode.getTplVarSolutionSpace()));
 
 		// The following is no longer being done:
 		// - set class, object/datatype property sets etc. on the node
@@ -689,8 +691,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		// 1)...QueryRootDistance
 		// AA: it seems to maximize the average Jaro-Winkler similarity of all the
 		// instantiations.
-		float newQueryRootDist = parentNode.getQueryRootDistance()
-				+ computeInstantiationCost(tplVarEntityQoQrInstantiated);
+		float newQueryRootDist = parentNode.getQueryRootDistance() + computeInstantiationCost(entityTransformations);
 		node.setQueryRootDistance(newQueryRootDist);
 		float queryRootDistSim = 1 - newQueryRootDist;
 
@@ -703,19 +704,12 @@ public class Specializer extends AbstractMappedQueryTransform {
 				+ (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree
 						* (1 - (node.getQuerySpecificityDistanceTP() + node.getQuerySpecificityDistanceVar())));
 
-		// float recommentedQueryScore = (newResulttypeSim +
-		// (qSpecDistSimVar+qSpecDistSimTriplePattern));
-		// log.info("recommentedQueryScoreI " +recommentedQueryScore);
-		//// float justSUM= 1* newQueryRootDist +newResulttypeSim +
-		// (qSpecDistVar/qSpecDistSimTriplePattern);
-		//// log.info("recommentedQueryScoreI2 "+justSUM );
-
 		node.setqRScore(recommendedQueryScore);
 
 		return node;
 	}
 
-	private QueryAndContextNode createQctxForRemoval(Query queryPostOp, QueryAndContextNode parentNode) {
+	protected QueryAndContextNode createQctxForRemoval(Query queryPostOp, QueryAndContextNode parentNode) {
 
 		QueryAndContextNode node = new QueryAndContextNode(queryPostOp.cloneQuery());
 
@@ -723,49 +717,18 @@ public class Specializer extends AbstractMappedQueryTransform {
 		Query clonedqO = QueryFactory.create(parentNode.getOriginalQuery());
 		node.setOriginalQuery(clonedqO);
 
-		// ..set the RDF dataset 1
-		IRDFDataset d1 = parentNode.getSourceDataset();
-		if (d1 instanceof SparqlIndexedDataset) {
-			// IRDFDataset newRdfD1 = new SparqlIndexedDataset(((String)
-			// parentNode.getRdfD1().getEndPointURL()),
-			// (String) parentNode.getRdfD1().getGraph());
-			// node.setRdfD1(newRdfD1);
-			node.setDataset1(d1);
-		} else { // TO ADD the case of FILEBASED dataset
-		}
-		// ..set the RDF dataset 2
-		IRDFDataset d2 = parentNode.getTargetDataset();
-		if (d2 instanceof SparqlIndexedDataset) {
-			// IRDFDataset newRdfD2 = new SparqlIndexedDataset(((String)
-			// parentNode.getRdfD2().getEndPointURL()),
-			// (String) parentNode.getRdfD2().getGraph());
-			// node.setRdfD2(newRdfD2);
-			node.setDataset2(d2);
+		// Compute the QueryTempVarSolutionSpace
 
-			// //C. Compute the QueryTempVarSolutionSpace
-			// QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-			// // [REPLACED] List<QuerySolution> qTsolMap =
-			// temVarValueSpace.computeTempVarSolutionSpace(clonedqR, this.rdfd2);
-			// //Map<Var, Set<RDFNode>> qTsolMap =
-			// temVarValueSpace.computeTempVarSolutionSpace(clonedqR, this.rdfd2, null);
-			// childQueryAndContextNode.setQueryTempVarValueMap(qTsolMap);
-			// List<QuerySolution> qTsol =
-			// parentQueryAndContextNode.getQueryTempVarSolutionSpace();
-			List<QuerySolution> qTsolChild = new ArrayList<>();
+		List<QuerySolution> qTsolChild = new ArrayList<>();
+		QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
+		List<QuerySolution> qTsolTMP = temVarValueSpace.computeTempVarSolutionSpace(queryPostOp, this.rdfd2, strict);
 
-			// Compute the QueryTempVarSolutionSpace
-			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();
-			List<QuerySolution> qTsolTMP = temVarValueSpace.computeTempVarSolutionSpace(queryPostOp, this.rdfd2,
-					strict);
+		// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
+		// <http://purl.org/dc/terms/title> ),
+		List<QuerySolution> qTsolCleaned = eliminateDuplicateBindings(qTsolTMP);
 
-			// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
-			// <http://purl.org/dc/terms/title> ),
-			List<QuerySolution> qTsolCleaned = eliminateDuplicateBindings(qTsolTMP);
-
-			qTsolChild.addAll(qTsolCleaned);
-			node.setSolutionSpace(qTsolCleaned);
-		} else { // TO ADD the case of FILEBASED dataset
-		}
+		qTsolChild.addAll(qTsolCleaned);
+		node.setTplVarSolutionSpace(qTsolCleaned);
 
 		// The following is no longer being done:
 		// - set class, object/datatype property sets etc. on the node
@@ -811,65 +774,30 @@ public class Specializer extends AbstractMappedQueryTransform {
 		return node;
 	}
 
-	// e.g. ( ?opt2 = <http://purl.org/dc/terms/title> ) ( ?opt1 =
-	// <http://purl.org/dc/terms/title> )
-	private List<QuerySolution> eliminateDuplicateBindings(List<QuerySolution> qSolList) {
-		List<QuerySolution> output = new ArrayList<>();
-		if (qSolList.isEmpty()) return qSolList;
-		for (QuerySolution qs : qSolList) {
-			List<String> valuesList = new ArrayList<>();
-			Iterator<String> varIter = qs.varNames();
-			while (varIter.hasNext()) {
-				String varName = varIter.next();
-				valuesList.add(qs.get(varName).toString());
-			}
-			if (valuesList.size() == 1) output.add(qs);
-			else {
-				String firstValue = valuesList.get(0);
-				valuesList.remove(0);
-				boolean isAllDifferent = true;
-				Iterator<String> varValueIter = valuesList.iterator();
-				while (varValueIter.hasNext() && isAllDifferent) {
-					String varValue = varValueIter.next();
-					if (varValue.equals(firstValue)) isAllDifferent = false;
-				}
-				if (isAllDifferent) output.add(qs);
-			}
-		}
-		return output;
-	}
-
-	private String getEntityQo(Var tv) {
+	protected Node getEntityQo(Var tv) {
 		String varName = tv.getVarName();
-		VarMapping<String, String> map;
-		if (varName.startsWith(TEMPLATE_VAR_CLASS)) map = this.classVarTable;
-		else if (varName.startsWith(TEMPLATE_VAR_PROP_OBJ)) map = this.objectProperyVarTable;
-		else if (varName.startsWith(TEMPLATE_VAR_PROP_DT)) map = this.datatypePropertyVarTable;
-		else return "";
-		return map.getValueFromVar(varName);
+		VarMapping<Var, Node> map;
+		if (varName.startsWith(TEMPLATE_VAR_CLASS))
+			map = this.classVarTable;
+		else if (varName.startsWith(TEMPLATE_VAR_PROP_OBJ))
+			map = this.objectProperyVarTable;
+		else if (varName.startsWith(TEMPLATE_VAR_PROP_DT))
+			map = this.datatypePropertyVarTable;
+		else
+			return null;
+		return map.getValueFromVar(tv);
 	}
 
-	private String getLocalName(String entityqO) {
-		String localName = "";
-		if (entityqO.startsWith("http://") || entityqO.startsWith("https://")) {
-			if (entityqO.contains("#")) {
-				localName = entityqO.substring(entityqO.indexOf("#") + 1, entityqO.length());
-				return localName;
-			}
-			localName = entityqO.substring(entityqO.lastIndexOf("/") + 1, entityqO.length());
-			return localName;
-		} else return entityqO;
-	}
-
-	private Set<Var> getQueryTemplateVariableSet(Query qR) {
+	protected Set<Var> getQueryTemplateVariableSet(Query qR) {
 		TemplateVariableScanner v = new TemplateVariableScanner();
 		// ... This will walk through all parts of the query
 		ElementWalker.walk(qR.getQueryPattern(), v);
 		return v.getTemplateVariables();
 	}
 
-	private Set<TriplePath> getQueryTriplePathSet(Query q) {
-		if (q == null) throw new IllegalArgumentException("Query cannot be null");
+	protected Set<TriplePath> getQueryTriplePathSet(Query q) {
+		if (q == null)
+			throw new IllegalArgumentException("Query cannot be null");
 		// Remember distinct objects in this
 		final Set<TriplePath> tpSet = new HashSet<>();
 		// This will walk through all parts of the query
@@ -886,7 +814,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		return tpSet;
 	}
 
-	private boolean isQueryIndexed(Query qWithoutTriple) {
+	protected boolean isCached(Query qWithoutTriple) {
 		Set<TriplePath> triplePathCollection = getQueryTriplePathSet(qWithoutTriple);
 		ArrayList<String> s = new ArrayList<>(); // and use Collections.sort()
 		for (TriplePath tp : triplePathCollection)
@@ -896,12 +824,26 @@ public class Specializer extends AbstractMappedQueryTransform {
 	}
 
 	/**
+	 * A query can be instantiated if and only if it is "templated", i.e. there is
+	 * at least one template variable in the query pattern, even if that variable is
+	 * not in the projection.
+	 * 
+	 * @param node
+	 * @return true iff there is at least one template variable in the transformed
+	 *         query.
+	 */
+	protected boolean isQueryTemplated(QueryAndContextNode queryNode) {
+		Set<Var> tempVarSet = getQueryTemplateVariableSet(queryNode.getTransformedQuery());
+		return tempVarSet.size() > 0;
+	}
+
+	/**
 	 * Takes the highest-scored query from a list of specializable queries and
 	 * removes it.
 	 * 
 	 * @return
 	 */
-	private QueryAndContextNode popTopScoredQueryCtx(List<QueryAndContextNode> rankedList) {
+	protected QueryAndContextNode popTopScoredQueryCtx(List<QueryAndContextNode> rankedList) {
 		if (rankedList.size() > 0) {
 			QueryAndContextNode maxNode = rankedList.get(0);
 			rankedList.remove(maxNode);

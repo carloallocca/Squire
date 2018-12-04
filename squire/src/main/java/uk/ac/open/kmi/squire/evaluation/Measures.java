@@ -21,7 +21,7 @@ public class Measures {
 	}
 
 	public float queryBindingCollapseRate = 1.0f;
-	
+
 	public float queryRootDistanceCoefficient = 1.0f;
 
 	public float querySpecificityDistanceCoefficient = 1.0f;
@@ -39,7 +39,7 @@ public class Measures {
 	private QueryResultTypeDistance qRTS;
 
 	private QuerySpecificityDistance qSpecDist;
-	
+
 	private QueryBindingCollapse qColl;
 
 	private IRDFDataset srcDs, tgtDs;
@@ -63,24 +63,27 @@ public class Measures {
 		float score = 0.0f;
 		switch (metric) {
 		case QUERY_BINDING_COLLAPSE_RATE:
-			if (getOriginalQuery() == null || getTransformedQuery() == null) throw new IllegalArgumentException(
-					"Query specificity measures require that both the original and the transformed query be set."
-							+ " Please do so by calling setOriginalQuery() and setTransformedQuery().");
+			if (getOriginalQuery() == null || getTransformedQuery() == null)
+				throw new IllegalArgumentException(
+						"Measuring the binding collapse rate requires that both the original and the transformed query be set."
+								+ " Please do so by calling setOriginalQuery() and setTransformedQuery() on this object.");
 			score = qColl.compute(getOriginalQuery(), getTransformedQuery());
 			break;
 		case QUERY_ROOT_DISTANCE:
 			log.warn("Query Root distance implementation is empty! returning default score", score);
 			break;
 		case QUERY_SPECIFICITY_DISTANCE_WRT_VARIABLE:
-			if (getOriginalQuery() == null || getTransformedQuery() == null) throw new IllegalArgumentException(
-					"Query specificity measures require that both the original and the specialised query be set."
-							+ " Please do so by calling setOriginalQuery() and setSpecializedQuery().");
+			if (getOriginalQuery() == null || getTransformedQuery() == null)
+				throw new IllegalArgumentException(
+						"Query specificity measures require that both the original and the specialised query be set."
+								+ " Please do so by calling setOriginalQuery() and setSpecializedQuery() on this object.");
 			score = qSpecDist.computeQSDwrtQueryVariable(getOriginalQuery(), getTransformedQuery());
 			break;
 		case QUERY_SPECIFICITY_DISTANCE_WRT_TRIPLEPATTERN:
-			if (getOriginalQuery() == null || getTransformedQuery() == null) throw new IllegalArgumentException(
-					"Query specificity measures require that both the original and the transformed query be set."
-							+ " Please do so by calling setOriginalQuery() and setTransformedQuery().");
+			if (getOriginalQuery() == null || getTransformedQuery() == null)
+				throw new IllegalArgumentException(
+						"Query specificity measures require that both the original and the transformed query be set."
+								+ " Please do so by calling setOriginalQuery() and setTransformedQuery() on this object.");
 			score = qSpecDist.computeQSDwrtQueryTP(getOriginalQuery(), getTransformedQuery());
 			break;
 		case QUERY_SPECIFICITY_DISTANCE:
@@ -91,12 +94,14 @@ public class Measures {
 			throw new NotImplementedException(
 					"Result size similarity is deprecated and must not be used for the time being.");
 		case RESULT_TYPE_SIMILARITY:
-			if (getOriginalQuery() == null || getTransformedQuery() == null) throw new IllegalArgumentException(
-					"Result type measures require that both the original and the transformed query be set."
-							+ " Please do so by calling setOriginalQuery() and setTransformedQuery().");
-			if (getSourceDataset() == null || getTargetDataset() == null) throw new IllegalArgumentException(
-					"Result type measures require that both the source and the target dataset be set."
-							+ " Please do so by calling setSourceDataset() and setTargetDataset().");
+			if (getOriginalQuery() == null || getTransformedQuery() == null)
+				throw new IllegalArgumentException(
+						"Result type measures require that both the original and the transformed query be set."
+								+ " Please do so by calling setOriginalQuery() and setTransformedQuery() on this object.");
+			if (getSourceDataset() == null || getTargetDataset() == null)
+				throw new IllegalArgumentException(
+						"Result type measures require that both the source and the target dataset be set."
+								+ " Please do so by calling setSourceDataset() and setTargetDataset() on this object.");
 			float resulTtypeDist = qRTS.computeQueryResultTypeDistance(getOriginalQuery(), getSourceDataset(),
 					getTransformedQuery(), getTargetDataset());
 			score = 1 - resulTtypeDist;

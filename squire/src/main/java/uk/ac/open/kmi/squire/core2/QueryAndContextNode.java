@@ -5,10 +5,13 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QuerySolution;
+import org.apache.jena.sparql.core.Var;
 
-import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+import uk.ac.open.kmi.squire.entityvariablemapping.RdfVarMapping;
+import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 
 /**
  * AA: Apparently an all-knowing POJO for the process of generating
@@ -26,42 +29,57 @@ public class QueryAndContextNode {
 		public int compare(QueryAndContextNode p1, QueryAndContextNode p2) {
 			float score1 = p1.getqRScore();
 			float score2 = p2.getqRScore();
-			// ...For ascending order
-			return Float.compare(score2, score1);
-			// return -1*Float.compare(score1, score2); // For descending order
+			return Float.compare(score2, score1); // ...for ascending order
+			// return -1*Float.compare(score1, score2); // ...for descending order
 		}
 
 	}
 
 	private float bindingCollapseRate, queryRootDistance, querySpecDist_Tp, querySpecDist_Var, resultTypeSimilarity;
 
-	private IRDFDataset ds1, ds2;
+	private final VarMapping<Var, Node> bindings;
 
 	private Query qO, qR;
 
 	private float qRScore;
 
-	private List<QuerySolution> queryTempVarSolutionSpace;
+	private List<QuerySolution> tplVarSolutionSpace;
 
+	@Deprecated
 	public QueryAndContextNode(Query transformedQuery) {
+		this(transformedQuery, new RdfVarMapping());
+	}
+
+	public QueryAndContextNode(Query transformedQuery, VarMapping<Var, Node> transformations) {
 		this.qR = transformedQuery;
+		this.bindings = transformations;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof QueryAndContextNode)) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof QueryAndContextNode))
+			return false;
 		QueryAndContextNode qctx = (QueryAndContextNode) obj;
-		return getOriginalQuery().equals(qctx.getOriginalQuery())
-				&& getTransformedQuery().equals(qctx.getTransformedQuery())
-				&& getSourceDataset().equals(qctx.getSourceDataset())
-				&& getTargetDataset().equals(qctx.getTargetDataset()) && getqRScore() == qctx.getqRScore();
+		return ((getOriginalQuery() == null && qctx.getOriginalQuery() == null)
+				|| getOriginalQuery().equals(qctx.getOriginalQuery()))
+				&& getTransformedQuery().equals(qctx.getTransformedQuery()) && getqRScore() == qctx.getqRScore();
 		// TODO consider the detailed measures rather than the score
 	}
 
 	public float getBindingCollapseRate() {
 		return bindingCollapseRate;
+	}
+
+	public VarMapping<Var, Node> getBindings() {
+		if (this.bindings == null)
+			throw new IllegalStateException("This instance of " + getClass().getName()
+					+ " was created without a binding map."
+					+ " If you intended to get the bindings, you should have passed them to the constructor earlier.");
+		return this.bindings;
 	}
 
 	public Query getOriginalQuery() {
@@ -84,20 +102,15 @@ public class QueryAndContextNode {
 		return querySpecDist_Var;
 	}
 
-	public List<QuerySolution> getQueryTempVarSolutionSpace() {
-		return queryTempVarSolutionSpace;
-	}
-
 	public float getResultTypeSimilarity() {
 		return resultTypeSimilarity;
 	}
 
-	public IRDFDataset getSourceDataset() {
-		return ds1;
-	}
-
-	public IRDFDataset getTargetDataset() {
-		return ds2;
+	public List<QuerySolution> getTplVarSolutionSpace() {
+		if (tplVarSolutionSpace == null)
+			throw new IllegalStateException("No template variable solution space is set yet."
+					+ " This may be the case if, for example, the query is an intermediate one (i.e. not fully instantiated).");
+		return tplVarSolutionSpace;
 	}
 
 	public Query getTransformedQuery() {
@@ -107,19 +120,11 @@ public class QueryAndContextNode {
 	@Override
 	public int hashCode() {
 		// TODO consider the detailed measures rather than the score
-		return Arrays.hashCode(new Object[] { qO, qR, ds1, ds2, qRScore });
+		return Arrays.hashCode(new Object[] { qO, qR, qRScore });
 	}
 
 	public void setBindingCollapseRate(float bindingCollapseRate) {
 		this.bindingCollapseRate = bindingCollapseRate;
-	}
-
-	public void setDataset1(IRDFDataset rdfD1) {
-		this.ds1 = rdfD1;
-	}
-
-	public void setDataset2(IRDFDataset rdfD2) {
-		this.ds2 = rdfD2;
 	}
 
 	public void setOriginalQuery(Query qO) {
@@ -146,9 +151,11 @@ public class QueryAndContextNode {
 		this.resultTypeSimilarity = resultTypeSimilarity;
 	}
 
-	public void setSolutionSpace(List<QuerySolution> queryTempVarSolutionSpace) {
-		if (queryTempVarSolutionSpace == null) this.queryTempVarSolutionSpace = new ArrayList<>();
-		else this.queryTempVarSolutionSpace = queryTempVarSolutionSpace;
+	public void setTplVarSolutionSpace(List<QuerySolution> queryTempVarSolutionSpace) {
+		if (queryTempVarSolutionSpace == null)
+			this.tplVarSolutionSpace = new ArrayList<>();
+		else
+			this.tplVarSolutionSpace = queryTempVarSolutionSpace;
 	}
 
 	public void setTransformedQuery(Query qR) {

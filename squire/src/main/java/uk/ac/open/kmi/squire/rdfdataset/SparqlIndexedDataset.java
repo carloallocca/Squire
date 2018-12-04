@@ -33,6 +33,7 @@ import uk.ac.open.kmi.squire.index.RDFDatasetIndexer;
 import uk.ac.open.kmi.squire.index.RDFDatasetIndexer.Fieldd;
 import uk.ac.open.kmi.squire.utils.SparqlUtils;
 import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
+import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlResultException;
 import uk.ac.open.kmi.squire.utils.StringUtils;
 
 /**
@@ -114,10 +115,12 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			complete = iterativeComputation(qS.toString(), tempClasses, 100, 0, null);
 			for (Entry<String, Set<String>> e : tempClasses.entrySet()) {
 				String k = e.getKey();
-				if (!classSignatures.containsKey(k)) classSignatures.put(k, new ClassSignature(k));
+				if (!classSignatures.containsKey(k))
+					classSignatures.put(k, new ClassSignature(k));
 				ClassSignature cs = classSignatures.get(k);
 				for (String prop : e.getValue())
-					if (prop != null && !cs.hasProperty(prop)) cs.addProperty(prop);
+					if (prop != null && !cs.hasProperty(prop))
+						cs.addProperty(prop);
 			}
 		} catch (BootedException e) {
 			// TODO fall back to computing plain classes.
@@ -125,7 +128,8 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 					+ " Falling back to per-class startegy.");
 			complete = false;
 		}
-		if (!complete) fallbackClassSet();
+		if (!complete)
+			fallbackClassSet();
 		int assoc = 0;
 		for (Entry<String, ClassSignature> e : classSignatures.entrySet())
 			assoc += e.getValue().listPathOrigins().size();
@@ -144,7 +148,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 * getDatatypePropertySet(),-1, 0, null)
 		 */
 		// No exclusions, creates excessively long queries
-		iterativeComputation(qS.toString(), getDatatypePropertySet(), 50, 0, null);
+		iterativeComputation(qS.toString(), this.datatypePropertySet, 50, 0, null);
 	}
 
 	@Override
@@ -164,7 +168,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 */
 		// No exclusions, creates excessively long queries
 		try {
-			iterativeComputation(qS.toString(), getIndividualSet(), 50, 0, null);
+			iterativeComputation(qS.toString(), this.individualSet, 50, 0, null);
 		} catch (BootedException e) {
 			log.error("We were kicked out immediately while trying to compute individuals."
 					+ " Have no fallback strategy for that.");
@@ -183,7 +187,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 */
 		// No exclusions, creates excessively long queries
 		try {
-			iterativeComputation(qS.toString(), getLiteralSet(), 50, 0, null);
+			iterativeComputation(qS.toString(), this.literalSet, 50, 0, null);
 		} catch (BootedException e) {
 			log.error("We were kicked out immediately while trying to compute literals."
 					+ " Have no fallback strategy for that.");
@@ -202,7 +206,7 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 * getObjectPropertySet(),-1, 0, null)
 		 */
 		// No exclusions, creates excessively long queries
-		iterativeComputation(qS.toString(), getObjectPropertySet(), 50, 0, null);
+		iterativeComputation(qS.toString(), this.objectPropertySet, 50, 0, null);
 	}
 
 	@Override
@@ -255,7 +259,8 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 
 	@Override
 	public Set<String> getPropertySet() {
-		if (this.propertySet.isEmpty()) return super.getPropertySet();
+		if (this.propertySet.isEmpty())
+			return super.getPropertySet();
 		return this.propertySet;
 	}
 
@@ -266,7 +271,8 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 
 	@Override
 	public boolean isInPropertySet(String propertyUri) {
-		if (this.propertySet.contains(propertyUri)) return true;
+		if (this.propertySet.contains(propertyUri))
+			return true;
 		return super.isInPropertySet(propertyUri);
 	}
 
@@ -319,22 +325,26 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			StringBuilder s = new StringBuilder();
 			if (endpointURL != null) {
 				s.append(endpointURL);
-				if (graphName != null && !graphName.isEmpty()) s.append("::");
+				if (graphName != null && !graphName.isEmpty())
+					s.append("::");
 			}
-			if (graphName != null && !graphName.isEmpty()) s.append(graphName);
+			if (graphName != null && !graphName.isEmpty())
+				s.append(graphName);
 			return s.toString();
 		}
 		return super.toString();
 	}
 
 	private String buildQuery(String partialQuery, int stepLength, int iteration, Set<Property> exclusions) {
-		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
+		if (iteration < 0)
+			throw new IllegalArgumentException("Iteration cannot be negative.");
 		int count = 0;
 		StringBuilder qS = new StringBuilder(partialQuery);
 		if (exclusions != null && !exclusions.isEmpty()) {
 			qS.append(" && ?x NOT IN (");
 			for (Iterator<Property> it = exclusions.iterator(); it.hasNext(); count++) {
-				if (count > 0) qS.append(",");
+				if (count > 0)
+					qS.append(",");
 				qS.append("<" + it.next().getURI() + ">");
 			}
 			qS.append(" )");
@@ -398,7 +408,8 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		}
 		for (String clazz : plainClasses) {
 			log.info("Indexing signature for class <{}>", clazz);
-			if (!classSignatures.containsKey(clazz)) classSignatures.put(clazz, new ClassSignature(clazz));
+			if (!classSignatures.containsKey(clazz))
+				classSignatures.put(clazz, new ClassSignature(clazz));
 			ClassSignature cs = classSignatures.get(clazz);
 			qS = new StringBuilder();
 			qS.append("SELECT DISTINCT ?x WHERE { ?s a <" + clazz + "> OPTIONAL { ?s ?x [] }");
@@ -413,7 +424,8 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			} finally {
 				// Let's use whatever we managed to obtain...
 				for (String prop : props)
-					if (prop != null && !cs.hasProperty(prop)) cs.addProperty(prop);
+					if (prop != null && !cs.hasProperty(prop))
+						cs.addProperty(prop);
 			}
 		}
 	}
@@ -432,9 +444,10 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			// Fall back to legacy method, for older indices
 			log.warn("No class signature field found. Falling back to legacy method.");
 			val = signatureDoc.get(Fieldd.ClassSet.toString());
-			if (val != null) for (String className : StringUtils.commaSeparated2List(val)) {
-				classSignatures.put(className, new ClassSignature(className));
-			}
+			if (val != null)
+				for (String className : StringUtils.commaSeparated2List(val)) {
+					classSignatures.put(className, new ClassSignature(className));
+				}
 		}
 	}
 
@@ -470,7 +483,8 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			int stepLength, int iteration, Set<Property> exclusions) throws BootedException {
 		long before = System.currentTimeMillis();
 		boolean complete = true;
-		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
+		if (iteration < 0)
+			throw new IllegalArgumentException("Iteration cannot be negative.");
 		String q = buildQuery(partialQuery, stepLength, iteration, exclusions);
 		log.debug("Sending query: {}", q);
 		String[][] items;
@@ -481,7 +495,8 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			// Don't die. Keep whatever was indexed so far.
 			log.warn("Got remote response : {}", e1.getMessage());
 			// If it was the first attempt though, give up and raise an exception.
-			if (iteration == 0) throw new BootedException();
+			if (iteration == 0)
+				throw new BootedException();
 			log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
 					iteration);
 			items = new String[0][0];
@@ -498,15 +513,15 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		if (items.length > 0)
 			// Inspect for new bindings: if at least one is found, do another round
 			for (int i = 0; i < items.length; i++) {
-			String k = items[i][0];
-			if (!targetContainer.containsKey(k)) {
-			targetContainer.put(k, new HashSet<>());
-			doRepeat = true;
-			}
-			if (!targetContainer.get(k).contains(items[i][1])) {
-			targetContainer.get(k).add(items[i][1]);
-			doRepeat = true;
-			}
+				String k = items[i][0];
+				if (!targetContainer.containsKey(k)) {
+					targetContainer.put(k, new HashSet<>());
+					doRepeat = true;
+				}
+				if (!targetContainer.get(k).contains(items[i][1])) {
+					targetContainer.get(k).add(items[i][1]);
+					doRepeat = true;
+				}
 			}
 		int assoc = 0;
 		for (Entry<String, Set<String>> e : targetContainer.entrySet())
@@ -518,10 +533,12 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 			log.info(" ... {} associations indexed so far (last {} in {} ms)", assoc, items.length,
 					(System.currentTimeMillis() - before));
 			if (stepLength == items.length) {
-				if (exclusions != null) for (int i = 0; i < items.length; i++)
-					exclusions.add(ResourceFactory.createProperty(items[i][1]));
+				if (exclusions != null)
+					for (int i = 0; i < items.length; i++)
+						exclusions.add(ResourceFactory.createProperty(items[i][1]));
 				complete = iterativeComputation(partialQuery, targetContainer, stepLength, iteration + 1, exclusions);
-			} else log.info("DONE. {} total associations indexed for this category.", assoc);
+			} else
+				log.info("DONE. {} total associations indexed for this category.", assoc);
 		}
 		return complete;
 	}
@@ -542,18 +559,20 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 	protected void iterativeComputation(final String partialQuery, final Set<String> targetContainer, int stepLength,
 			int iteration, Set<Property> exclusions) throws BootedException {
 		long before = System.currentTimeMillis();
-		if (iteration < 0) throw new IllegalArgumentException("Iteration cannot be negative.");
+		if (iteration < 0)
+			throw new IllegalArgumentException("Iteration cannot be negative.");
 		String q = buildQuery(partialQuery, stepLength, iteration, exclusions);
 		log.debug("Sending query: {}", q);
 		List<String> itemList;
 		try {
 			String res = SparqlUtils.doRawQuery(q, this.endpointURL);
 			itemList = SparqlUtils.extractSelectVariableValues(res, "x");
-		} catch (SparqlException e1) {
+		} catch (SparqlException | SparqlResultException e1) {
 			// Don't die. Keep whatever was indexed so far.
 			log.warn("Got remote response : {}", e1.getMessage());
 			// If it was the first attempt though, give up and raise an exception.
-			if (iteration == 0) throw new BootedException();
+			if (iteration == 0)
+				throw new BootedException();
 			log.warn("Indexing failed at iteration {}. Will stop polling and keep already indexed resources.",
 					iteration);
 			itemList = Collections.emptyList();
@@ -566,17 +585,20 @@ public class SparqlIndexedDataset extends AbstractRdfDataset {
 		 * but it's costly).
 		 */
 		if (itemList.isEmpty() || targetContainer.containsAll(itemList)) {
-			if (!itemList.isEmpty()) log.debug("All {} RDF resources already present, closing loop.", itemList.size());
+			if (!itemList.isEmpty())
+				log.debug("All {} RDF resources already present, closing loop.", itemList.size());
 			log.info("DONE. {} total resources indexed.", targetContainer.size());
 		} else { // the recursive call.
 			targetContainer.addAll(itemList);
 			log.info(" ... {} resources indexed so far (last {} in {} ms)", targetContainer.size(), itemList.size(),
 					(System.currentTimeMillis() - before));
 			if (stepLength == itemList.size()) {
-				if (exclusions != null) for (String op : itemList)
-					exclusions.add(ResourceFactory.createProperty(op));
+				if (exclusions != null)
+					for (String op : itemList)
+						exclusions.add(ResourceFactory.createProperty(op));
 				iterativeComputation(partialQuery, targetContainer, stepLength, iteration + 1, exclusions);
-			} else log.info("DONE. {} total resources indexed for this category.", targetContainer.size());
+			} else
+				log.info("DONE. {} total resources indexed for this category.", targetContainer.size());
 		}
 
 	}
