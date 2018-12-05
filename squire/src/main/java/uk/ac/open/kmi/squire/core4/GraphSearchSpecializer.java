@@ -1,14 +1,10 @@
 package uk.ac.open.kmi.squire.core4;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,16 +17,16 @@ import org.apache.jena.sparql.core.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
+import uk.ac.open.kmi.squire.core2.QueryCtxNode;
 import uk.ac.open.kmi.squire.entityvariablemapping.RdfVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 import uk.ac.open.kmi.squire.evaluation.Dijkstra;
 import uk.ac.open.kmi.squire.evaluation.model.Edge;
 import uk.ac.open.kmi.squire.evaluation.model.SpecializationGraph;
-import uk.ac.open.kmi.squire.evaluation.model.Vertex;
 import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
 import uk.ac.open.kmi.squire.operation.IsSparqlQuerySatisfiableStateful;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
+import uk.ac.open.kmi.squire.utils.StringUtils;
 
 public class GraphSearchSpecializer extends Specializer {
 
@@ -43,16 +39,16 @@ public class GraphSearchSpecializer extends Specializer {
 				resultSizeSimilarityDegree, querySpecificityDistanceDegree, strict, token);
 	}
 
-	private final List<QueryAndContextNode> recommendations = new ArrayList<>();
+	private final List<QueryCtxNode> recommendations = new ArrayList<>();
 
-	public List<QueryAndContextNode> getSpecializations() {
+	public List<QueryCtxNode> getSpecializations() {
 		return recommendations;
 	}
 
-	private SpecializationGraph<QueryAndContextNode> buildGraph(QueryAndContextNode root) {
+	private SpecializationGraph<QueryCtxNode> buildGraph(QueryCtxNode root) {
 
-		Map<VarMapping<Var, Node>, QueryAndContextNode> ops2Nodes = new HashMap<>();
-		Set<Edge<QueryAndContextNode>> edges = new HashSet<>();
+		Map<VarMapping<Var, Node>, QueryCtxNode> ops2Nodes = new HashMap<>();
+		Set<Edge<QueryCtxNode>> edges = new HashSet<>();
 		VarMapping<Var, Node> blank = new RdfVarMapping();
 		ops2Nodes.put(blank, root);
 		List<QuerySolution> sols = root.getTplVarSolutionSpace();
@@ -68,19 +64,17 @@ public class GraphSearchSpecializer extends Specializer {
 
 			PowerSet<String> pset = new PowerSet<String>(vars);
 
-			
 			for (Set<String> set : pset) {
 
-				//System.out.println(set);		
-				
+				// System.out.println(set);
+
 				// Compute the rest
 				Set<String> rest = new HashSet<>();
 				for (Iterator<String> it = sol.varNames(); it.hasNext();) {
 					String v = it.next();
-					if(!set.contains(v)) rest.add(v);
+					if (!set.contains(v))
+						rest.add(v);
 				}
-				
-
 
 				// for every set create a node if it doesn't exist.
 				// Combine this and the rest into another node.
@@ -97,39 +91,47 @@ public class GraphSearchSpecializer extends Specializer {
 			}
 		}
 
-		SpecializationGraph<QueryAndContextNode> g = new SpecializationGraph<>(ops2Nodes.values(), edges);
+		SpecializationGraph<QueryCtxNode> g = new SpecializationGraph<>(ops2Nodes.values(), edges);
 		return g;
 	}
 
-	private QueryAndContextNode buildNext(final VarMapping<Var, Node> current, NodeTransformation op,
-			Map<VarMapping<Var, Node>, QueryAndContextNode> vertexMap, Set<Edge<QueryAndContextNode>> edges) {
+	private QueryCtxNode buildNext(final VarMapping<Var, Node> current, NodeTransformation op,
+			Map<VarMapping<Var, Node>, QueryCtxNode> vertexMap, Set<Edge<QueryCtxNode>> edges) {
 		if (!vertexMap.containsKey(current))
 			throw new IllegalArgumentException("Vertex map must contain current var mapping as key.");
 
 		VarMapping<Var, Node> applied = new RdfVarMapping(current);
-		Node nod = op.getOriginalNode();
-		if (!nod.isVariable())
+		Node from = op.getFrom();
+		if (!from.isVariable())
 			throw new IllegalStateException(
 					"Original node of transformation was supposed to be a variable, but was instead a "
-							+ nod.getClass().getName());
-		applied.put((Var) nod, op.getTransformedNode());
-		QueryAndContextNode parent = vertexMap.get(current), child;
+							+ from.getClass().getName());
+		applied.put((Var) from, op.getTo());
+		QueryCtxNode parent = vertexMap.get(current), child;
+
+		Node nodeFrom = getOriginalEntity((Var) from);
+		Node nodeTo = op.getTo();
+		String entityqO_TMP = StringUtils.getLocalName(nodeFrom.getURI());
+		String entityqR_TMP = StringUtils.getLocalName(nodeTo.getURI());
+		float cost = nodeFactory.computeInstantiationCost(entityqO_TMP, entityqR_TMP);
+
 		if (vertexMap.containsKey(applied)) {
 			// log.warn("Applied child already exists: "+applied);
-			
+
 			// But try to add an edge
-			edges.add(new Edge<QueryAndContextNode>(parent, vertexMap.get(applied), 1));
+			edges.add(new Edge<QueryCtxNode>(parent, vertexMap.get(applied), cost));
 			return vertexMap.get(applied);
 		}
 		log.debug("Creating node for {} + {}", current, op);
 		Query qOp = parent.getTransformedQuery().cloneQuery();
 		InstantiateTemplateVar op_inst = new InstantiateTemplateVar();
 
-		qOp = op_inst.instantiateVarTemplate(qOp, (Var) nod, op.getTransformedNode());
-		child = new QueryAndContextNode(qOp, applied);
+		qOp = op_inst.instantiateVarTemplate(qOp, (Var) from, op.getTo());
+		child = new QueryCtxNode(qOp, applied);
 		child.setOriginalQuery(this.qO);
 		vertexMap.put(applied, child);
-		edges.add(new Edge<QueryAndContextNode>(parent, child, 1));
+
+		edges.add(new Edge<QueryCtxNode>(parent, child, cost));
 		return child;
 	}
 
@@ -140,10 +142,10 @@ public class GraphSearchSpecializer extends Specializer {
 		return rvm;
 	}
 
-	public List<QueryAndContextNode> specialize() {
+	public List<QueryCtxNode> specialize() {
 
 		log.debug(" - {} specializable query templates", this.specializables.size());
-		for (QueryAndContextNode qctx : this.specializables) {
+		for (QueryCtxNode qctx : this.specializables) {
 			log.debug("   - original query:\r\n{}", qctx.getOriginalQuery());
 			log.debug("   - generalized query:\r\n{}", qctx.getTransformedQuery());
 		}
@@ -152,29 +154,28 @@ public class GraphSearchSpecializer extends Specializer {
 
 		// XXX Scary conditioned loop : specializables is reduced in another method...
 		while (!this.specializables.isEmpty()) {
-			QueryAndContextNode parentNode = popTopScoredQueryCtx(this.specializables);
+			QueryCtxNode parentNode = popTopScoredQueryCtx(this.specializables);
 			// Construct the graph
-			SpecializationGraph<QueryAndContextNode> g = buildGraph(parentNode);
-			
-			Dijkstra<QueryAndContextNode> dijkstra = new Dijkstra<>(g);
+			SpecializationGraph<QueryCtxNode> g = buildGraph(parentNode);
+
+			Dijkstra<QueryCtxNode> dijkstra = new Dijkstra<>(g);
 			dijkstra.execute(parentNode);
-			
+
 			// Inspect for final vertices
-			Set<QueryAndContextNode> finalVertices = new HashSet<>(g.getVertices());
-			for(Edge<QueryAndContextNode> edge : g.getEdges())
+			Set<QueryCtxNode> finalVertices = new HashSet<>(g.getVertices());
+			for (Edge<QueryCtxNode> edge : g.getEdges())
 				finalVertices.remove(edge.getSource());
-			
-			for(QueryAndContextNode end : finalVertices) {
-				List<QueryAndContextNode> path = dijkstra.getPath(end);
 
+			for (QueryCtxNode end : finalVertices) {
+				List<QueryCtxNode> path = dijkstra.getPath(end);
 
-				for (QueryAndContextNode vertex : path) {
+				for (QueryCtxNode vertex : path) {
 					System.out.println(vertex.getBindings());
 				}
 			}
-			
 
-			
+			// this.recommendations.add(childNode);
+			// notifyQueryRecommendation(q0, 1);
 
 		} // end while
 		this.notifyQueryRecommendationCompletion(true);

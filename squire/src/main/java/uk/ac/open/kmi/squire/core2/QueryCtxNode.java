@@ -21,12 +21,12 @@ import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
  *
  * @author carloallocca
  */
-public class QueryAndContextNode {
+public class QueryCtxNode {
 
-	public static class QRScoreComparator implements Comparator<QueryAndContextNode> {
+	public static class QRScoreComparator implements Comparator<QueryCtxNode> {
 
 		@Override
-		public int compare(QueryAndContextNode p1, QueryAndContextNode p2) {
+		public int compare(QueryCtxNode p1, QueryCtxNode p2) {
 			float score1 = p1.getqRScore();
 			float score2 = p2.getqRScore();
 			return Float.compare(score2, score1); // ...for ascending order
@@ -46,11 +46,11 @@ public class QueryAndContextNode {
 	private List<QuerySolution> tplVarSolutionSpace;
 
 	@Deprecated
-	public QueryAndContextNode(Query transformedQuery) {
+	public QueryCtxNode(Query transformedQuery) {
 		this(transformedQuery, new RdfVarMapping());
 	}
 
-	public QueryAndContextNode(Query transformedQuery, VarMapping<Var, Node> transformations) {
+	public QueryCtxNode(Query transformedQuery, VarMapping<Var, Node> transformations) {
 		this.qR = transformedQuery;
 		this.bindings = transformations;
 	}
@@ -61,9 +61,9 @@ public class QueryAndContextNode {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof QueryAndContextNode))
+		if (!(obj instanceof QueryCtxNode))
 			return false;
-		QueryAndContextNode qctx = (QueryAndContextNode) obj;
+		QueryCtxNode qctx = (QueryCtxNode) obj;
 		return ((getOriginalQuery() == null && qctx.getOriginalQuery() == null)
 				|| getOriginalQuery().equals(qctx.getOriginalQuery()))
 				&& getTransformedQuery().equals(qctx.getTransformedQuery()) && getqRScore() == qctx.getqRScore();

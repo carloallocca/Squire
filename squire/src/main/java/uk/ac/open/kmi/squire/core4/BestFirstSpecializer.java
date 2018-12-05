@@ -16,7 +16,7 @@ import org.apache.jena.sparql.core.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
+import uk.ac.open.kmi.squire.core2.QueryCtxNode;
 import uk.ac.open.kmi.squire.core2.QueryTempVarSolutionSpace;
 import uk.ac.open.kmi.squire.evaluation.Measures;
 import uk.ac.open.kmi.squire.evaluation.Measures.Metrics;
@@ -44,7 +44,7 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 
 	private Query qG, qO;
 
-	private List<QueryAndContextNode> recommendations;
+	private List<QueryCtxNode> recommendations;
 
 	public BestFirstSpecializer(Query originalQuery, Query generalQuery, IRDFDataset dFrom, IRDFDataset dTo,
 			boolean strict) {
@@ -57,7 +57,7 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 		this.strict = strict;
 	}
 
-	public List<QueryAndContextNode> getSpecializations() {
+	public List<QueryCtxNode> getSpecializations() {
 		return recommendations;
 	}
 
@@ -145,7 +145,7 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 					log.debug(" - Query spec. dist. (TP) = {}", qdist_var);
 					log.debug(" - Res. type sim. = {}", rt_sim);
 
-					QueryAndContextNode qctx = new QueryAndContextNode(gq.getQuery());
+					QueryCtxNode qctx = new QueryCtxNode(gq.getQuery());
 					qctx.setOriginalQuery(qO);
 					qctx.setBindingCollapseRate(bind_coll);
 					qctx.setQuerySpecificityDistanceTP(qdist_tp);
@@ -184,12 +184,12 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 				}
 			}
 
-			Set<QueryAndContextNode> optimals = new HashSet<>();
+			Set<QueryCtxNode> optimals = new HashSet<>();
 
 			log.debug("Inspecting best candidates for each metric:");
 			for (Metrics metric : bestMap.keySet()) {
 				log.debug("Metric {} ({} queries)", metric, bestMap.getOptimalNodes(metric).size());
-				for (QueryAndContextNode qctx : bestMap.getOptimalNodes(metric)) {
+				for (QueryCtxNode qctx : bestMap.getOptimalNodes(metric)) {
 					log.debug("Query:\r\n{}", qctx.getTransformedQuery());
 					log.debug(" - Binding collapse rate = {}", qctx.getBindingCollapseRate());
 					log.debug(" - Query spec. dist. (Var) = {}", qctx.getQuerySpecificityDistanceVar());
@@ -207,7 +207,7 @@ public class BestFirstSpecializer extends AbstractMappedQueryTransform {
 				log.warn("No ideal branch was found, need to find a strategy for the visit plan!");
 			else {
 				log.debug("Best-scored candidates follow:");
-				for (QueryAndContextNode qctx : optimals) {
+				for (QueryCtxNode qctx : optimals) {
 					log.debug("query: {}", qctx.getTransformedQuery());
 				}
 

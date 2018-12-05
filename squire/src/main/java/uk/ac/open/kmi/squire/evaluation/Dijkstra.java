@@ -19,7 +19,7 @@ public class Dijkstra<V> {
 	private Set<V> settledNodes;
 	private Set<V> unSettledNodes;
 	private Map<V, V> predecessors;
-	private Map<V, Integer> distance;
+	private Map<V, Float> distance;
 
 	public Dijkstra(SpecializationGraph<V> graph) {
 		// create a copy of the array so that we can operate on this array
@@ -32,7 +32,7 @@ public class Dijkstra<V> {
 		unSettledNodes = new HashSet<>();
 		distance = new HashMap<>();
 		predecessors = new HashMap<>();
-		distance.put(source, 0);
+		distance.put(source, 0f);
 		unSettledNodes.add(source);
 		while (unSettledNodes.size() > 0) {
 			V node = getMinimum(unSettledNodes);
@@ -54,7 +54,7 @@ public class Dijkstra<V> {
 
 	}
 
-	private int getDistance(V node, V target) {
+	private float getDistance(V node, V target) {
 		for (Edge<V> edge : edges) {
 			if (edge.getSource().equals(node) && edge.getDestination().equals(target)) {
 				return edge.getWeight();
@@ -91,8 +91,8 @@ public class Dijkstra<V> {
 		return settledNodes.contains(vertex);
 	}
 
-	private int getShortestDistance(V destination) {
-		Integer d = distance.get(destination);
+	private float getShortestDistance(V destination) {
+		Float d = distance.get(destination);
 		if (d == null) {
 			return Integer.MAX_VALUE;
 		} else {

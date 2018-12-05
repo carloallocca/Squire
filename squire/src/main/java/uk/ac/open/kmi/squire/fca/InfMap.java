@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
+import uk.ac.open.kmi.squire.core2.QueryCtxNode;
 import uk.ac.open.kmi.squire.evaluation.Measures;
 import uk.ac.open.kmi.squire.evaluation.Measures.Metrics;
 
@@ -15,19 +15,19 @@ import uk.ac.open.kmi.squire.evaluation.Measures.Metrics;
  * @author Alessandro Adamou<alexdma@apache.org>
  *
  */
-public class InfMap extends HashMap<Metrics, Set<QueryAndContextNode>> {
+public class InfMap extends HashMap<Metrics, Set<QueryCtxNode>> {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 534293999520492941L;
 
-	public boolean addOptimalNode(Metrics metric, QueryAndContextNode node) {
+	public boolean addOptimalNode(Metrics metric, QueryCtxNode node) {
 		if (!containsKey(metric)) put(metric, new HashSet<>());
 		return get(metric).add(node);
 	}
 
-	public Set<QueryAndContextNode> getOptimalNodes(Metrics metric) {
+	public Set<QueryCtxNode> getOptimalNodes(Metrics metric) {
 		return get(metric);
 	}
 

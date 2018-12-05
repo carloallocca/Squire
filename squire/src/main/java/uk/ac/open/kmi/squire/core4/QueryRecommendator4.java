@@ -10,7 +10,7 @@ import java.util.Set;
 import org.apache.jena.query.Query;
 
 import uk.ac.open.kmi.squire.core.QueryScorePair;
-import uk.ac.open.kmi.squire.core2.QueryAndContextNode;
+import uk.ac.open.kmi.squire.core2.QueryCtxNode;
 import uk.ac.open.kmi.squire.evaluation.Measures;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 
@@ -54,11 +54,11 @@ public class QueryRecommendator4 extends AbstractQueryRecommender {
 		this.qTemplate.addAll(genOp.generalize(getQuery()));
 
 		// SPECIALIZE...
-		List<QueryAndContextNode> recoms = new LinkedList<>();
+		List<QueryCtxNode> recoms = new LinkedList<>();
 		for (Query q : this.qTemplate) {
 			Specializer spec = new 
-					 Specializer
-					//GraphSearchSpecializer
+				//	 Specializer
+				GraphSearchSpecializer
 					( getQuery(), q, d1, d2, genOp,
 					getMetrics().resultTypeSimilarityCoefficient, getMetrics().queryRootDistanceCoefficient,
 					getMetrics().resultSizeSimilarityCoefficient, getMetrics().querySpecificityDistanceCoefficient,
@@ -77,8 +77,8 @@ public class QueryRecommendator4 extends AbstractQueryRecommender {
 		return orderedRecommendations;
 	}
 
-	protected void rankRecommendations(List<QueryAndContextNode> qRList) {
-		for (QueryAndContextNode qrRecom : qRList) {
+	protected void rankRecommendations(List<QueryCtxNode> qRList) {
+		for (QueryCtxNode qrRecom : qRList) {
 			QueryScorePair pair = new QueryScorePair(qrRecom.getTransformedQuery(), qrRecom.getqRScore());
 			this.orderedRecommendations.add(pair);
 		}

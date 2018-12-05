@@ -4,9 +4,9 @@ import java.util.Arrays;
 
 public class Edge<V> {
 	private final V source, destination;
-	private final int weight;
+	private final float weight;
 
-	public Edge(V source, V destination, int weight) {
+	public Edge(V source, V destination, float weight) {
 		this.source = source;
 		this.destination = destination;
 		this.weight = weight;
@@ -32,7 +32,7 @@ public class Edge<V> {
 		return source;
 	}
 
-	public int getWeight() {
+	public float getWeight() {
 		return weight;
 	}
 
