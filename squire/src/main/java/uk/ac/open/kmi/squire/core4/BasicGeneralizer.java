@@ -136,7 +136,7 @@ public class BasicGeneralizer extends AbstractMappedQueryTransform implements Ge
 		final Var varName;
 		if (obj.isURI()) {
 			String o = obj.getURI();
-			if (rdfd1.getClassSet().contains(obj) && !rdfd2.getClassSet().contains(obj))
+			if (rdfd1.getClassSet().contains(o) && !rdfd2.getClassSet().contains(o))
 				varName = classVarTable.getOrCreateVar(obj, TEMPLATE_VAR_CLASS);
 			else if (rdfd1.isInObjectPropertySet(o) && !rdfd2.isInObjectPropertySet(o))
 				varName = objectProperyVarTable.getOrCreateVar(obj, TEMPLATE_VAR_PROP_OBJ);

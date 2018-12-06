@@ -64,22 +64,22 @@ public class QueryResultTypeDistance {
 	 * @param qRvars
 	 * @return
 	 */
-	public float computeQueryResultTypeDistance(Query qOri, IRDFDataset d1, Query qRec, IRDFDataset d2) {
+	public float compute(Query qOri, IRDFDataset d1, Query qRec, IRDFDataset d2) {
 		float dist;
 		List<VarTypeMap> qOri_d1_signature, qRec_d2_signature;
 		if (d1 instanceof FileBasedRDFDataset)
-			qOri_d1_signature = computeQueryVariableSignature(qOri, (FileBasedRDFDataset) d1);
+			qOri_d1_signature = queryVariableSignature(qOri, (FileBasedRDFDataset) d1);
 		else
-			qOri_d1_signature = computeQueryVariableSignature(qOri, (SparqlIndexedDataset) d1);
+			qOri_d1_signature = queryVariableSignature(qOri, (SparqlIndexedDataset) d1);
 		if (d2 instanceof FileBasedRDFDataset)
-			qRec_d2_signature = computeQueryVariableSignature(qRec, (FileBasedRDFDataset) d2);
+			qRec_d2_signature = queryVariableSignature(qRec, (FileBasedRDFDataset) d2);
 		else
-			qRec_d2_signature = computeQueryVariableSignature(qRec, (SparqlIndexedDataset) d2);
+			qRec_d2_signature = queryVariableSignature(qRec, (SparqlIndexedDataset) d2);
 		dist = 1 - rtqOverlapRate(qOri_d1_signature, qRec_d2_signature);
 		return dist;
 	}
 
-	private List<VarTypeMap> computeQueryVariableSignature(Query qOri, FileBasedRDFDataset d1) {
+	private List<VarTypeMap> queryVariableSignature(Query qOri, FileBasedRDFDataset d1) {
 		List<VarTypeMap> signature = new ArrayList<>();
 		try {
 			OntModel inf = ModelFactory.createOntologyModel();
@@ -116,7 +116,7 @@ public class QueryResultTypeDistance {
 		return signature;
 	}
 
-	private List<VarTypeMap> computeQueryVariableSignature(Query qOri, SparqlIndexedDataset d1) {
+	private List<VarTypeMap> queryVariableSignature(Query qOri, SparqlIndexedDataset d1) {
 		if (!qOri.isSelectType())
 			throw new UnsupportedOperationException("Only SELECT queries are supported at the moment.");
 		List<VarTypeMap> signature = new ArrayList<>();

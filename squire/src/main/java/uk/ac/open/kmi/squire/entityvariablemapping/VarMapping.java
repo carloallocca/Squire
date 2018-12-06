@@ -17,6 +17,8 @@ public interface VarMapping<V, N> {
 
 	public void clear();
 
+	public int count();
+
 	public V getOrCreateVar(N value, String varPrefix);
 
 	public N getValueFromVar(V var);

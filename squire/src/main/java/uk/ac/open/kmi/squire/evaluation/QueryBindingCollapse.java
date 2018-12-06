@@ -66,6 +66,8 @@ import org.slf4j.LoggerFactory;
  * TODO: better to compute it from an operation record than by re-scanning the
  * query.
  * 
+ * FIXME - still NaN (0/0) or Infinity (n/0)
+ * 
  * @author Alessandro Adamou<alexdma@apache.org>
  *
  */
@@ -108,18 +110,21 @@ public class QueryBindingCollapse {
 		final Set<Node> increased = new HashSet<>();
 		for (Node p : origOcc.keySet()) {
 			if (p.isURI() && transfOcc.containsKey(p) && origOcc.get(p) < transfOcc.get(p)) {
-				log.warn("Value {} has increased from {} to {} !", p, origOcc.get(p), transfOcc.get(p));
+				log.debug("Usage of {} has increased from {} to {} !", p, origOcc.get(p), transfOcc.get(p));
 				increased.add(p);
 				num += origOcc.get(p);
-			} else if (p.isVariable()) denom += origOcc.get(p);
+			} else if (p.isVariable())
+				denom += origOcc.get(p);
 		}
-		if (!increased.isEmpty()) for (Node p : origOcc.keySet()) {
-			if (p.isVariable() && !transfOcc.containsKey(p)) {
-				log.warn("Variable {} has been collapsed.", p);
-				num += origOcc.get(p);
+		if (!increased.isEmpty())
+			for (Node p : origOcc.keySet()) {
+				if (p.isVariable() && !transfOcc.containsKey(p)) {
+					log.debug("Variable {} has been collapsed.", p);
+					num += origOcc.get(p);
+				}
 			}
-		}
-		float score = 1.0f * num / denom;
+
+		float score = 1.0f * num; // / denom;
 		log.debug("Collapse rate is calculated as {}/{} = {}", num, denom, score);
 		return score;
 	}

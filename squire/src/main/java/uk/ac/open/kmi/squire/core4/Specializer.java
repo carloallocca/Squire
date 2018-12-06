@@ -108,7 +108,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 
 		// 3)...QueryResultTypeSimilarity
 		QueryResultTypeDistance qRTS = new QueryResultTypeDistance();
-		float resulTtypeDist = qRTS.computeQueryResultTypeDistance(this.qO, this.rdfd1, this.qR, this.rdfd2);
+		float resulTtypeDist = qRTS.compute(this.qO, this.rdfd1, this.qR, this.rdfd2);
 		float resultTypeSim = 1 - resulTtypeDist;
 
 		// 4)...QueryResultSizeSimilarity

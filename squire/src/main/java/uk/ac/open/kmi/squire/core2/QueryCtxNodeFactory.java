@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.core4.NodeTransformation;
+import uk.ac.open.kmi.squire.evaluation.QueryBindingCollapse;
 import uk.ac.open.kmi.squire.evaluation.QueryGPESim;
 import uk.ac.open.kmi.squire.evaluation.QueryResultTypeDistance;
 import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
@@ -24,18 +25,18 @@ public class QueryCtxNodeFactory {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	private final Query qO, qR;
+	private final Query qOriginal, qGeneral;
 
 	private float resultTypeSimilarityDegree, queryRootDistanceDegree, resultSizeSimilarityDegree,
 			querySpecificityDistanceDegree;
 
 	private boolean strict = false;
 
-	public QueryCtxNodeFactory(Query qO, Query qR, IRDFDataset ds1, IRDFDataset ds2, float resultTypeSimilarityDegree,
-			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree,
-			boolean strict) {
-		this.qO = qO;
-		this.qR = qR;
+	public QueryCtxNodeFactory(Query originalQuery, Query generalQuery, IRDFDataset ds1, IRDFDataset ds2,
+			float resultTypeSimilarityDegree, float queryRootDistanceDegree, float resultSizeSimilarityDegree,
+			float querySpecificityDistanceDegree, boolean strict) {
+		this.qOriginal = originalQuery;
+		this.qGeneral = generalQuery;
 		this.ds1 = ds1;
 		this.ds2 = ds2;
 		this.strict = strict;
@@ -54,36 +55,48 @@ public class QueryCtxNodeFactory {
 	 */
 	public float computeInstantiationCost(List<NodeTransformation> tplVarInstantiations) {
 		int size = tplVarInstantiations.size();
-		float nodeCost = 0;
+		float cumulatedCost = 0;
 		if (size > 0) {
 			for (NodeTransformation item : tplVarInstantiations) {
 				String entityqO_TMP = StringUtils.getLocalName(item.getFrom().toString());
 				String entityqR_TMP = StringUtils.getLocalName(item.getTo().toString());
-				nodeCost += computeInstantiationCost(entityqO_TMP, entityqR_TMP);
+				cumulatedCost += computeInstantiationCost(entityqO_TMP, entityqR_TMP);
 			}
-			return (float) 1 - (nodeCost / size); // we divide by size as we want the value to be between 0 and 1.
+			// divide by size as we want the value to be between 0 and 1 (XXX why?)
+			return 1f - (cumulatedCost / size);
 		}
 		return 0;
 	}
 
 	/**
+	 * The cost of a single instantiation step
+	 * 
 	 * Instantiating an entity into another costs the Jaro-Winkler similarity of
 	 * their respective names...
 	 * 
 	 * @param entityqO
+	 *            the entity in the original query
 	 * @param entityqR
+	 *            the entity in the reformulated query
 	 * @return
 	 */
 	public float computeInstantiationCost(String entityqO, String entityqR) {
-		if (entityqO == null || entityqR == null) {
-			log.warn("Instantiation to or from a null entity has no cost (from: {} , to: {}).", entityqO, entityqR);
+		if (entityqO == null || entityqR == null || entityqO.equals(entityqR)) {
+			log.warn("Instantiation to or from a null entity, or between equal entities, has no cost"
+					+ " (from: {} , to: {}).", entityqO, entityqR);
 			return 0f;
 		}
 		JaroWinklerSimilarity jwSim = new JaroWinklerSimilarity();
-		float sim = jwSim.computeMatchingScore(entityqO, entityqR);
+		float cost = jwSim.computeMatchingScore(entityqO, entityqR);
+cost = 1f/cost;
 		// log.debug("Instantiating from {} to {} costs {}.", entityqO, entityqR, sim);
-		// return (float) (1.0 - sim);
-		return sim;
+		return cost;
+	}
+
+	public float computeInstantiationCost(String entityqO, String entityqR, Query qAfter) {
+		float cost = computeInstantiationCost(entityqO, entityqR);
+		cost += new QueryBindingCollapse().compute(qOriginal, qAfter);
+		return cost;
 	}
 
 	public float computeRemoveOperationCost(Query originalQuery, Query childQuery) {
@@ -126,8 +139,7 @@ public class QueryCtxNodeFactory {
 
 		// 3)...QueryResultTypeSimilarity
 		QueryResultTypeDistance qRTS = new QueryResultTypeDistance();
-		float newResulttypeSim = qRTS.computeQueryResultTypeDistance(node.getOriginalQuery(), this.ds1,
-				node.getTransformedQuery(), this.ds2);
+		float newResulttypeSim = qRTS.compute(node.getOriginalQuery(), this.ds1, node.getTransformedQuery(), this.ds2);
 
 		float recommendedQueryScore = (queryRootDistanceDegree * queryRootDistSim)
 				+ (resultTypeSimilarityDegree * newResulttypeSim) + (querySpecificityDistanceDegree
@@ -176,7 +188,7 @@ public class QueryCtxNodeFactory {
 
 		// 3)...QueryResultTypeSimilarity
 		QueryResultTypeDistance qRTS = new QueryResultTypeDistance();
-		float resulTtypeDist = qRTS.computeQueryResultTypeDistance(this.qO, this.ds1, this.qR, this.ds2);
+		float resulTtypeDist = qRTS.compute(this.qOriginal, this.ds1, this.qGeneral, this.ds2);
 		float resultTypeSim = 1 - resulTtypeDist;
 
 		// float recommentedQueryScore = ( ( newQueryRootDist) +
@@ -248,10 +260,9 @@ public class QueryCtxNodeFactory {
 
 		// 2)...QuerySpecificityDistance
 		QuerySpecificityDistance qSpecDist = new QuerySpecificityDistance();
-		float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(node.getOriginalQuery(),
-				node.getTransformedQuery());
-		float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(node.getOriginalQuery(),
-				node.getTransformedQuery());
+		Query orig = node.getOriginalQuery(), transf = node.getTransformedQuery();
+		float qSpecDistSimVar = qSpecDist.computeQSDwrtQueryVariable(orig, transf);
+		float qSpecDistSimTriplePattern = qSpecDist.computeQSDwrtQueryTP(orig, transf);
 		node.setQuerySpecificityDistanceTP(qSpecDistSimTriplePattern);
 		node.setQuerySpecificityDistanceVar(qSpecDistSimVar);
 

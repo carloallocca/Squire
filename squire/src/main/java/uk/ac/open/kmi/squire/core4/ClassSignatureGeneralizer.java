@@ -67,7 +67,7 @@ public class ClassSignatureGeneralizer extends BasicGeneralizer {
 		for (Entry<Node, Set<Node>> entry : mq[0].getTypesPerSubject().entrySet()) {
 			log.debug("Subject {} (#classes = {})", entry.getKey(), entry.getValue().size());
 			for (Node claz : entry.getValue()) {
-				log.debug("Processing RDf type node {}", claz);
+				log.debug("Processing RDF type node {}", claz);
 				Var v = ifObjectIsNotD2ThenGenerateVariableNew(claz);
 				log.debug(" ... produced template variable {}", v);
 				if (v == null) {

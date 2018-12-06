@@ -102,7 +102,7 @@ public class Measures {
 				throw new IllegalArgumentException(
 						"Result type measures require that both the source and the target dataset be set."
 								+ " Please do so by calling setSourceDataset() and setTargetDataset() on this object.");
-			float resulTtypeDist = qRTS.computeQueryResultTypeDistance(getOriginalQuery(), getSourceDataset(),
+			float resulTtypeDist = qRTS.compute(getOriginalQuery(), getSourceDataset(),
 					getTransformedQuery(), getTargetDataset());
 			score = 1 - resulTtypeDist;
 			break;

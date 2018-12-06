@@ -46,6 +46,11 @@ public abstract class AbstractVarMapping<V, N> implements VarMapping<V, N> {
 	}
 
 	@Override
+	public int count() {
+		return varToValue.size();
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
 			return false;

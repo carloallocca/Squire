@@ -5,10 +5,13 @@ import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
@@ -21,6 +24,8 @@ import uk.ac.open.kmi.squire.core2.QueryCtxNode;
 import uk.ac.open.kmi.squire.entityvariablemapping.RdfVarMapping;
 import uk.ac.open.kmi.squire.entityvariablemapping.VarMapping;
 import uk.ac.open.kmi.squire.evaluation.Dijkstra;
+import uk.ac.open.kmi.squire.evaluation.PropertyTypePreservationDistance;
+import uk.ac.open.kmi.squire.evaluation.QuerySpecificityDistance;
 import uk.ac.open.kmi.squire.evaluation.model.Edge;
 import uk.ac.open.kmi.squire.evaluation.model.SpecializationGraph;
 import uk.ac.open.kmi.squire.operation.InstantiateTemplateVar;
@@ -108,13 +113,17 @@ public class GraphSearchSpecializer extends Specializer {
 							+ from.getClass().getName());
 		applied.put((Var) from, op.getTo());
 		QueryCtxNode parent = vertexMap.get(current), child;
+		Query qOp = parent.getTransformedQuery().cloneQuery();
+		InstantiateTemplateVar op_inst = new InstantiateTemplateVar();
 
+		qOp = op_inst.instantiateVarTemplate(qOp, (Var) from, op.getTo());
 		Node nodeFrom = getOriginalEntity((Var) from);
 		Node nodeTo = op.getTo();
 		String entityqO_TMP = StringUtils.getLocalName(nodeFrom.getURI());
 		String entityqR_TMP = StringUtils.getLocalName(nodeTo.getURI());
-		float cost = nodeFactory.computeInstantiationCost(entityqO_TMP, entityqR_TMP);
-
+		float cost = nodeFactory.computeInstantiationCost(entityqO_TMP, entityqR_TMP, qOp);
+		cost += new QuerySpecificityDistance().computeQSDwrtQueryTP(this.qO, qOp);
+		cost += new PropertyTypePreservationDistance().compute(applied, this.rdfd2);
 		if (vertexMap.containsKey(applied)) {
 			// log.warn("Applied child already exists: "+applied);
 
@@ -123,10 +132,7 @@ public class GraphSearchSpecializer extends Specializer {
 			return vertexMap.get(applied);
 		}
 		log.debug("Creating node for {} + {}", current, op);
-		Query qOp = parent.getTransformedQuery().cloneQuery();
-		InstantiateTemplateVar op_inst = new InstantiateTemplateVar();
 
-		qOp = op_inst.instantiateVarTemplate(qOp, (Var) from, op.getTo());
 		child = new QueryCtxNode(qOp, applied);
 		child.setOriginalQuery(this.qO);
 		vertexMap.put(applied, child);
@@ -152,6 +158,8 @@ public class GraphSearchSpecializer extends Specializer {
 
 		IsSparqlQuerySatisfiableStateful satisfiability = new IsSparqlQuerySatisfiableStateful(this.rdfd2);
 
+		Map<QueryCtxNode, Float> scoreMap = new HashMap<>();
+
 		// XXX Scary conditioned loop : specializables is reduced in another method...
 		while (!this.specializables.isEmpty()) {
 			QueryCtxNode parentNode = popTopScoredQueryCtx(this.specializables);
@@ -168,16 +176,33 @@ public class GraphSearchSpecializer extends Specializer {
 
 			for (QueryCtxNode end : finalVertices) {
 				List<QueryCtxNode> path = dijkstra.getPath(end);
-
+				if (path == null) {
+					log.warn("No path to {} !", end.getBindings());
+					continue;
+				}
 				for (QueryCtxNode vertex : path) {
 					System.out.println(vertex.getBindings());
 				}
+
+				float cost = dijkstra.getShortestDistance(end);
+				System.out.println("cost = " + cost);
+
+				scoreMap.put(end, cost);
 			}
 
-			// this.recommendations.add(childNode);
-			// notifyQueryRecommendation(q0, 1);
-
 		} // end while
+
+		Map<QueryCtxNode, Float> sortedByCount = scoreMap.entrySet().stream().sorted(Map.Entry.comparingByValue())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+		for (Entry<QueryCtxNode, Float> e : sortedByCount.entrySet()) {
+			log.info("{} : {}", e.getValue(), e.getKey().getTransformedQuery());
+			float score = 1f / e.getValue();
+			e.getKey().setqRScore(score);
+			this.recommendations.add(e.getKey());
+			notifyQueryRecommendation(e.getKey().getTransformedQuery(), score);
+		}
+
 		this.notifyQueryRecommendationCompletion(true);
 		return this.recommendations;
 	}

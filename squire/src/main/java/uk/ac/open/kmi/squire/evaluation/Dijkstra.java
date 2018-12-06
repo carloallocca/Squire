@@ -91,7 +91,7 @@ public class Dijkstra<V> {
 		return settledNodes.contains(vertex);
 	}
 
-	private float getShortestDistance(V destination) {
+	public float getShortestDistance(V destination) {
 		Float d = distance.get(destination);
 		if (d == null) {
 			return Integer.MAX_VALUE;
