@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.squire.evaluation.model;
+package uk.ac.open.kmi.squire.evaluation;
 
 public class Vertex {
 	final private String id;

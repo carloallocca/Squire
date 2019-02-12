@@ -17,15 +17,15 @@ import java.util.List;
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
 import org.apache.jena.atlas.json.JsonValue;
+import org.insightcentre.squire.report.ConsolidatingReporter;
+import org.insightcentre.squire.report.Tracer;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4;
+import uk.ac.open.kmi.squire.core4.QueryRecommendationJob;
 import uk.ac.open.kmi.squire.jobs.JobManager;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
-import uk.ac.open.kmi.squire.report.ConsolidatingReporter;
-import uk.ac.open.kmi.squire.report.Tracer;
 
 /**
  *
@@ -138,7 +138,7 @@ public class TestGoldStandard {
 		d1 = new SparqlIndexedDataset(source_endpoint);
 		d2 = new SparqlIndexedDataset(target_endpoint);
 
-		QueryRecommendatorForm4 R1 = new QueryRecommendatorForm4(qo, d1, d2, resultTypeSimilarityDegree,
+		QueryRecommendationJob R1 = new QueryRecommendationJob(qo, d1, d2, resultTypeSimilarityDegree,
 				queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree, false,
 				Integer.toString(1));
 
@@ -153,7 +153,7 @@ public class TestGoldStandard {
 		String dir = "TestResults/";
 		new File(dir).mkdir();
 		for (String q : queries) {
-			QueryRecommendatorForm4 recom = new QueryRecommendatorForm4(q, d1, d2, configuration.wResultTypeSimilarity,
+			QueryRecommendationJob recom = new QueryRecommendationJob(q, d1, d2, configuration.wResultTypeSimilarity,
 					configuration.wQueryRootDistance, configuration.wResultSizeSimilarity,
 					configuration.wQuerySpecificityDistance, false, Integer.toString(1));
 			ConsolidatingReporter rep = new ConsolidatingReporter(q, new URL(source), new URL(target));

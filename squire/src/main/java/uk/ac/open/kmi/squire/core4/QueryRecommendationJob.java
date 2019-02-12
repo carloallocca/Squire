@@ -6,6 +6,7 @@
 package uk.ac.open.kmi.squire.core4;
 
 import java.nio.channels.ClosedByInterruptException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -27,7 +28,7 @@ import uk.ac.open.kmi.squire.rdfdataset.RDFDatasetSimilarity;
  *
  * @author carloallocca
  */
-public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservable
+public class QueryRecommendationJob extends AbstractQueryRecommendationObservable
 		implements IQueryRecommendationObserver, Runnable {
 
 	private Set<QueryRecommendationListener> listeners = new HashSet<>();
@@ -37,13 +38,13 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	private final float queryRootDistanceDegree, querySpecificityDistanceDegree, resultSizeSimilarityDegree,
 			resultTypeSimilarityDegree;
 
-	private final boolean strict;
-
 	private final String queryString;
 
 	private final IRDFDataset rdfd1, rdfd2;
 
-	public QueryRecommendatorForm4(String qString, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
+	private final boolean strict;
+
+	public QueryRecommendationJob(String qString, IRDFDataset d1, IRDFDataset d2, float resultTypeSimilarityDegree,
 			float queryRootDistanceDegree, float resultSizeSimilarityDegree, float querySpecificityDistanceDegree,
 			boolean strict, String token) {
 		this.token = token;
@@ -81,6 +82,11 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 	@Override
 	public void updateDatasetSimilarity(float simScore, String token) {
 		notifyDatatsetSimilarity(simScore);
+	}
+
+	@Override
+	public void updateGeneralized(Collection<Query> lgg) {
+		fireGeneralized(lgg);
 	}
 
 	@Override
@@ -142,6 +148,11 @@ public class QueryRecommendatorForm4 extends AbstractQueryRecommendationObservab
 				log.error("Exception caught while building recommendation.", ex);
 			}
 		return Collections.emptyList();
+	}
+
+	protected void fireGeneralized(Collection<Query> lgg) {
+		for (QueryRecommendationListener listener : listeners)
+			listener.generalized(lgg, queryString);
 	}
 
 	protected void fireQueryRecommended(Query query, float score) {

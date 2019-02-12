@@ -49,6 +49,8 @@ public class QuerySpecificityDistance {
 	 * The more variables are instantiated in the transformation from one query to
 	 * another, the longer this distance.
 	 * 
+	 * XXX variables or occurrences of variables?
+	 * 
 	 * @param qO
 	 * @param qR
 	 * @return

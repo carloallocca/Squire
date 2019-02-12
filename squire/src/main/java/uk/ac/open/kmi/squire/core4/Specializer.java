@@ -137,6 +137,7 @@ public class Specializer extends AbstractMappedQueryTransform {
 		log.info(" - overall score = {}", recommendedQueryScore);
 
 		// C. Compute the QueryTempVarSolutionSpace
+		log.info("Computing solution space of general query...");
 		List<QuerySolution> qTsol;
 		try {
 			QueryTempVarSolutionSpace temVarValueSpace = new QueryTempVarSolutionSpace();

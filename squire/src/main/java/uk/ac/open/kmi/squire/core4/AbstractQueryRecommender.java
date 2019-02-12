@@ -1,5 +1,7 @@
 package uk.ac.open.kmi.squire.core4;
 
+import java.util.Collection;
+
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 
@@ -51,6 +53,11 @@ public abstract class AbstractQueryRecommender extends AbstractQueryRecommendati
 	@Override
 	public void updateDatasetSimilarity(float simScore, String token) {
 		// Nothing to do
+	}
+
+	@Override
+	public void updateGeneralized(Collection<Query> lgg) {
+		this.notifyQueryGeneralized(lgg);
 	}
 
 	@Override

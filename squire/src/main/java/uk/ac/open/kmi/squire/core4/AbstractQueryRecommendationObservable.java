@@ -5,6 +5,7 @@
  */
 package uk.ac.open.kmi.squire.core4;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,13 +22,15 @@ public abstract class AbstractQueryRecommendationObservable implements IQueryRec
 	protected String token;
 
 	@Override
-	public void register(IQueryRecommendationObserver o) {
-		observers.add(o);
+	public void notifyDatatsetSimilarity(float score) {
+		for (IQueryRecommendationObserver obs : observers)
+			obs.updateDatasetSimilarity(score, token);
 	}
 
 	@Override
-	public void unregister(IQueryRecommendationObserver o) {
-		observers.remove(o);
+	public void notifyQueryGeneralized(Collection<Query> lgg) {
+		for (IQueryRecommendationObserver obs : observers)
+			obs.updateGeneralized(lgg);
 	}
 
 	@Override
@@ -37,21 +40,25 @@ public abstract class AbstractQueryRecommendationObservable implements IQueryRec
 	}
 
 	@Override
+	public void notifyQueryRecommendationCompletion(Boolean finished) {
+		for (IQueryRecommendationObserver obs : observers)
+			obs.updateQueryRecommendationCompletion(finished, token);
+	}
+
+	@Override
 	public void notifyQuerySatisfiableValue(Query query, boolean value) {
 		for (IQueryRecommendationObserver observer : observers)
 			observer.updateSatisfiableValue(query, value, token);
 	}
 
 	@Override
-	public void notifyDatatsetSimilarity(float score) {
-		for (IQueryRecommendationObserver obs : observers)
-			obs.updateDatasetSimilarity(score, token);
+	public void register(IQueryRecommendationObserver o) {
+		observers.add(o);
 	}
 
 	@Override
-	public void notifyQueryRecommendationCompletion(Boolean finished) {
-		for (IQueryRecommendationObserver obs : observers)
-			obs.updateQueryRecommendationCompletion(finished, token);
+	public void unregister(IQueryRecommendationObserver o) {
+		observers.remove(o);
 	}
 
 }

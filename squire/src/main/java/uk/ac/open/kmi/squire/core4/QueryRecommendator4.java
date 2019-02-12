@@ -51,18 +51,18 @@ public class QueryRecommendator4 extends AbstractQueryRecommender {
 		// GENERALIZE...
 		// TODO allow generalizer pipelines
 		BasicGeneralizer genOp = new ClassSignatureGeneralizer(d1, d2); // = new BasicGeneralizer(d1, d2);
-		this.qTemplate.addAll(genOp.generalize(getQuery()));
+		Set<Query> lgg = genOp.generalize(getQuery());
+		this.qTemplate.addAll(lgg);
+		notifyQueryGeneralized(lgg);
 
 		// SPECIALIZE...
 		List<QueryCtxNode> recoms = new LinkedList<>();
 		for (Query q : this.qTemplate) {
-			Specializer spec = new 
-					// Specializer
-				GraphSearchSpecializer
-					( getQuery(), q, d1, d2, genOp,
-					getMetrics().resultTypeSimilarityCoefficient, getMetrics().queryRootDistanceCoefficient,
-					getMetrics().resultSizeSimilarityCoefficient, getMetrics().querySpecificityDistanceCoefficient,
-					strict, this.token);
+			Specializer spec = new
+			// Specializer
+			GraphSearchSpecializer(getQuery(), q, d1, d2, genOp, getMetrics().resultTypeSimilarityCoefficient,
+					getMetrics().queryRootDistanceCoefficient, getMetrics().resultSizeSimilarityCoefficient,
+					getMetrics().querySpecificityDistanceCoefficient, strict, this.token);
 			spec.register(this);
 			spec.specialize();
 			recoms.addAll(spec.getSpecializations());

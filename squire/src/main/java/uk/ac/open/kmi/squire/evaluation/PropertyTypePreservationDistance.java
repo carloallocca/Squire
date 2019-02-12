@@ -22,7 +22,6 @@ public class PropertyTypePreservationDistance {
 			String nname = e.getValue().getURI();
 			if ((vname.startsWith(TEMPLATE_VAR_PROP_OBJ) && target.isInDatatypePropertySet(nname))
 					|| (vname.startsWith(TEMPLATE_VAR_PROP_DT) && target.isInObjectPropertySet(nname))) {
-				System.out.println("Penalizing transformation of " + vname + " into " + nname);
 				dist += 1 / transformations.count();
 			}
 		}

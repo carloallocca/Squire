@@ -191,7 +191,7 @@ public class TestClassSignatureGeneralizer {
 	 * 
 	 * It must be replaced by a generalized TP.
 	 */
-	// @Test
+	@Test
 	public void oneTypeNotPresent() throws Exception {
 		String q = "PREFIX foaf: <http://xmlns.com/foaf/0.1/>  " + "SELECT DISTINCT ?author WHERE {" + "?s a <"
 				+ ol_Article.asNode() + "> ; foaf:maker ?author" + " }";

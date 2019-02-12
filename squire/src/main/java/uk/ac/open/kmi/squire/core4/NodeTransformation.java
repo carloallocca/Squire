@@ -3,8 +3,8 @@ package uk.ac.open.kmi.squire.core4;
 import org.apache.jena.graph.Node;
 
 /**
- * A record of transforming every instance of one RDF node into another,
- * including (and especially) SPARQL variables.
+ * A record of transforming every occurrence of a single RDF node, including
+ * (and especially) SPARQL variables, into occurrences of another node.
  * 
  * @author carloallocca
  *

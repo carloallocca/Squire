@@ -180,10 +180,10 @@
 			},
 			{
 				"id": "q2",
-				"description": "List the collections that belong to another collection, and describe the collections they belong to",
-				"original": "SELECT DISTINCT ?collection ?parentCollection ?parentId ?parentDescr WHERE { ?collection a <http://www.w3.org/2004/02/skos/core#OrderedCollection> ; <http://www.w3.org/2004/02/skos/core#member> ?parentCollection . ?parentCollection <http://purl.org/dc/elements/1.1/identifier> ?parentId ; <http://vocab.getty.edu/ontology#parentString> ?parentDescr }",
+				"description": "Birthplaces and birth dates",
+				"original": "PREFIX edm: <http://www.europeana.eu/schemas/edm/> SELECT DISTINCT ?name ?date ?place WHERE { ?x a edm:Agent ; <http://www.w3.org/2004/02/skos/core#prefLabel> ?name ; edm:begin ?date ; <http://rdvocab.info/ElementsGr2/placeOfBirth> ?place }",
 				"expected": [
-					"SELECT DISTINCT ?collection ?descr ?collectionMember WHERE { ?collection a <http://www.loc.gov/mads/rdf/v1#MADSCollection> . ?collection <http://www.loc.gov/mads/rdf/v1#hasMADSCollectionMember> ?collectionMember . ?collection <http://www.w3.org/2000/01/rdf-schema#comment> ?descr }"
+					"PREFIX crm: <http://www.cidoc-crm.org/cidoc-crm/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT DISTINCT ?name ?date ?place WHERE { ?x a crm:E21_Person ; crm:P1_is_identified_by/rdfs:label ?name ; crm:P98i_was_born [ crm:P4_has_time-span/crm:P82_at_some_time_within ?date ; crm:P7_took_place_at ?place ] }"
 				]
 			},
 			{
@@ -192,7 +192,17 @@
 				"original": "SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> . ?concept <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel }",
 				"expected": [
 					"SELECT DISTINCT ?concept ?prefLabel WHERE { ?concept a <http://www.w3.org/2004/02/skos/core#Concept> ; <http://www.w3.org/2004/02/skos/core#prefLabel> ?prefLabel ; <http://www.w3.org/2004/02/skos/core#inScheme> ?thesaurus }"
-				]
+				],
+				"note": "At a bare minimum, the same query as the original should be recommended."
+			},
+			{
+				"id": "q4",
+				"description": "List the collections that belong to another collection, and describe the collections they belong to",
+				"original": "SELECT DISTINCT ?collection ?parentCollection ?parentId ?parentDescr WHERE { ?collection a <http://www.w3.org/2004/02/skos/core#OrderedCollection> ; <http://www.w3.org/2004/02/skos/core#member> ?parentCollection . ?parentCollection <http://purl.org/dc/elements/1.1/identifier> ?parentId ; <http://vocab.getty.edu/ontology#parentString> ?parentDescr }",
+				"expected": [
+					"SELECT DISTINCT ?collection ?descr ?collectionMember WHERE { ?collection a <http://www.loc.gov/mads/rdf/v1#MADSCollection> . ?collection <http://www.loc.gov/mads/rdf/v1#hasMADSCollectionMember> ?collectionMember . ?collection <http://www.w3.org/2000/01/rdf-schema#comment> ?descr }"
+				],
+				"note": "A counter-example of a non-star query to see how a method performs with it."
 			}
 		]
 	}

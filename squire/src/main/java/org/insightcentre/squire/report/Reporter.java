@@ -1,4 +1,4 @@
-package uk.ac.open.kmi.squire.report;
+package org.insightcentre.squire.report;
 
 import java.io.PrintWriter;
 import java.net.URL;

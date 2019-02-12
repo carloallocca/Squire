@@ -1,9 +1,10 @@
-package uk.ac.open.kmi.squire.report;
+package org.insightcentre.squire.report;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +48,11 @@ public class ConsolidatingReporter extends Reporter {
 
 	public ConsolidatingReporter(String originalQuery, URL sourceEndpoint, URL targetEndpoint) {
 		super(originalQuery, sourceEndpoint, targetEndpoint);
+	}
+
+	@Override
+	public void generalized(Collection<Query> lgg, String original) {
+		// We are not interested in the lgg for the consolidated report.
 	}
 
 	/**
@@ -103,7 +109,8 @@ public class ConsolidatingReporter extends Reporter {
 			log.warn("Original query has changed!");
 			log.warn(" * Got: {}", original);
 			log.warn(" * Expected: {}", this.originalQuery);
-		} else this.originalQuery = original;
+		} else
+			this.originalQuery = original;
 		recommendations.add(new QueryStringScorePair(query.serialize(), score));
 		order.put(query.serialize(), ++counter);
 	}

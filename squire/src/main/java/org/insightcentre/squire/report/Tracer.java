@@ -1,7 +1,9 @@
-package uk.ac.open.kmi.squire.report;
+package org.insightcentre.squire.report;
 
 import java.io.PrintWriter;
 import java.net.URL;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.apache.jena.query.Query;
 import org.slf4j.Logger;
@@ -36,6 +38,21 @@ public class Tracer extends Reporter {
 		reset();
 	}
 
+	@Override
+	public void generalized(Collection<Query> lgg, String original) {
+		out.println("==== BEGIN LGG ====");
+		out.println("Least general generalization follows (" + lgg.size() + " queries) :");
+		int i = 0;
+		for (Iterator<Query> it = lgg.iterator(); it.hasNext(); i++) {
+			out.println();
+			out.println("[" + i + "] : " + it.next());
+			out.println();
+		}
+		out.println("===== END LGG =====");
+		out.println();
+		out.flush();
+	}
+
 	public void printFooter() {
 		printFooter(out);
 	}
@@ -51,9 +68,10 @@ public class Tracer extends Reporter {
 			log.warn("Original query has changed!");
 			log.warn(" * Got: {}", original);
 			log.warn(" * Expected: {}", this.originalQuery);
-		} else this.originalQuery = original;
+		} else
+			this.originalQuery = original;
 		out.println("=========");
-		out.println("Query # " + (++counter));
+		out.println("Recommendation # " + (++counter));
 		out.println("Score = " + score);
 		out.println("Computation time = " + (timestamp - latestTimestamp) + " ms (" + (timestamp - startTimestamp)
 				+ " ms since process start)");

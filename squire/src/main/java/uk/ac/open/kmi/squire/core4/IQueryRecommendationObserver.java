@@ -5,6 +5,8 @@
  */
 package uk.ac.open.kmi.squire.core4;
 
+import java.util.Collection;
+
 import org.apache.jena.query.Query;
 
 /**
@@ -14,6 +16,8 @@ import org.apache.jena.query.Query;
 public interface IQueryRecommendationObserver {
 
 	public void updateDatasetSimilarity(float simScore, String token);
+
+	public void updateGeneralized(Collection<Query> lgg);
 
 	public void updateQueryRecommendated(Query qR, float score, String token);
 

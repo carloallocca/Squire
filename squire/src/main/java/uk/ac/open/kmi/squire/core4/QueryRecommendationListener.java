@@ -1,5 +1,7 @@
 package uk.ac.open.kmi.squire.core4;
 
+import java.util.Collection;
+
 import org.apache.jena.query.Query;
 
 import uk.ac.open.kmi.squire.jobs.JobManager;
@@ -18,6 +20,14 @@ import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
  *
  */
 public interface QueryRecommendationListener {
+
+	/**
+	 * Fired after a least general generalization has been computed
+	 * 
+	 * @param lgg
+	 * @param original
+	 */
+	public void generalized(Collection<Query> lgg, String original);
 
 	/**
 	 * Fired after a new query recommendation has been issued.

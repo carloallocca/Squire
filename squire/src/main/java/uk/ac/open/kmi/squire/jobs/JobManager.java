@@ -5,6 +5,7 @@
  */
 package uk.ac.open.kmi.squire.jobs;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.open.kmi.squire.core4.IQueryRecommendationObserver;
-import uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4;
+import uk.ac.open.kmi.squire.core4.QueryRecommendationJob;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
 
@@ -35,7 +36,8 @@ public class JobManager implements IQueryRecommendationObserver {
 	private static int tokenCounter = 0;
 
 	public static JobManager getInstance() {
-		if (me == null) me = new JobManager();
+		if (me == null)
+			me = new JobManager();
 		return me;
 	}
 
@@ -75,7 +77,7 @@ public class JobManager implements IQueryRecommendationObserver {
 		synchronized (map) {
 			map.put(strToken, new RecommendationJobStatus());
 		}
-		QueryRecommendatorForm4 R1 = new QueryRecommendatorForm4(qString, d1, d2, resultTypeSimilarityDegree,
+		QueryRecommendationJob R1 = new QueryRecommendationJob(qString, d1, d2, resultTypeSimilarityDegree,
 				queryRootDistanceDegree, resultSizeSimilarityDegree, querySpecificityDistanceDegree, false,
 				Integer.toString(tokenCounter));
 		R1.register(this);
@@ -176,7 +178,8 @@ public class JobManager implements IQueryRecommendationObserver {
 	public synchronized boolean stopJob(String token) {
 		Future<?> promise = taskMap.get(token);
 		boolean existed = promise != null;
-		if (existed) promise.cancel(true);
+		if (existed)
+			promise.cancel(true);
 		taskMap.remove(token);
 		return existed;
 	}
@@ -221,6 +224,11 @@ public class JobManager implements IQueryRecommendationObserver {
 		if (map.containsKey(token)) {
 			getJobStatus(token).setSatisfiable(value);
 		}
+	}
+
+	@Override
+	public void updateGeneralized(Collection<Query> lgg) {
+		// Not sure whether to notify the web app etc.
 	}
 
 }

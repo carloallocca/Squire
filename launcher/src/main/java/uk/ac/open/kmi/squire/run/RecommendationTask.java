@@ -8,14 +8,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
 
+import org.insightcentre.squire.report.ConsolidatingReporter;
+import org.insightcentre.squire.report.Tracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import uk.ac.open.kmi.squire.core4.QueryRecommendatorForm4;
+import uk.ac.open.kmi.squire.core4.QueryRecommendationJob;
 import uk.ac.open.kmi.squire.rdfdataset.IRDFDataset;
 import uk.ac.open.kmi.squire.rdfdataset.SparqlIndexedDataset;
-import uk.ac.open.kmi.squire.report.ConsolidatingReporter;
-import uk.ac.open.kmi.squire.report.Tracer;
 
 public class RecommendationTask {
 
@@ -52,7 +52,7 @@ public class RecommendationTask {
 		new File(dir).mkdir();
 		for (String tgt : targetEndpoints) {
 			IRDFDataset d1 = new SparqlIndexedDataset(sourceEndpoint), d2 = new SparqlIndexedDataset(tgt);
-			QueryRecommendatorForm4 recom = new QueryRecommendatorForm4(query, d1, d2, 1, 1, 1, 1, strict,
+			QueryRecommendationJob recom = new QueryRecommendationJob(query, d1, d2, 1, 1, 1, 1, strict,
 					Integer.toString(1));
 
 			URL uS, uT;
@@ -82,7 +82,7 @@ public class RecommendationTask {
 			if (tracer != null) tracer.printFooter();
 			try {
 				log.info("Writing consolidated report to file {}", filename);
-				rep.printReport(new PrintWriter(new FileWriter(filename)), 50);
+				rep.printReport(new PrintWriter(new FileWriter(filename)), 100);
 			} catch (IOException e) {
 				log.error("Cannot write report to file {}", filename);
 				throw new RuntimeException(e);

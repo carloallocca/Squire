@@ -10,13 +10,13 @@ import java.util.List;
 import org.junit.Test;
 
 import uk.ac.open.kmi.squire.evaluation.model.Edge;
-import uk.ac.open.kmi.squire.evaluation.model.SpecializationGraph;
-import uk.ac.open.kmi.squire.evaluation.model.Vertex;
+import uk.ac.open.kmi.squire.evaluation.model.Graph;
+import uk.ac.open.kmi.squire.evaluation.model.ResidentGraph;
 
 public class TestDijkstra {
 
-	private List<Vertex> nodes;
 	private List<Edge<Vertex>> edges;
+	private List<Vertex> nodes;
 
 	@Test
 	public void testExcute() {
@@ -41,7 +41,7 @@ public class TestDijkstra {
 		addLane("Edge_11", 1, 10, 600);
 
 		// Lets check from location Loc_1 to Loc_10
-		SpecializationGraph<Vertex> graph = new SpecializationGraph<>(nodes, edges);
+		Graph<Vertex> graph = new ResidentGraph<>(nodes, edges);
 		Dijkstra<Vertex> dijkstra = new Dijkstra<>(graph);
 		dijkstra.execute(nodes.get(0));
 		LinkedList<Vertex> path = dijkstra.getPath(nodes.get(10));
@@ -49,9 +49,8 @@ public class TestDijkstra {
 		assertNotNull(path);
 		assertTrue(path.size() > 0);
 
-		for (Vertex vertex : path) {
+		for (Vertex vertex : path)
 			System.out.println(vertex);
-		}
 
 	}
 

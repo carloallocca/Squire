@@ -61,7 +61,7 @@ import uk.ac.open.kmi.squire.utils.SparqlUtils.SparqlException;
  */
 public class QueryTempVarSolutionSpace {
 
-	private class NotTemplatedException extends Exception {
+	public class NotTemplatedException extends Exception {
 		private static final long serialVersionUID = 5830516022506521166L;
 		private Query q;
 
@@ -110,7 +110,8 @@ public class QueryTempVarSolutionSpace {
 			res = SparqlUtils.doRawQuery(qT.toString(), rdfd2.getEndPointURL().toString());
 			qTsol = SparqlUtils.extractProjectedValues(res, qT.getProjectVars());
 		} catch (SparqlException | JsonParseException ex) {
-			if (ex instanceof SparqlException) log.error("Connection failed while checking solution space.", ex);
+			if (ex instanceof SparqlException)
+				log.error("Connection failed while checking solution space.", ex);
 			else if (ex instanceof JsonParseException) {
 				log.error("Solution space result size is not valid JSON. Content follows:");
 				log.error("{}", res);
@@ -157,7 +158,8 @@ public class QueryTempVarSolutionSpace {
 				}
 			}
 		});
-		if (throwIt[0]) throw new TooGeneralException(q);
+		if (throwIt[0])
+			throw new TooGeneralException(q);
 	}
 
 	private Map<Var, Set<Var>> filter(Map<Var, Set<Var>> reductions, Var... variables) {
@@ -165,12 +167,15 @@ public class QueryTempVarSolutionSpace {
 		Map<Var, Set<Var>> filtered = new HashMap<>();
 		for (Var v : reductions.keySet()) {
 			// If the key is filtered in, copy the whole value
-			if (projv.contains(v)) filtered.put(v, new HashSet<>(reductions.get(v)));
-			else for (Var r : reductions.get(v))
-				if (projv.contains(r)) {
-					if (!filtered.containsKey(v)) filtered.put(v, new HashSet<>());
-					filtered.get(v).add(r);
-				}
+			if (projv.contains(v))
+				filtered.put(v, new HashSet<>(reductions.get(v)));
+			else
+				for (Var r : reductions.get(v))
+					if (projv.contains(r)) {
+						if (!filtered.containsKey(v))
+							filtered.put(v, new HashSet<>());
+						filtered.get(v).add(r);
+					}
 		}
 		return filtered;
 	}
@@ -216,9 +221,11 @@ public class QueryTempVarSolutionSpace {
 
 			@Override
 			public boolean equals(Object obj) {
-				if (this == obj) return true;
-				if (obj instanceof NodeAndPropType) return node.equals(((NodeAndPropType) obj).node)
-						&& propertyType.equals(((NodeAndPropType) obj).propertyType);
+				if (this == obj)
+					return true;
+				if (obj instanceof NodeAndPropType)
+					return node.equals(((NodeAndPropType) obj).node)
+							&& propertyType.equals(((NodeAndPropType) obj).propertyType);
 				return false;
 			}
 
@@ -234,7 +241,8 @@ public class QueryTempVarSolutionSpace {
 			log.debug("Projection forced to the following variables: {}", (Object[]) projectToThese);
 			templateVars.retainAll(new HashSet<>(Arrays.asList(projectToThese)));
 		}
-		if (templateVars.isEmpty()) throw new NotTemplatedException(queryOrig);
+		if (templateVars.isEmpty())
+			throw new NotTemplatedException(queryOrig);
 		Set<Var> usedVars = new HashSet<>();
 		/*
 		 * The subject node and the corresponding TP that we choose to keep.
@@ -255,10 +263,11 @@ public class QueryTempVarSolutionSpace {
 					if (projected.contains(tp.getSubject()) || projected.contains(tp.getPredicate())
 							|| projected.contains(tp.getObject()))
 						try {
-						if (tp.getPredicate().isVariable() && tp.getObject().isVariable()) keep(tp, pathBlock);
-					} catch (NotTemplatedException ex) {
-						throw new RuntimeException(ex);
-					}
+							if (tp.getPredicate().isVariable() && tp.getObject().isVariable())
+								keep(tp, pathBlock);
+						} catch (NotTemplatedException ex) {
+							throw new RuntimeException(ex);
+						}
 				}
 				// Do another scan for reductions
 				for (Iterator<TriplePath> it = el.patternElts(); it.hasNext();) {
@@ -271,10 +280,14 @@ public class QueryTempVarSolutionSpace {
 						Var p = (Var) tp.getPredicate(), o = (Var) tp.getObject();
 						Class<? extends Property> propType;
 						if (strict) {
-							if (p.getName().startsWith(TEMPLATE_VAR_PROP_DT)) propType = DatatypeProperty.class;
-							else if (p.getName().startsWith(TEMPLATE_VAR_PROP_OBJ)) propType = DatatypeProperty.class;
-							else propType = Property.class;
-						} else propType = Property.class;
+							if (p.getName().startsWith(TEMPLATE_VAR_PROP_DT))
+								propType = DatatypeProperty.class;
+							else if (p.getName().startsWith(TEMPLATE_VAR_PROP_OBJ))
+								propType = DatatypeProperty.class;
+							else
+								propType = Property.class;
+						} else
+							propType = Property.class;
 						NodeAndPropType key = new NodeAndPropType(s, propType);
 						if (!subjectsWithGenericTPs.containsKey(key)) {
 							try {
@@ -290,9 +303,12 @@ public class QueryTempVarSolutionSpace {
 						}
 					} else {
 						pathBlock.addTriple(tp); // Always add nontrivial TPs
-						if (s.isVariable()) usedVars.add((Var) s);
-						if (tp.getPredicate().isVariable()) usedVars.add((Var) tp.getPredicate());
-						if (tp.getObject().isVariable()) usedVars.add((Var) tp.getObject());
+						if (s.isVariable())
+							usedVars.add((Var) s);
+						if (tp.getPredicate().isVariable())
+							usedVars.add((Var) tp.getPredicate());
+						if (tp.getObject().isVariable())
+							usedVars.add((Var) tp.getObject());
 					}
 				}
 				qpNu.addElement(pathBlock);
@@ -306,17 +322,24 @@ public class QueryTempVarSolutionSpace {
 				Class<? extends Property> pt;
 				if (strict) {
 					String nam = p.getName();
-					if (nam.startsWith(TEMPLATE_VAR_PROP_DT)) pt = DatatypeProperty.class;
-					else if (nam.startsWith(TEMPLATE_VAR_PROP_OBJ)) pt = ObjectProperty.class;
-					else pt = Property.class;
-				} else pt = Property.class;
+					if (nam.startsWith(TEMPLATE_VAR_PROP_DT))
+						pt = DatatypeProperty.class;
+					else if (nam.startsWith(TEMPLATE_VAR_PROP_OBJ))
+						pt = ObjectProperty.class;
+					else
+						pt = Property.class;
+				} else
+					pt = Property.class;
 				subjectsWithGenericTPs.put(new NodeAndPropType(s, pt), tp);
 				pathBlock.addTriple(tp);
 				usedVars.add(p);
-				if (!reductions.containsKey(p)) reductions.put(p, new HashSet<>());
+				if (!reductions.containsKey(p))
+					reductions.put(p, new HashSet<>());
 				usedVars.add(o);
-				if (!reductions.containsKey(o)) reductions.put(o, new HashSet<>());
-				if (s.isVariable()) usedVars.add((Var) s);
+				if (!reductions.containsKey(o))
+					reductions.put(o, new HashSet<>());
+				if (s.isVariable())
+					usedVars.add((Var) s);
 			}
 
 		});
@@ -325,7 +348,8 @@ public class QueryTempVarSolutionSpace {
 		qT.setDistinct(true);
 		qT.setQuerySelectType();
 		for (Var tv : templateVars)
-			if (usedVars.contains(tv)) qT.addResultVar(tv.getName());
+			if (usedVars.contains(tv))
+				qT.addResultVar(tv.getName());
 
 		if (strict) {
 			String exp = "";
@@ -351,7 +375,8 @@ public class QueryTempVarSolutionSpace {
 				}
 			});
 			for (int i = 0; i < conds.size(); i++) {
-				if (i > 0) exp += " && ";
+				if (i > 0)
+					exp += " && ";
 				exp += conds.get(i);
 			}
 			log.debug(exp);
@@ -365,7 +390,8 @@ public class QueryTempVarSolutionSpace {
 
 	protected void computeSolutionSpacePaginated(Query baseQuery, IRDFDataset dataset, int step, int stepLength,
 			final Set<Map<String, RDFNode>> solutions) {
-		if (stepLength <= 0) throw new IllegalArgumentException("Step length must be a positive integer.");
+		if (stepLength <= 0)
+			throw new IllegalArgumentException("Step length must be a positive integer.");
 		long before = System.currentTimeMillis();
 		Query paginatedQuery = QueryFactory.create(baseQuery);
 		paginatedQuery.setLimit(stepLength);
@@ -382,7 +408,8 @@ public class QueryTempVarSolutionSpace {
 				// unintentional)
 				for (QuerySolution sol : items) {
 					QuerySolutionMap solMap;
-					if (sol instanceof QuerySolutionMap) solMap = (QuerySolutionMap) sol;
+					if (sol instanceof QuerySolutionMap)
+						solMap = (QuerySolutionMap) sol;
 					else {
 						solMap = new QuerySolutionMap();
 						solMap.addAll(sol);
@@ -395,9 +422,11 @@ public class QueryTempVarSolutionSpace {
 					}
 				}
 				log.debug("Added {} new solutions (time={} ms)", added, System.currentTimeMillis() - before);
-			} else log.debug("No new solutions, stopping at size {}", solutions.size());
+			} else
+				log.debug("No new solutions, stopping at size {}", solutions.size());
 			doAgain &= items.size() == stepLength;
-			if (doAgain) computeSolutionSpacePaginated(baseQuery, dataset, step + 1, stepLength, solutions);
+			if (doAgain)
+				computeSolutionSpacePaginated(baseQuery, dataset, step + 1, stepLength, solutions);
 		} catch (SparqlException ex) {
 			log.error("Query failed.", ex);
 			error = true;

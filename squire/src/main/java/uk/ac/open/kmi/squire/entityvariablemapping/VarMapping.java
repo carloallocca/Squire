@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 /**
+ * A two-way map of transformations from variables to values.
  * 
  * @author alessandro
  *
